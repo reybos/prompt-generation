@@ -23,22 +23,7 @@ import { ChainValues } from '@langchain/core/utils/types';
 import fs from 'fs/promises';
 import path from 'path';
 import { getGenerationsDir } from '../server.js';
-
-// Helper to get and increment the file number
-async function getNextFileNumber(generationsDir: string): Promise<number> {
-    const trackerPath = path.join(generationsDir, 'number_tracker.json');
-    let number = 1;
-    try {
-        const data = await fs.readFile(trackerPath, 'utf-8');
-        const obj = JSON.parse(data);
-        if (typeof obj.number === 'number') number = obj.number;
-    } catch (e) {
-        // If file doesn't exist, start from 1
-    }
-    // Save incremented number
-    await fs.writeFile(trackerPath, JSON.stringify({ number: number + 1 }), 'utf-8');
-    return number;
-}
+import { getNextFileNumber } from '../utils/fileUtils.js';
 
 /**
  * Run the complete content generation pipeline

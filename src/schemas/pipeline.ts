@@ -112,3 +112,35 @@ export const ContentPackageSchema = z.object({
     titleDesc: TitleDescriptionSchema,
     hashtags: z.string(),
 });
+
+/**
+ * Song video generation schemas
+ */
+export const SongVideoSegmentSchema = z.object({
+    duration: z.number().refine(val => val === 6 || val === 10, {
+        message: "Duration must be 6 or 10 seconds"
+    }),
+    content: z.string(),
+});
+
+export const SongVideoInputItemSchema = z.object({
+    topic: z.string(),
+    segments: z.array(SongVideoSegmentSchema),
+});
+
+export const SongVideoInputSchema = z.array(SongVideoInputItemSchema);
+
+export const SongVideoSceneSchema = z.object({
+    scene: z.number(),
+    duration: z.number(),
+    image_prompt: z.string().optional(),
+    video_prompt: z.string(),
+});
+
+export const SongVideoOutputSchema = z.object({
+    scenes: z.array(SongVideoSceneSchema),
+    enhancedMedia: z.array(SongVideoSceneSchema),
+    title: z.string(),
+    description: z.string(),
+    hashtags: z.string(),
+});

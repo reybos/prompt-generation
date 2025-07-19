@@ -3,23 +3,34 @@
  * Exports all prompt templates
  */
 
-import { scriptPrompt } from './scriptPrompt.js';
-import { characterPrompt } from './characterPrompt.js';
-import { mediaPrompt } from './mediaPrompt.js';
-import { enhanceMediaPrompt, shortenVideoPrompt } from './enhanceMediaPrompt.js';
-import { narrationPrompt } from './narrationPrompt.js';
-import { musicPrompt } from './musicPrompt.js';
-import { titleDescPrompt } from './titleDescPrompt.js';
-import { hashtagsPrompt } from './hashtagsPrompt.js';
+import { narrationPrompt } from './video/narrationPrompt.js';
+import { enhanceMediaPrompt } from './video/enhanceMediaPrompt.js';
+import { mediaPrompt } from './video/mediaPrompt.js';
+import { scriptPrompt } from './video/scriptPrompt.js';
+import { titleDescPrompt } from './video/titleDescPrompt.js';
+import { musicPrompt } from './video/musicPrompt.js';
+import { hashtagsPrompt } from './video/hashtagsPrompt.js';
+import { characterPrompt } from './video/characterPrompt.js';
+import { shortenVideoPrompt } from './video/shortenVideoPrompt.js';
+import { songMediaPrompt } from './song/songMediaPrompt.js';
+import { songEnhanceMediaPrompt } from './song/songEnhanceMediaPrompt.js';
+import { songShortenPrompt } from './song/songShortenPrompt.js';
+import { songTitleDescPrompt } from './song/songTitleDescPrompt.js';
+import { songHashtagsPrompt } from './song/songHashtagsPrompt.js';
 
 export {
-    scriptPrompt,
-    characterPrompt,
-    mediaPrompt,
-    enhanceMediaPrompt,
     narrationPrompt,
-    musicPrompt,
+    enhanceMediaPrompt,
+    mediaPrompt,
+    scriptPrompt,
     titleDescPrompt,
+    musicPrompt,
     hashtagsPrompt,
+    characterPrompt,
     shortenVideoPrompt,
+    songMediaPrompt,
+    songEnhanceMediaPrompt,
+    songShortenPrompt,
+    songTitleDescPrompt,
+    songHashtagsPrompt,
 };

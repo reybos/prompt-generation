@@ -125,4 +125,40 @@ export interface PipelineOptions {
     emitLog?: (log: string, requestId: string | undefined) => void;
 }
 
+/**
+ * Song video generation input: array of song objects with topic and segments
+ */
+export interface SongVideoSegment {
+    duration: number; // Duration in seconds for this scene
+    content: string; // What's happening in this scene (lyrics, melody, etc.)
+}
+
+export interface SongVideoInputItem {
+    topic: string;
+    segments: SongVideoSegment[];
+}
+
+export type SongVideoInput = SongVideoInputItem[];
+
+/**
+ * Song video scene prompt (output of media/enhanced step)
+ */
+export interface SongVideoScene {
+    scene: number;
+    duration: number; // 6 or 10
+    image_prompt?: string; // only for scene 0
+    video_prompt: string;
+}
+
+/**
+ * Song video output (final result)
+ */
+export interface SongVideoOutput {
+    scenes: SongVideoScene[];
+    enhancedMedia: SongVideoScene[];
+    title: string;
+    description: string;
+    hashtags: string;
+}
+
 /* END GENAI */

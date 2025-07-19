@@ -36,3 +36,21 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 // Remove old GENERATIONS_DIR logic and use getGenerationsDir()
 const GENERATIONS_DIR: string | null = getGenerationsDir();
+
+/**
+ * Helper to get and increment the file number for generations
+ */
+export async function getNextFileNumber(generationsDir: string): Promise<number> {
+  const trackerPath = path.join(generationsDir, 'number_tracker.json');
+  let number = 1;
+  try {
+    const data = await fs.readFile(trackerPath, 'utf-8');
+    const obj = JSON.parse(data);
+    if (typeof obj.number === 'number') number = obj.number;
+  } catch (e) {
+    // If file doesn't exist, start from 1
+  }
+  // Save incremented number
+  await fs.writeFile(trackerPath, JSON.stringify({ number: number + 1 }), 'utf-8');
+  return number;
+}
