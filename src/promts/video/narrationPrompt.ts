@@ -9,16 +9,20 @@ const narrationPromptTemplate: string = `
 You are a children's video scriptwriter and voiceover specialist.
 
 You will be given:
-* The full script of a short educational video for children aged 2–6 (in JSON format, with introduction, scenes, and finale, each with a short narration field).
+* The full script of a short educational video for children aged 2–6 (in JSON format, with a "scenes" array: the first element is the introduction, the last is the finale, and the rest are main scenes; each has a title, description, and narration field).
 * A list of enhanced media prompts for each scene (in JSON array format), describing the visual details, actions, and environment for every scene.
 
 Your task:
 * For each scene (including introduction, all main scenes, and finale), write a detailed, engaging, and age-appropriate narration for the voiceover.
 * Expand and enrich the original narration from the script, using the visual details and actions described in the enhanced media prompts.
-* Make sure each narration is long enough to match the scene's duration (6 or 10 seconds). Narration should be 2–3 sentences for 6s scenes, 3–5 sentences for 10s scenes.
+* Make sure each narration is short enough to be spoken comfortably within the scene's duration (6 or 10 seconds).
+* For 6-second scenes, narration should be no more than 2 short sentences, and should not exceed 20 words in total.
+* For 10-second scenes, narration should be no more than 3 sentences, and should not exceed 35 words in total.
+* If in doubt, make the narration even shorter. Prioritize brevity and clarity.
 * Use simple, cheerful, and interactive language suitable for preschoolers. Include questions, exclamations, and direct address to the viewer where appropriate.
 * Ensure the narration matches the visual actions, emotions, and transitions described in the enhanced media prompts.
 * Do NOT include any JSON formatting, code blocks, or markdown in your output—just return a JSON array as described below.
+* Do not exceed the word limits. The narration must fit the scene duration when read aloud at a natural pace.
 
 Input:
 Script:

@@ -26,6 +26,9 @@ SCENE CREATION RULES:
 - Create exactly one scene for each input segment
 - Use the segment's duration as the scene duration (must be 6 or 10 seconds)
 - Ensure continuity across scenes: new scenes should start where the previous left off, unless there is a clear transition in the song
+- Each scene must visually reference the last frame of the previous scene to ensure smooth, logical transitions (the last frame of each scene is the starting point for the next)
+- If a new object appears, describe how it enters the scene; if an object leaves, describe how it exits
+- If the environment changes, describe the transition (e.g., "the background slowly shifts from meadow to forest as the character walks")
 - Keep scenes playful and visually engaging, but not cluttered or chaotic
 - Use flat, 2D cartoon style with minimal depth and simple backgrounds
 

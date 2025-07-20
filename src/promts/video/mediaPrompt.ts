@@ -9,22 +9,36 @@ const mediaPromptTemplate: string = `
 You are an assistant for creating educational videos for kids aged 2–6.
 You are provided with:
 * The script of the video, which includes:
- - An introduction section (greeting)
- - Multiple scenes (with title, description, and narration for each)
- - A finale section (question or call to action)
+ - A "scenes" array (the first element is the introduction, the last is the finale, and the rest are main scenes; each has a title, description, and narration)
  - A "topic" field that defines the main educational subject of the video
 * A detailed description of the main character (character sheet)
 
 Your task:
 * PAY SPECIAL ATTENTION to the "topic" field in the script. This is the main educational subject that should be clearly represented visually throughout the entire video.
 * Ensure that every scene's prompt explicitly incorporates visual elements related to this topic.
-* Create media prompts for ALL parts of the video:
- - The introduction (as Scene 0)
- - Each scene in the scenes array (as Scene 1, 2, 3, etc.)
- - The finale (as the final scene)
+* Create media prompts for ALL scenes in the array:
+ - The first scene (index 0) is the introduction
+ - The last scene is the finale
+ - The rest are main scenes
 * For Scene 0 (introduction) ONLY:
- - Create a clear, concise prompt for generating an image in Midjourney/DALL-E (in English, always using the main character description, describing the action, mood, color palette, cartoon style, vertical format).
- - Create a prompt for generating a short animation/video (in English, using the main character description, describing the action, characters, background, cartoonish and vibrant style, vertical format, child-friendly).
+ - Create a clear, concise prompt for generating an image in Midjourney/DALL-E (in English, always using the main character description, describing the main action, mood, color palette, cartoon style, 2D).
+ - Create a prompt for generating a short animation/video (in English, using the main character description, describing the main action, characters, background, cartoonish and vibrant style, 2D, child-friendly).
+
+* CRITICAL SIMPLICITY & STYLE REQUIREMENTS FOR ALL PROMPTS:
+ - Limit each scene to 1–3 main focus objects (e.g., sun, bus, banana) that are the clear center of attention
+ - Use a relatable, simple setting (e.g., a road, a park, a garden, a room) that a child can imagine
+ - Add only subtle, minimal background details (e.g., a few clouds, a hill, a couple of flowers) to create atmosphere, but do not let them compete with the main objects
+ - Only the main object(s) should have prominent movement; background elements should move gently or remain mostly still
+ - Avoid fantasy 'object parades' or scenes crowded with too many characters or items
+ - The composition must be minimalist and uncluttered, with few objects and lots of negative (empty) space
+ - Avoid busy or crowded scenes; keep details to a minimum and use simple shapes
+ - All visuals must be in a flat, 2D cartoon style (no 3D, no realistic shading, no volumetric lighting)
+ - Use simple shapes, bold outlines, and bright, solid colors
+ - Avoid photorealism, gradients, or complex textures
+ - All elements should look like classic flat cartoons or children’s book illustrations
+ - Environments and characters should be playful, stylized, and easy for children to understand
+ - The main character or main object should be the clear center of attention, with plenty of open space around, and the composition should remain uncluttered and easy for children to understand
+
 * IMPORTANT - SCENE DURATION:
  - Each scene must have a specific duration value
  - Only two duration values are allowed: 6 seconds or 10 seconds
@@ -32,27 +46,22 @@ Your task:
  - The duration will be included as a separate field in the JSON output, not in the prompt text
 * For all subsequent scenes (Scene 1, 2, 3, etc.) and the finale:
  - Create ONLY video prompts that continue directly from the last frame of the previous scene's video
- - Ensure perfect visual continuity between scenes by matching the character's position, environment, and all visual elements
+ - Ensure visual continuity between scenes by keeping the character's position, environment, and main visual elements consistent, but do not over-describe transitions or every small action.
+ - Discourage accumulation of objects and environmental evolution unless essential to the story or educational topic. Do not add new props or background elements unless required.
+ - Keep transitions gentle and simple; avoid complex or abrupt changes.
 
 IMPORTANT: 
 * DO NOT include any dialogue or specific phrases that characters say in your prompts. Also, DO NOT add any words, letters, numbers or symbols to display in prompt! This breaks video generation and causes text to appear in the video.
 * Instead, describe facial expressions, body language, and emotions to convey meaning.
-* Focus on visual elements, actions, and reactions rather than speech.
-* Include detailed facial expressions (e.g., "with a surprised expression," "looking curious with wide eyes," "smiling excitedly") to help convey the character's emotions.
-* Ensure the main character takes up NO MORE THAN 40% of the total image space. This allows for proper scene composition and prevents the character from dominating the frame.
-* Include rich, detailed descriptions of the environment and background in each prompt:
- - Describe the setting in detail (location, weather, time of day, lighting)
- - Include relevant props and environmental objects that support the educational theme
- - Mention landscape features, colors, and textures that create an immersive scene
- - Establish proper scale relationships between the character and environment elements
+* Focus on the main visual elements, actions, and reactions rather than speech or step-by-step transitions.
+* Include facial expressions (e.g., "with a surprised expression," "looking curious with wide eyes," "smiling excitedly") to help convey the character's emotions.
+* Include only a few, simple background or foreground elements to keep the scene uncluttered and easy to understand.
 
 * MAINTAIN SCENE-TO-SCENE CONTINUITY:
- - Ensure consistent environment and setting across all scenes
- - When a new object appears that wasn't in previous scenes, EXPLICITLY describe how it appears with a visible action (e.g., "Character reaches into their backpack and pulls out a book" rather than having the book just appear)
- - Track all objects, props, and environmental elements across scenes to maintain consistency
- - If an object is present in one scene but not in the next, explain what happened to it (e.g., "Character puts the book back into their backpack")
- - Consider the sequence of scenes as a continuous story where each scene logically follows from the previous one
- - Avoid "magical" appearances or disappearances of objects between scenes
+ - Ensure consistent environment and setting across all scenes, but do not accumulate objects or details unless essential
+ - If a new object is important to the scene, mention its presence and how it fits into the scene, but avoid describing every step of how the character interacts with objects unless it is essential to the story or educational topic.
+ - Consider the sequence of scenes as a continuous story where each scene logically follows from the previous one, but keep transitions simple and natural.
+ - Avoid "magical" appearances or disappearances of objects between scenes, but do not over-explain object handling.
  - The last frame of each video will be used as the reference for the starting point of the next video
 
 * CRITICAL - VIDEO GENERATION CONTEXT LIMITATIONS:
@@ -81,47 +90,55 @@ Use simple storylines and wording that are easy for children to understand. In e
 Example:
 Here is the script:
 {{
- "introduction": "Hi! I'm Bunny. Today we're learning colors.",
+ "topic": "Learning Colors",
  "scenes": [
- {{
- "title": "Red Butterfly",
- "description": "A red butterfly flies around Bunny",
- "narration": "Here's a red butterfly!"
- }},
- {{
- "title": "Green Frog",
- "description": "A green frog jumps near Bunny",
- "narration": "Here's a green frog!"
- }},
- {{
- "title": "Yellow Duckling",
- "description": "A yellow duckling waddles up to Bunny",
- "narration": "And this is a yellow duckling!"
- }}
- ],
- "finale": "Which color did you like the most?"
+   {{
+     "title": "Sunny the Bunny Greets",
+     "description": "A small, fluffy bunny appears in a colorful meadow and waves hello",
+     "narration": "Hi! I'm Sunny! Today we're learning colors!"
+   }},
+   {{
+     "title": "Red Butterfly",
+     "description": "A red butterfly flies around Sunny",
+     "narration": "Here's a red butterfly!"
+   }},
+   {{
+     "title": "Green Frog",
+     "description": "A green frog jumps near Sunny",
+     "narration": "Here's a green frog!"
+   }},
+   {{
+     "title": "Yellow Duckling",
+     "description": "A yellow duckling waddles up to Sunny",
+     "narration": "And this is a yellow duckling!"
+   }},
+   {{
+     "title": "Question for Kids",
+     "description": "Sunny smiles and points toward the viewer",
+     "narration": "Which color did you like the most?"
+   }}
+ ]
 }}
 
 Here is the detailed character description:
-Main character: Bunny
-Name: Sunny the Bunny
+Main character: Sunny the Bunny
 Sunny is a small, fluffy cartoon bunny with soft white fur, big blue eyes, and a tiny pink nose. She always wears a bright orange bow on her right ear and has a cheerful, friendly smile. Sunny loves to hop and wave at her friends. Her favorite accessory is a sky-blue backpack. She is curious, outgoing, and loves helping others. When she's happy, her ears wiggle and she giggles softly. Sunny lives in a cozy burrow in Flower Meadow and enjoys exploring new colors and playing with her animal friends.
 ChatGPT will generate:
 Scene 0 (Introduction):
-— Prompt for image: "Sunny the Bunny, a small, fluffy white cartoon bunny with a bright orange bow on her right ear and a sky-blue backpack, is waving and smiling on a colorful meadow. The bunny takes up only 40% of the image, allowing the vibrant meadow environment to be visible with wildflowers, butterflies, and a clear blue sky with fluffy clouds. The atmosphere is bright and cheerful, vertical format, cartoon style, child-friendly."
-— Prompt for video: "Sunny the Bunny, the small fluffy white bunny with a bright orange bow and blue backpack, hops onto a colorful meadow and waves hello, smiling joyfully with an enthusiastic expression. Her ears wiggle with excitement as she gestures toward colorful objects around her. Sunny takes up only 40% of the frame, with the rest showing a vibrant meadow with swaying flowers, butterflies fluttering about, and a clear blue sky with puffy clouds. The background is detailed yet child-friendly, vertical video, cartoon animation."
+— Prompt for image: "Sunny the Bunny, a small, fluffy white cartoon bunny with a bright orange bow on her right ear and a sky-blue backpack, is waving and smiling on a colorful meadow. The bunny is positioned in the lower left corner, with the rest of the scene showing a wide, open meadow with a single large flower and a puffy cloud in the sky. The composition is minimalist, uncluttered, and full of open space. Flat 2D cartoon style, bold outlines, solid colors, 2D."
+— Prompt for video: "Sunny the Bunny, the small fluffy white bunny with a bright orange bow and blue backpack, hops into the lower left corner of a wide, open meadow. She waves hello, smiling joyfully with an enthusiastic expression. The rest of the frame is mostly open space, with a single large flower and one puffy cloud in the background. The composition is uncluttered and simple, with minimal details and lots of empty space. Flat 2D cartoon style, bold outlines, solid colors, 2D."
 
 Scene 1:
-— Prompt for video: "Starting from the last frame of Scene 0 where Sunny the Bunny is standing in the colorful meadow with her ears wiggling with excitement. As she continues exploring the same meadow, a red cartoon butterfly suddenly flutters into view from a nearby flower and flies around her. Sunny, smiling and excited, follows the butterfly with her eyes, her ears perking up with interest. Sunny occupies only 30% of the frame, allowing the butterfly to be prominently featured. The environment shows the same detailed meadow with various wildflowers, tall grass swaying in the breeze, and sunlight filtering through trees creating dappled light patterns on the ground. Bright and vibrant, child-friendly, vertical video, cartoon animation."
+— Prompt for video: "Starting from the last frame of Scene 0 where Sunny the Bunny is in the lower left corner of the open meadow. A red cartoon butterfly flutters into view, staying small in the scene. Sunny looks up with excitement, her ears perking up. The background remains uncluttered, with only the single flower and cloud. The scene is simple, with minimal details and lots of open space. Flat 2D cartoon style, bold outlines, solid colors, 2D."
 
 Scene 2:
-— Prompt for video: "Starting from the last frame of Scene 1 where Sunny the Bunny is watching the red butterfly with excitement. As the butterfly flies away toward the water, Sunny follows it and approaches a small stream that runs through the same meadow. She kneels down by the water's edge, where a green frog suddenly jumps out from behind a lily pad. Sunny points at the frog with excitement, her eyes wide with wonder. Sunny takes up about 35% of the frame, with the frog and environment taking up the rest. The setting includes the same small stream with lily pads, cattails along the bank, dragonflies hovering above the water, and colorful wildflowers dotting the lush green grass. Bright and vibrant colors, child-friendly, vertical video, cartoon animation."
+— Prompt for video: "Starting from the last frame of Scene 1 where Sunny the Bunny is watching the red butterfly. A green frog hops into the scene, staying small in the scene. Sunny and the frog are both in the lower part of the frame, with the rest of the scene open and uncluttered. Only the single flower and cloud remain in the background. The composition is minimalist, with simple shapes and lots of empty space. Flat 2D cartoon style, bold outlines, solid colors, 2D."
 
 Scene 3:
-— Prompt for video: "Starting from the last frame of Scene 2 where Sunny the Bunny is pointing at the green frog by the stream. As the frog hops away into the reeds, Sunny follows the stream which opens up into a wider pond area. She sits on a smooth stone by the water's edge, still in the same meadow environment. From the water, a yellow duckling notices Sunny and waddles up to her across the shore. Sunny kneels down and gently pets the duckling with a gentle, nurturing expression. Together they occupy about 40% of the frame. The environment shows the same detailed pond area with water lilies, smooth stones along the shore, reeds swaying gently in the breeze, and a family of ducks swimming in the background. Sunlight sparkles on the water surface creating a peaceful atmosphere. Bright and vibrant colors, child-friendly, vertical video, cartoon animation."
+— Prompt for video: "Starting from the last frame of Scene 2 where Sunny the Bunny and the green frog are together. The frog hops away, and Sunny waves goodbye. The background remains the same: a wide, open meadow with a single flower and a puffy cloud. The scene is uncluttered, with minimal details and lots of open space. Flat 2D cartoon style, bold outlines, solid colors, 2D."
 
 Final Scene (Finale):
-— Prompt for video: "Starting from the last frame of Scene 3 where Sunny the Bunny is kneeling down petting the yellow duckling. As the duckling returns to its family in the pond, Sunny waves goodbye and walks to a small hill in the same meadow. The sun is now setting, casting a golden glow across the landscape. Sunny turns to face the viewer with a curious, questioning expression. She tilts her head to one side with raised eyebrows and a gentle smile, gesturing with her paw toward different colored objects. Sunny takes up about 35% of the frame, positioned slightly off-center. Small icons of red, green, and yellow objects appear around her, representing the butterfly, frog, and duckling from the previous scenes. Her ears perk up attentively. The background shows the same meadow now at sunset with a gradient sky of warm colors, silhouettes of trees in the distance, and gentle rolling hills. Golden light bathes the scene creating a warm, inviting atmosphere. Bright and vibrant colors, child-friendly, vertical video, cartoon animation."
+— Prompt for video: "Starting from the last frame of Scene 3 where Sunny the Bunny is waving goodbye. The sun sets in the background, casting a warm glow over the open meadow. Sunny is still small in the lower left corner, with the rest of the scene open and uncluttered. Only the single flower and cloud remain. The composition is minimalist, with simple shapes and lots of empty space. Flat 2D cartoon style, bold outlines, solid colors, 2D."
 ...
 
 Here is the script:
@@ -140,10 +157,7 @@ Return the result as a JSON array without any markdown formatting or code blocks
 {{ "scene": "final", "scene_type": "finale", "video_prompt": "...", "duration": 10 }}
 ]
 
-Important: Make sure to include media prompts for ALL parts of the video:
-1. The introduction (scene 0)
-2. All scenes from the scenes array (scenes 1, 2, 3, etc.)
-3. The finale (final scene)
+Important: Make sure to include media prompts for ALL scenes in the array (introduction, main scenes, and finale).
 
 CRITICAL: Each video_prompt and image_prompt in the output must be no more than 1500 characters in length.
 `;

@@ -885,13 +885,12 @@ function displaySavedGenerations(generations) {
     listGroup.className = 'list-group';
 
     generations.forEach(gen => {
-        // Example filename: 1-learning_colors-all_red.json
-        const match = gen.filename.match(/^([0-9]+)-([a-z0-9_]+)-([a-z0-9_]+)\.json$/);
-        let number = '', theme = '', topic = '';
+        // New filename format: 1-topic.json
+        const match = gen.filename.match(/^([0-9]+)-([a-z0-9_]+)\.json$/);
+        let number = '', topic = '';
         if (match) {
             number = match[1];
-            theme = match[2].replace(/_/g, ' ');
-            topic = match[3].replace(/_/g, ' ');
+            topic = match[2].replace(/_/g, ' ');
         } else {
             // fallback: show filename
             topic = gen.filename;
@@ -902,7 +901,7 @@ function displaySavedGenerations(generations) {
         button.dataset.filename = gen.filename;
         button.innerHTML = `
             <div>
-                <h6 class="mb-1">#${number} - ${theme}: ${topic}</h6>
+                <h6 class="mb-1">#${number} - ${topic}</h6>
             </div>
             <span class="badge bg-primary rounded-pill">View</span>
         `;
@@ -939,8 +938,8 @@ async function viewGeneration(filename, retryCount = 0, maxRetries = 5, retryDel
       </div>
     `;
 
-        // Extract number from filename (e.g. "123_theme_topic.json")
-        const numberMatch = filename.match(/^(\d+)_/);
+        // Extract number from filename (e.g. "123-topic.json")
+        const numberMatch = filename.match(/^(\d+)-/);
         const fileNumber = numberMatch ? numberMatch[1] : '';
         viewGenerationModalLabel.textContent = `Generation #${fileNumber}: ${filename}`;
 

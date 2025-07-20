@@ -55,7 +55,7 @@ async function runContentPipeline(
     const musicModel = 'anthropic/claude-3.7-sonnet';
     const musicTemperature = 0.6;
     const titleDescModel = 'anthropic/claude-3.7-sonnet';
-    const titleTemperature = 0.6;
+    const titleTemperature = 0.8;
     const hashtagsModel = 'anthropic/claude-3.7-sonnet';
     const hashtagsTemperature = 0.4;
 
@@ -88,7 +88,8 @@ async function runContentPipeline(
                         options.emitLog(`🎭 Generating character for "${topic}"...`, options.requestId);
                     }
                     // 2. Generate Character
-                    const introObject: any = (scriptJson as Record<string, any>).introduction || {};
+                    const scenesArr = (scriptJson as Record<string, any>).scenes || [];
+                    const introObject: any = scenesArr.length > 0 ? scenesArr[0] : {};
                     const characterChain: Runnable<ChainValues, string> = createChain(characterPrompt, { model: characterModel, temperature: characterTemperature });
                     const characterJson: string | Record<string, any> | null = await executePipelineStep(
                         'CHARACTER',
@@ -256,8 +257,8 @@ async function runContentPipeline(
                         safeTheme = safeTheme.replace(/^_+|_+$/g, '');
                         safeTopic = safeTopic.replace(/^_+|_+$/g, '');
                         const fileNumber = await getNextFileNumber(generationsDir);
-                        // Use dash between number, theme, and topic
-                        const filename = `${fileNumber}-${safeTheme}-${safeTopic}.json`;
+                        // Use dash between number and topic only (removed theme)
+                        const filename = `${fileNumber}-${safeTopic}.json`;
                         const cleanedFilename = filename.replace(/-+\.json$/, '.json');
                         const filePath = path.join(unprocessedDir, cleanedFilename);
                         await fs.writeFile(filePath, JSON.stringify(results[theme][topic], null, 2), 'utf-8');

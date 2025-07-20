@@ -25,6 +25,9 @@ For each prompt, enhance while maintaining a playful, flat, cartoonish style, bu
 
 Maintain strong visual continuity:
 Each new scene should continue visually from where the previous scene ended, unless a transition is clearly required by the song.
+- Each scene must visually reference the last frame of the previous scene to ensure smooth, logical transitions (the last frame of each scene is the starting point for the next)
+- If a new object appears, describe how it enters the scene; if an object leaves, describe how it exits
+- If the environment changes, describe the transition (e.g., "the background slowly shifts from meadow to forest as the character walks")
 If an object or motif leaves or enters the scene, describe how simply (e.g., "red circle moves to the left", "blue square appears").
 The environment must not change abruptly; transitions between scenes should be smooth and logical.
 If the previous scene contained objects that remain in the new scene, mention their presence and position.
