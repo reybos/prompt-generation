@@ -7,7 +7,6 @@ import { createChain } from '../chains/index.js';
 import { safeJsonParse, executePipelineStep } from '../utils/index.js';
 import {
     scriptPrompt,
-    characterPrompt,
     mediaPrompt,
     enhanceMediaPrompt,
     musicPrompt,
@@ -44,8 +43,6 @@ async function runContentPipeline(
     // Set models for each step here
     const scriptModel = 'openai/gpt-4o';
     const scriptTemperature = 0.55;
-    const characterModel = 'openai/gpt-4o';
-    const characterTemperature = 0.4;
     const mediaModel = 'anthropic/claude-3.7-sonnet';
     const mediaTemperature = 0.3;
     const enhanceMediaModel = 'anthropic/claude-3.7-sonnet';
@@ -85,51 +82,32 @@ async function runContentPipeline(
                     if (!scriptJson) { results[theme][topic] = null; break; }
 
                     if (options.emitLog && options.requestId) {
-                        options.emitLog(`🎭 Generating character for "${topic}"...`, options.requestId);
-                    }
-                    // 2. Generate Character
-                    const scenesArr = (scriptJson as Record<string, any>).scenes || [];
-                    const introObject: any = scenesArr.length > 0 ? scenesArr[0] : {};
-                    const characterChain: Runnable<ChainValues, string> = createChain(characterPrompt, { model: characterModel, temperature: characterTemperature });
-                    const characterJson: string | Record<string, any> | null = await executePipelineStep(
-                        'CHARACTER',
-                        characterChain,
-                        {
-                            title: introObject.title || '',
-                            description: introObject.description || '',
-                            narration: introObject.narration || '',
-                        }
-                    );
-                    if (!characterJson) { results[theme][topic] = null; break; }
-
-                    if (options.emitLog && options.requestId) {
                         options.emitLog(`🖼️ Generating media prompts for "${topic}"...`, options.requestId);
                     }
-                    // 3. Generate Media Prompts
+                    // 2. Generate Media Prompts
                     const scriptStr: string = JSON.stringify(scriptJson, null, 2);
-                    const characterStr: string = JSON.stringify(characterJson, null, 2);
                     const mediaChain: Runnable<ChainValues, string> = createChain(mediaPrompt, { model: mediaModel, temperature: mediaTemperature });
                     const mediaJson: string | Record<string, any> | null = await executePipelineStep(
                         'MEDIA PROMPTS',
                         mediaChain,
-                        { script: scriptStr, character: characterStr }
+                        { script: scriptStr }
                     );
                     if (!mediaJson) { results[theme][topic] = null; break; }
 
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`✨ Generating enhanced media prompts for "${topic}"...`, options.requestId);
                     }
-                    // 4. Enhance Media Prompts
+                    // 3. Enhance Media Prompts
                     const mediaStr: string = JSON.stringify(mediaJson, null, 2);
                     const enhanceMediaChain: Runnable<ChainValues, string> = createChain(enhanceMediaPrompt, { model: enhanceMediaModel, temperature: enhanceMediaTemperature });
                     const enhancedMediaJson: string | Record<string, any> | null = await executePipelineStep(
                         'ENHANCED MEDIA PROMPTS',
                         enhanceMediaChain,
-                        { media_prompts: mediaStr, character: characterStr, script: scriptStr }
+                        { media_prompts: mediaStr, script: scriptStr }
                     );
                     if (!enhancedMediaJson) { results[theme][topic] = null; break; }
 
-                    // 4a. Shorten video prompts if needed
+                    // 3a. Shorten video prompts if needed
                     let enhancedMediaObj = (typeof enhancedMediaJson === 'string') ? safeJsonParse(enhancedMediaJson, 'ENHANCED MEDIA') : enhancedMediaJson;
                     let needsShortening = false;
                     let shorteningFailed = false;
@@ -181,7 +159,7 @@ async function runContentPipeline(
                     // If we modified, use the updated object for downstream
                     const finalEnhancedMedia = needsShortening ? enhancedMediaObj : enhancedMediaJson;
 
-                    // 4b. Generate Detailed Narration for Voiceover
+                    // 3b. Generate Detailed Narration for Voiceover
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`🎤 Generating detailed narration for voiceover for "${topic}"...`, options.requestId);
                     }
@@ -196,7 +174,7 @@ async function runContentPipeline(
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`🎵 Generating music suggestions for "${topic}"...`, options.requestId);
                     }
-                    // 5. Generate Music Suggestions
+                    // 4. Generate Music Suggestions
                     const musicChain: Runnable<ChainValues, string> = createChain(musicPrompt, { model: musicModel, temperature: musicTemperature });
                     const musicJson: string | Record<string, any> | null = await executePipelineStep(
                         'MUSIC SUGGESTIONS',
@@ -210,13 +188,12 @@ async function runContentPipeline(
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`🏷️ Generating title and description for "${topic}"...`, options.requestId);
                     }
-                    // 6. Generate Title and Description
-                    const characterName: string = (characterJson as Record<string, any>)?.name || '';
+                    // 5. Generate Title and Description
                     const titleDescChain: Runnable<ChainValues, string> = createChain(titleDescPrompt, { model: titleDescModel, temperature: titleTemperature });
                     const titleDescJson: string | Record<string, any> | null = await executePipelineStep(
                         'TITLE AND DESCRIPTION',
                         titleDescChain,
-                        { topic, script: scriptStr, character: characterName },
+                        { topic, script: scriptStr },
                         true,
                         'title and description'
                     );
@@ -225,12 +202,12 @@ async function runContentPipeline(
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`#️⃣ Generating hashtags for "${topic}"...`, options.requestId);
                     }
-                    // 7. Generate Hashtags
+                    // 6. Generate Hashtags
                     const hashtagsChain: Runnable<ChainValues, string> = createChain(hashtagsPrompt, { model: hashtagsModel, temperature: hashtagsTemperature });
                     const hashtagsText: string | Record<string, any> | null = await executePipelineStep(
                         'HASHTAGS',
                         hashtagsChain,
-                        { topic, script: scriptStr, character: characterName, channel: channelName },
+                        { topic, script: scriptStr, channel: channelName },
                         false
                     );
                     if (!hashtagsText) { results[theme][topic] = null; break; }
@@ -238,7 +215,6 @@ async function runContentPipeline(
                     // Return all generated data as ContentPackage
                     results[theme][topic] = {
                         script: scriptJson as any,
-                        character: characterJson as any,
                         media: mediaJson as any,
                         enhancedMedia: finalEnhancedMedia as any,
                         narration: narrationJson as any,

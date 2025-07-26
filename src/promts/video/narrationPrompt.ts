@@ -14,12 +14,13 @@ You will be given:
 
 Your task:
 * For each scene (including introduction, all main scenes, and finale), write a detailed, engaging, and age-appropriate narration for the voiceover.
+* Narration must always be delivered as a neutral, third-person voiceover (from the author or narrator), not from the perspective of any character. Do not use phrases like "I'm...", "Let's...", or address the viewer as a character.
 * Expand and enrich the original narration from the script, using the visual details and actions described in the enhanced media prompts.
 * Make sure each narration is short enough to be spoken comfortably within the scene's duration (6 or 10 seconds).
 * For 6-second scenes, narration should be no more than 2 short sentences, and should not exceed 20 words in total.
 * For 10-second scenes, narration should be no more than 3 sentences, and should not exceed 35 words in total.
 * If in doubt, make the narration even shorter. Prioritize brevity and clarity.
-* Use simple, cheerful, and interactive language suitable for preschoolers. Include questions, exclamations, and direct address to the viewer where appropriate.
+* Use simple, cheerful, and interactive language suitable for preschoolers. Include questions, exclamations, and direct address to the viewer where appropriate, but always from the narrator's perspective.
 * Ensure the narration matches the visual actions, emotions, and transitions described in the enhanced media prompts.
 * Do NOT include any JSON formatting, code blocks, or markdown in your output—just return a JSON array as described below.
 * Do not exceed the word limits. The narration must fit the scene duration when read aloud at a natural pace.
@@ -39,10 +40,10 @@ Return a JSON array, one object per scene, with these fields:
 
 Example output:
 [
-  {{ "scene": 0, "scene_type": "introduction", "narration": "Hi, I'm Sunny the Bunny! Look at this beautiful meadow—there are so many colors to explore. Are you ready to go on an adventure with me?" }},
-  {{ "scene": 1, "scene_type": "main", "narration": "Wow, a red butterfly is flying all around me! Its wings are so bright and pretty. Can you spot something red where you are?" }},
-  {{ "scene": 2, "scene_type": "main", "narration": "Now, look—a green frog is jumping near the stream! He looks so happy to see us. Let's say hello to our new friend!" }},
-  {{ "scene": "final", "scene_type": "finale", "narration": "What a fun day we've had! Which color did you like the most? I can't wait to play and learn with you again soon!" }}
+  {{ "scene": 0, "scene_type": "introduction", "narration": "Welcome to a colorful adventure! Look at the beautiful meadow—so many colors to explore. Are you ready to discover something new today?" }},
+  {{ "scene": 1, "scene_type": "main", "narration": "A red butterfly flutters by, its wings shining brightly. Can you spot something red around you?" }},
+  {{ "scene": 2, "scene_type": "main", "narration": "Near the stream, a green frog jumps with joy. What other green things can you find?" }},
+  {{ "scene": "final", "scene_type": "finale", "narration": "What a fun day of learning! Which color was your favorite? See you next time for more adventures!" }}
 ]
 `;
 

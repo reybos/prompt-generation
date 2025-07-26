@@ -107,7 +107,6 @@ export interface TitleDescription {
  */
 export interface ContentPackage {
     script: Script;
-    character: Character;
     media: MediaPrompt;
     enhancedMedia: EnhancedMediaPrompt;
     narration?: any;
