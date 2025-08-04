@@ -8,7 +8,7 @@ import { PromptTemplate } from '@langchain/core/prompts';
 // --- Duration Requirements ---
 const DURATION_REQUIREMENTS = `
 * IMPORTANT - SCENE DURATION:
- - Each scene has a specific duration value (6 seconds)
+ - Each scene has a specific duration value (6 or 10 seconds)
  - DO NOT modify the duration values provided in the input
  - Preserve the exact duration value for each scene in your output
  - The duration is provided as a separate field in the JSON, not in the prompt text
@@ -72,7 +72,7 @@ const OUTPUT_FORMAT = `
 Return the improved prompts as a JSON array without any markdown formatting or code blocks. The JSON structure should include image_prompt only for Scene 0, video_prompt for all scenes, and duration for all scenes:
 [
  {{ "scene": 0, "scene_type": "introduction", "image_prompt": "...", "video_prompt": "...", "duration": 6 }},
- {{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 6 }},
+ {{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
  {{ "scene": 2, "scene_type": "main", "video_prompt": "...", "duration": 6 }},
  ...
  {{ "scene": "final", "scene_type": "finale", "video_prompt": "...", "duration": 6 }}

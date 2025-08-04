@@ -17,14 +17,14 @@ CRITICAL SIMPLICITY & STYLE REQUIREMENTS FOR ALL PROMPTS:
 - All visuals must be in a flat, 2D cartoon style (no 3D, no realistic shading, no volumetric lighting)
 - Use simple shapes, bold outlines, and bright, solid colors
 - Avoid photorealism, gradients, or complex textures
-- All elements should look like classic flat cartoons or children’s book illustrations
+- All elements should look like classic flat cartoons or children's book illustrations
 - Environments and characters should be playful, stylized, and easy for children to understand
 `;
 
 const DURATION_REQUIREMENTS = `
 IMPORTANT - SCENE DURATION:
 - Each scene must have a specific duration value
-- Only one duration value is allowed: 6 seconds
+- Only one duration value is allowed: 6 or 10 seconds
 - Assign an appropriate duration to each scene based on its complexity and content
 - The duration will be included as a separate field in the JSON output, not in the prompt text
 `;
@@ -54,13 +54,22 @@ const OUTPUT_FORMAT = `
 Return the result as a JSON array without any markdown formatting or code blocks:
 [
 {{ "scene": 0, "scene_type": "introduction", "image_prompt": "...", "video_prompt": "...", "duration": 6 }},
-{{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 6 }},
+{{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
 {{ "scene": 2, "scene_type": "main", "video_prompt": "...", "duration": 6 }},
 ...
 {{ "scene": "final", "scene_type": "finale", "video_prompt": "...", "duration": 6 }}
 ]
 
+Requirements:
+- The response must be **raw JSON only**, no Markdown, no backticks, no text before or after.
+- The output must be valid \`application/json\`.
+- All double quotes inside string values must be escaped as \`\\"\`.
+- Ensure there are no trailing commas or syntax errors.
+- The JSON must be ready for direct parsing by \`JSON.parse()\` with no preprocessing.
+
 Important: Make sure to include media prompts for ALL scenes in the array (introduction, main scenes, and finale).
+
+
 
 CRITICAL: Each video_prompt and image_prompt in the output must be no more than 1500 characters in length.
 `;
@@ -79,7 +88,7 @@ Your task:
  - The last scene is the finale
  - The rest are main scenes
 * For Scene 0 (introduction) ONLY:
- - Create a clear, concise prompt for generating an image in Midjourney/DALL-E (in English, describing the main action, mood, color palette, cartoon style, 2D).
+ - Create a clear, concise prompt for generating an image in Midjourney/DALL-E (in English, describing the main action, mood, color palette, cartoon style, 2D). The image_prompt should emphasize highly stylized, cartoon-like characters with exaggerated features, flat colors, and simple geometric shapes.
  - Create a prompt for generating a short animation/video (in English, describing the main action, characters, background, cartoonish and vibrant style, 2D, child-friendly).
 * For all subsequent scenes (Scene 1, 2, 3, etc.) and the finale:
  - Create ONLY video prompts
@@ -114,7 +123,7 @@ ${OUTPUT_FORMAT}
 `;
 
 const mediaPrompt: PromptTemplate = new PromptTemplate({
-    inputVariables: ["script"],
+    inputVariables: ["script", "scene_duration"],
     template: mediaPromptTemplate
 });
 

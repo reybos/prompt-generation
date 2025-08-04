@@ -11,39 +11,9 @@ Given the topic, script, and channel name, generate a list of 7–12 relevant ha
 
 Rules:
 * Mix general hashtags (format, age, genre) and unique, video-specific tags (topic, activity, objects, emotions, actions, interactive elements, and character names if present in the script).
-* Include hashtags related to the main activity (e.g., #countwithme, #colorhunt, #storytime, #singalong, #findtheobject, #guessgame, #animalfriends, #learnandplay, #funforkids, #rainbowfun, #bedtimestory, #readalong, etc.)
 * For each video, make the selection a bit different: don't repeat the same set in every video.
 * Use only lowercase English words, no special characters except #.
 * Separate hashtags with spaces.
-
-Examples:
-Input:
-Topic: Learning Colors: Red
-Script: Bunny Sunny finds lots of red things in the garden: a red apple, a red flower, a red ball.
-Channel name: minimarvels
-Output:
-#shorts #kidslearning #colorhunt #redobjects #findthered #preschoolfun #toddleractivities #minimarvels #sunnythebunny #learncolors
-
-Input:
-Topic: Counting to 3
-Script: Rizzo the Raccoon and friends find three apples and count them together.
-Channel name: minimarvels
-Output:
-#shorts #countwithme #numbersforkids #preschoolmath #toddlerfun #rizzotheraccoon #minimarvels #learnnumbers #kidsactivities #mathgames
-
-Input:
-Topic: Animals of the Forest
-Script: Kids meet different forest animals and learn their sounds.
-Channel name: minimarvels
-Output:
-#shorts #animalfriends #forestanimals #learnanimalsounds #natureforkids #preschooladventures #kidsdiscover #minimarvels #wildlifelearning
-
-Input:
-Topic: Shapes Around Us
-Script: Robot Dotty finds shapes in the playground: circle, square, triangle.
-Channel name: minimarvels
-Output:
-#shorts #shapegame #playandlearn #dottytherobot #geometryforkids #preschoollearning #findtheshape #minimarvels #kidschallenge
 
 Input:
 * Topic: {topic}
