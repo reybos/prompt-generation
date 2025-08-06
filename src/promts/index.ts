@@ -17,6 +17,7 @@ import { songEnhanceMediaPrompt } from './song/songEnhanceMediaPrompt.js';
 import { songShortenPrompt } from './song/songShortenPrompt.js';
 import { songTitleDescPrompt } from './song/songTitleDescPrompt.js';
 import { songHashtagsPrompt } from './song/songHashtagsPrompt.js';
+import { imagePrompt, songWithAnimalsTitleDescPrompt, songWithAnimalsHashtagsPrompt, songWithAnimalsVideoPrompt } from './song_with_animals/index.js';
 
 export {
     narrationPrompt,
@@ -33,4 +34,8 @@ export {
     songShortenPrompt,
     songTitleDescPrompt,
     songHashtagsPrompt,
+    imagePrompt,
+    songWithAnimalsTitleDescPrompt,
+    songWithAnimalsHashtagsPrompt,
+    songWithAnimalsVideoPrompt,
 };

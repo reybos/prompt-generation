@@ -118,6 +118,29 @@ app.post('/api/generate-song-video', async (req, res) => {
     }
 });
 
+// API endpoint for song with animals generation
+app.post('/api/generate-song-with-animals', async (req, res) => {
+    try {
+        const { input } = req.body;
+        if (!input) {
+            return res.status(400).json({ error: 'Missing input' });
+        }
+        // Generate a unique requestId for this generation
+        const requestId = crypto.randomUUID();
+        // Start song with animals generation in the background (do not await)
+        processSongWithAnimalsGeneration(input, requestId)
+            .catch(err => {
+                console.error('Error in background song with animals generation:', err);
+                emitLog('Error during song with animals generation: ' + (err?.message || err), requestId);
+            });
+        // Respond immediately so frontend can connect to SSE
+        return res.json({ success: true, requestId });
+    } catch (err) {
+        console.error('Error in /api/generate-song-with-animals:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // SSE endpoint for streaming logs to the frontend
 app.get('/api/logs/stream', (req, res) => {
     const { requestId } = req.query;
@@ -235,6 +258,31 @@ async function processSongVideoGeneration(
         emitLog(`Song video generation complete. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during song video generation: ${err}`;
+        logs.push(error);
+        emitLog(error, requestId);
+    }
+}
+
+// Song with animals generation processor
+async function processSongWithAnimalsGeneration(
+    input: any,
+    requestId: string
+): Promise<void> {
+    const logs: string[] = [];
+
+    // Wait for SSE client to connect
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log(`[SONG WITH ANIMALS] Checking for active connection for requestId: ${requestId}`);
+    console.log(`[SONG WITH ANIMALS] Active connections: ${activeConnections.size}`);
+
+    try {
+        const result = await import('./pipeline/songWithAnimalsPipeline.js').then(m => m.runSongWithAnimalsPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId) }));
+        
+        // Emit completion message with results
+        emitLog(`Song with animals generation complete. Generated ${result.length} song(s).`, requestId);
+    } catch (err) {
+        const error = `Error during song with animals generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }

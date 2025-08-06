@@ -55,6 +55,16 @@ const songErrorAlert = document.getElementById('songErrorAlert');
 const songErrorMessage = document.getElementById('songErrorMessage');
 const songLoadingSpinner = document.getElementById('songLoadingSpinner');
 
+// DOM Elements for Song with Animals Generation
+const songWithAnimalsLink = document.getElementById('song-with-animals-link');
+const songWithAnimalsContent = document.getElementById('song-with-animals-content');
+const songWithAnimalsForm = document.getElementById('songWithAnimalsForm');
+const songWithAnimalsResultsSection = document.getElementById('songWithAnimalsResultsSection');
+const songWithAnimalsResultsContainer = document.getElementById('songWithAnimalsResultsContainer');
+const songWithAnimalsErrorAlert = document.getElementById('songWithAnimalsErrorAlert');
+const songWithAnimalsErrorMessage = document.getElementById('songWithAnimalsErrorMessage');
+const songWithAnimalsLoadingSpinner = document.getElementById('songWithAnimalsLoadingSpinner');
+
 // Bootstrap instances
 const toast = new window.bootstrap.Toast(copyToast);
 const saveModal = new window.bootstrap.Modal(saveGenerationModal);
@@ -64,6 +74,7 @@ const viewModal = new window.bootstrap.Modal(viewGenerationModal);
 let generatedContent = null;
 let logEventSource = null;
 let songVideoLogEventSource = null;
+let songWithAnimalsLogEventSource = null;
 
 /**
  * Connect to the SSE log stream for song video generation
@@ -135,6 +146,75 @@ function connectToSongVideoLogStream(requestId) {
 }
 
 /**
+ * Connect to the SSE log stream for song with animals generation
+ * @param {string} requestId - The request ID to filter logs by
+ */
+function connectToSongWithAnimalsLogStream(requestId) {
+    // Close any existing connection
+    if (songWithAnimalsLogEventSource) {
+        console.log('Closing existing song with animals log stream connection');
+        songWithAnimalsLogEventSource.close();
+    }
+
+    console.log(`Connecting to song with animals log stream with requestId: ${requestId}`);
+
+    // Create a new EventSource connection
+    songWithAnimalsLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
+
+    // Handle connection open
+    songWithAnimalsLogEventSource.onopen = () => {
+        console.log('Song with animals log stream connection established');
+        if (songWithAnimalsResultsContainer && songWithAnimalsResultsContainer.querySelector('.list-group')) {
+            songWithAnimalsResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
+        }
+    };
+
+    // Handle incoming messages
+    songWithAnimalsLogEventSource.onmessage = (event) => {
+        console.log('Received song with animals SSE message:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'connected') {
+                console.log('Connected to song with animals log stream');
+            } else if (data.type === 'log') {
+                console.log('Received song with animals log:', data.log, 'timestamp:', data.timestamp);
+                if (songWithAnimalsResultsContainer && songWithAnimalsResultsContainer.querySelector('.alert-info')) {
+                    songWithAnimalsResultsContainer.innerHTML = '';
+                }
+                appendSongWithAnimalsLogEntry(data.log, data.timestamp);
+            } else if (data.type === 'complete') {
+                console.log('Song with animals generation complete:', data.message);
+                appendSongWithAnimalsLogEntry(data.message, data.timestamp);
+                if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+                setTimeout(() => {
+                    if (songWithAnimalsLogEventSource) {
+                        console.log('Closing song with animals log stream connection after completion');
+                        songWithAnimalsLogEventSource.close();
+                        songWithAnimalsLogEventSource = null;
+                    }
+                }, 1000);
+            } else {
+                console.warn('Unknown song with animals message type:', data.type);
+            }
+        } catch (error) {
+            console.error('Error parsing song with animals SSE message:', error, event.data);
+        }
+    };
+
+    // Handle errors
+    songWithAnimalsLogEventSource.onerror = (error) => {
+        console.error('Song with animals log stream error:', error);
+        if (songWithAnimalsResultsContainer && songWithAnimalsResultsContainer.querySelector('.alert-info')) {
+            songWithAnimalsResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
+        }
+        if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+        songWithAnimalsLogEventSource.close();
+        songWithAnimalsLogEventSource = null;
+    };
+}
+
+/**
  * Append a single log entry to the song video display
  * @param {string} log - The log message to append
  * @param {string} timestamp - The timestamp for the log entry
@@ -180,6 +260,54 @@ function appendSongVideoLogEntry(log, timestamp) {
 
     // Scroll to the bottom
     songResultsContainer.scrollTop = songResultsContainer.scrollHeight;
+}
+
+/**
+ * Append a single log entry to the song with animals display
+ * @param {string} log - The log message to append
+ * @param {string} timestamp - The timestamp for the log entry
+ */
+function appendSongWithAnimalsLogEntry(log, timestamp) {
+    // Skip logs containing "Using default channel name"
+    if (log && log.includes("Using default channel name")) {
+        console.log('Skipping channel name log:', log);
+        return;
+    }
+
+    console.log('Appending song with animals log entry:', log, 'timestamp:', timestamp);
+
+    // Make sure the results section is visible
+    if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.remove('d-none');
+
+    // Create the log item list if it doesn't exist yet
+    if (!songWithAnimalsResultsContainer.querySelector('.list-group')) {
+        console.log('Creating new song with animals log list');
+        const logList = document.createElement('div');
+        logList.className = 'list-group';
+        songWithAnimalsResultsContainer.appendChild(logList);
+    }
+
+    const logList = songWithAnimalsResultsContainer.querySelector('.list-group');
+
+    // Create and append the new log entry
+    const logItem = document.createElement('div');
+    logItem.className = 'list-group-item';
+
+    if (timestamp) {
+        logItem.innerHTML = `
+      <div class="d-flex justify-content-between align-items-start">
+        <p class="mb-0">${log}</p>
+        <small class="text-muted ms-2">${timestamp}</small>
+      </div>
+    `;
+    } else {
+        logItem.innerHTML = `<p class="mb-0">${log}</p>`;
+    }
+
+    logList.appendChild(logItem);
+
+    // Scroll to the bottom
+    songWithAnimalsResultsContainer.scrollTop = songWithAnimalsResultsContainer.scrollHeight;
 }
 
 /**
@@ -515,11 +643,15 @@ if (savedLink) {
         savedLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (songGenerateLink) songGenerateLink.classList.remove('active');
+        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (songGenerateContent) songGenerateContent.classList.add('d-none');
         if (songResultsSection) songResultsSection.classList.add('d-none');
         if (songErrorAlert) songErrorAlert.classList.add('d-none');
+        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
+        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
+        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
         if (savedContent) savedContent.classList.remove('d-none');
         if (typeof loadSavedGenerations === 'function') {
             loadSavedGenerations();
@@ -533,11 +665,15 @@ if (generateLink) {
         generateLink.classList.add('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songGenerateLink) songGenerateLink.classList.remove('active');
+        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (generateContent) generateContent.classList.remove('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (songGenerateContent) songGenerateContent.classList.add('d-none');
         if (songResultsSection) songResultsSection.classList.add('d-none');
         if (songErrorAlert) songErrorAlert.classList.add('d-none');
+        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
+        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
+        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
         if (resultsSection) resultsSection.classList.remove('d-none');
     });
 }
@@ -548,12 +684,35 @@ if (songGenerateLink) {
         songGenerateLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
+        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (songGenerateContent) songGenerateContent.classList.remove('d-none');
         if (songResultsSection) songResultsSection.classList.add('d-none');
         if (songErrorAlert) songErrorAlert.classList.add('d-none');
+        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
+        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
+        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+    });
+}
+
+if (songWithAnimalsLink) {
+    songWithAnimalsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        songWithAnimalsLink.classList.add('active');
+        if (generateLink) generateLink.classList.remove('active');
+        if (savedLink) savedLink.classList.remove('active');
+        if (songGenerateLink) songGenerateLink.classList.remove('active');
+        if (generateContent) generateContent.classList.add('d-none');
+        if (savedContent) savedContent.classList.add('d-none');
+        if (resultsSection) resultsSection.classList.add('d-none');
+        if (songGenerateContent) songGenerateContent.classList.add('d-none');
+        if (songResultsSection) songResultsSection.classList.add('d-none');
+        if (songErrorAlert) songErrorAlert.classList.add('d-none');
+        if (songWithAnimalsContent) songWithAnimalsContent.classList.remove('d-none');
+        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
+        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
     });
 }
 
@@ -638,6 +797,74 @@ if (songGenerationForm) {
                 songErrorAlert.classList.remove('d-none');
             }
             if (songLoadingSpinner) songLoadingSpinner.classList.add('d-none');
+        }
+    });
+}
+
+if (songWithAnimalsForm) {
+    songWithAnimalsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
+        if (songWithAnimalsResultsContainer) songWithAnimalsResultsContainer.innerHTML = '';
+        if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.remove('d-none');
+        const lyricsElem = document.getElementById('songWithAnimalsLyrics');
+        const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
+        if (!lyricsText) {
+            if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
+                songWithAnimalsErrorMessage.textContent = 'Please enter song lyrics';
+                songWithAnimalsErrorAlert.classList.remove('d-none');
+            }
+            if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+            return;
+        }
+        
+        // Create the input format expected by the pipeline
+        const songs = [{ lyrics: lyricsText }];
+        
+        try {
+            const response = await fetch('/api/generate-song-with-animals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ input: songs })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'An error occurred during song with animals generation');
+            }
+
+            if (data.requestId) {
+                console.log('Received requestId for song with animals generation:', data.requestId);
+
+                // Clear previous results and show results section
+                if (songWithAnimalsResultsContainer) songWithAnimalsResultsContainer.innerHTML = '';
+                if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.remove('d-none');
+                
+                // Connect to log stream for song with animals generation
+                connectToSongWithAnimalsLogStream(data.requestId);
+
+                // Add initial message
+                appendSongWithAnimalsLogEntry('Song with animals generation started: You will see logs in real-time as they are generated.');
+
+                // Fallback message if logs are delayed
+                setTimeout(() => {
+                    const logGroup = songWithAnimalsResultsContainer.querySelector('.list-group');
+                    if (!logGroup || logGroup.children.length <= 1) {
+                        console.log('No logs received via SSE yet for song with animals, adding a status message');
+                        appendSongWithAnimalsLogEntry('Waiting for logs. This may take a moment.');
+                    }
+                }, 3000);
+            } else {
+                throw new Error('No requestId received from server');
+            }
+        } catch (error) {
+            if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
+                songWithAnimalsErrorMessage.textContent = error.message || 'An error occurred during song with animals generation';
+                songWithAnimalsErrorAlert.classList.remove('d-none');
+            }
+            if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
         }
     });
 }

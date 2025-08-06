@@ -161,3 +161,40 @@ export interface SongVideoOutput {
 }
 
 /* END GENAI */
+
+/**
+ * Song with animals input: array of song objects with lyrics
+ */
+export interface SongWithAnimalsInputItem {
+    lyrics: string; // The song lyrics as a string
+}
+
+export type SongWithAnimalsInput = SongWithAnimalsInputItem[];
+
+/**
+ * Song with animals image prompt (output of image generation step)
+ */
+export interface SongWithAnimalsImagePrompt {
+    line: string;
+    prompt: string;
+}
+
+/**
+ * Song with animals video prompt (output of video generation step)
+ */
+export interface SongWithAnimalsVideoPrompt {
+    line: string;
+    video_prompt: string;
+}
+
+/**
+ * Song with animals output (final result)
+ */
+export interface SongWithAnimalsOutput {
+    global_style: string;
+    prompts: SongWithAnimalsImagePrompt[];
+    video_prompts: SongWithAnimalsVideoPrompt[];
+    title: string;
+    description: string;
+    hashtags: string;
+}
