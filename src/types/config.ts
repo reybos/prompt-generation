@@ -29,6 +29,9 @@ export interface EnvironmentConfig {
     defaultTopic: string;
     generationsDirPath?: string;
     generationsDirRelativePath?: string;
+    
+    // Song segmentation configuration
+    songSegmentLines: number;
 
     // fal.ai configuration
     falApiKey: string | undefined;

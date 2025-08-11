@@ -6,10 +6,10 @@
 import {PromptTemplate} from '@langchain/core/prompts';
 
 const songWithAnimalsHashtagsPromptTemplate: string = `You are a social media expert specializing in children's content.
-Input is a 4-line segment from a children's song with animal characters ({songLyrics}).
+Input is a segment from a children's song with animal characters ({songLyrics}).
 
 TASK
-Generate relevant hashtags for a children's video featuring this 4-line song segment.
+Generate relevant hashtags for a children's video featuring this song segment.
 
 HASHTAG REQUIREMENTS:
 • Include educational hashtags (learning, kids, education)
@@ -17,7 +17,7 @@ HASHTAG REQUIREMENTS:
 • Include fun/entertainment hashtags
 • Include age-appropriate hashtags (toddlers, preschoolers)
 • Include parent-focused hashtags
-• 3-6 hashtags total
+• 7-10 hashtags total
 • Mix of popular and niche hashtags
 • No spaces in hashtags, use camelCase if needed
 

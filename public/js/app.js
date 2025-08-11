@@ -45,16 +45,6 @@ const resultsSection = document.getElementById('resultsSection');
 const generationForm = document.getElementById('generationForm');
 const copyToast = document.getElementById('copyToast');
 
-// DOM Elements for Song Generation
-const songGenerateLink = document.getElementById('song-generate-link');
-const songGenerateContent = document.getElementById('song-generate-content');
-const songGenerationForm = document.getElementById('songGenerationForm');
-const songResultsSection = document.getElementById('songResultsSection');
-const songResultsContainer = document.getElementById('songResultsContainer');
-const songErrorAlert = document.getElementById('songErrorAlert');
-const songErrorMessage = document.getElementById('songErrorMessage');
-const songLoadingSpinner = document.getElementById('songLoadingSpinner');
-
 // DOM Elements for Song with Animals Generation
 const songWithAnimalsLink = document.getElementById('song-with-animals-link');
 const songWithAnimalsContent = document.getElementById('song-with-animals-content');
@@ -73,77 +63,7 @@ const viewModal = new window.bootstrap.Modal(viewGenerationModal);
 // Store the generated content and active SSE connection
 let generatedContent = null;
 let logEventSource = null;
-let songVideoLogEventSource = null;
 let songWithAnimalsLogEventSource = null;
-
-/**
- * Connect to the SSE log stream for song video generation
- * @param {string} requestId - The request ID to filter logs by
- */
-function connectToSongVideoLogStream(requestId) {
-    // Close any existing connection
-    if (songVideoLogEventSource) {
-        console.log('Closing existing song video log stream connection');
-        songVideoLogEventSource.close();
-    }
-
-    console.log(`Connecting to song video log stream with requestId: ${requestId}`);
-
-    // Create a new EventSource connection
-    songVideoLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
-
-    // Handle connection open
-    songVideoLogEventSource.onopen = () => {
-        console.log('Song video log stream connection established');
-        if (songResultsContainer && songResultsContainer.querySelector('.list-group')) {
-            songResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
-        }
-    };
-
-    // Handle incoming messages
-    songVideoLogEventSource.onmessage = (event) => {
-        console.log('Received song video SSE message:', event.data);
-        try {
-            const data = JSON.parse(event.data);
-
-            if (data.type === 'connected') {
-                console.log('Connected to song video log stream');
-            } else if (data.type === 'log') {
-                console.log('Received song video log:', data.log, 'timestamp:', data.timestamp);
-                if (songResultsContainer && songResultsContainer.querySelector('.alert-info')) {
-                    songResultsContainer.innerHTML = '';
-                }
-                appendSongVideoLogEntry(data.log, data.timestamp);
-            } else if (data.type === 'complete') {
-                console.log('Song video generation complete:', data.message);
-                appendSongVideoLogEntry(data.message, data.timestamp);
-                if (songLoadingSpinner) songLoadingSpinner.classList.add('d-none');
-                setTimeout(() => {
-                    if (songVideoLogEventSource) {
-                        console.log('Closing song video log stream connection after completion');
-                        songVideoLogEventSource.close();
-                        songVideoLogEventSource = null;
-                    }
-                }, 1000);
-            } else {
-                console.warn('Unknown song video message type:', data.type);
-            }
-        } catch (error) {
-            console.error('Error parsing song video SSE message:', error, event.data);
-        }
-    };
-
-    // Handle errors
-    songVideoLogEventSource.onerror = (error) => {
-        console.error('Song video log stream error:', error);
-        if (songResultsContainer && songResultsContainer.querySelector('.alert-info')) {
-            songResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
-        }
-        if (songLoadingSpinner) songLoadingSpinner.classList.add('d-none');
-        songVideoLogEventSource.close();
-        songVideoLogEventSource = null;
-    };
-}
 
 /**
  * Connect to the SSE log stream for song with animals generation
@@ -212,54 +132,6 @@ function connectToSongWithAnimalsLogStream(requestId) {
         songWithAnimalsLogEventSource.close();
         songWithAnimalsLogEventSource = null;
     };
-}
-
-/**
- * Append a single log entry to the song video display
- * @param {string} log - The log message to append
- * @param {string} timestamp - The timestamp for the log entry
- */
-function appendSongVideoLogEntry(log, timestamp) {
-    // Skip logs containing "Using default channel name"
-    if (log && log.includes("Using default channel name")) {
-        console.log('Skipping channel name log:', log);
-        return;
-    }
-
-    console.log('Appending song video log entry:', log, 'timestamp:', timestamp);
-
-    // Make sure the results section is visible
-    if (songResultsSection) songResultsSection.classList.remove('d-none');
-
-    // Create the log item list if it doesn't exist yet
-    if (!songResultsContainer.querySelector('.list-group')) {
-        console.log('Creating new song video log list');
-        const logList = document.createElement('div');
-        logList.className = 'list-group';
-        songResultsContainer.appendChild(logList);
-    }
-
-    const logList = songResultsContainer.querySelector('.list-group');
-
-    // Create and append the new log entry
-    const logItem = document.createElement('div');
-    logItem.className = 'list-group-item';
-
-    if (timestamp) {
-        logItem.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start">
-        <p class="mb-0">${log}</p>
-        <small class="text-muted ms-2">${timestamp}</small>
-      </div>
-    `;
-    } else {
-        logItem.innerHTML = `<p class="mb-0">${log}</p>`;
-    }
-
-    logList.appendChild(logItem);
-
-    // Scroll to the bottom
-    songResultsContainer.scrollTop = songResultsContainer.scrollHeight;
 }
 
 /**
@@ -642,13 +514,9 @@ if (savedLink) {
         e.preventDefault();
         savedLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
-        if (songGenerateLink) songGenerateLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
-        if (songGenerateContent) songGenerateContent.classList.add('d-none');
-        if (songResultsSection) songResultsSection.classList.add('d-none');
-        if (songErrorAlert) songErrorAlert.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
@@ -664,33 +532,10 @@ if (generateLink) {
         e.preventDefault();
         generateLink.classList.add('active');
         if (savedLink) savedLink.classList.remove('active');
-        if (songGenerateLink) songGenerateLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (generateContent) generateContent.classList.remove('d-none');
         if (savedContent) savedContent.classList.add('d-none');
-        if (songGenerateContent) songGenerateContent.classList.add('d-none');
-        if (songResultsSection) songResultsSection.classList.add('d-none');
-        if (songErrorAlert) songErrorAlert.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
         if (resultsSection) resultsSection.classList.remove('d-none');
-    });
-}
-
-if (songGenerateLink) {
-    songGenerateLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        songGenerateLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
-        if (savedLink) savedLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
-        if (savedContent) savedContent.classList.add('d-none');
-        if (resultsSection) resultsSection.classList.add('d-none');
-        if (songGenerateContent) songGenerateContent.classList.remove('d-none');
-        if (songResultsSection) songResultsSection.classList.add('d-none');
-        if (songErrorAlert) songErrorAlert.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
@@ -703,101 +548,12 @@ if (songWithAnimalsLink) {
         songWithAnimalsLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
-        if (songGenerateLink) songGenerateLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
-        if (songGenerateContent) songGenerateContent.classList.add('d-none');
-        if (songResultsSection) songResultsSection.classList.add('d-none');
-        if (songErrorAlert) songErrorAlert.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.remove('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
-    });
-}
-
-if (songGenerationForm) {
-    songGenerationForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (songErrorAlert) songErrorAlert.classList.add('d-none');
-        if (songResultsSection) songResultsSection.classList.add('d-none');
-        if (songResultsContainer) songResultsContainer.innerHTML = '';
-        if (songLoadingSpinner) songLoadingSpinner.classList.remove('d-none');
-        const songsJsonElem = document.getElementById('songsJson');
-        const songsJsonText = songsJsonElem && songsJsonElem.value ? songsJsonElem.value.trim() : '';
-        if (!songsJsonText) {
-            if (songErrorAlert && songErrorMessage) {
-                songErrorMessage.textContent = 'Please enter Songs JSON';
-                songErrorAlert.classList.remove('d-none');
-            }
-            if (songLoadingSpinner) songLoadingSpinner.classList.add('d-none');
-            return;
-        }
-        let songs;
-        try {
-            songs = JSON.parse(songsJsonText);
-            if (!Array.isArray(songs)) throw new Error('Songs must be an array of objects');
-            for (const song of songs) {
-                if (typeof song !== 'object' || Array.isArray(song)) throw new Error('Each song must be an object');
-                if (typeof song.topic !== 'string' || !song.topic.trim()) throw new Error('Each song must have a non-empty topic');
-                if (!Array.isArray(song.segments)) throw new Error('Each song must have a segments array');
-                for (const seg of song.segments) {
-                    if (typeof seg !== 'object' || !seg.duration || !seg.content) throw new Error('Each segment must have "duration" and "content"');
-                    if (typeof seg.duration !== 'number' || (seg.duration !== 6 && seg.duration !== 10)) throw new Error('Each segment duration must be 6 or 10 seconds');
-                }
-            }
-        } catch (error) {
-            if (songErrorAlert && songErrorMessage) {
-                songErrorMessage.textContent = `Invalid JSON format: ${error.message}`;
-                songErrorAlert.classList.remove('d-none');
-            }
-            if (songLoadingSpinner) songLoadingSpinner.classList.add('d-none');
-            return;
-        }
-        try {
-            const response = await fetch('/api/generate-song-video', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ input: songs })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || 'An error occurred during song video generation');
-            }
-
-            if (data.requestId) {
-                console.log('Received requestId for song video generation:', data.requestId);
-
-                // Clear previous results and show results section
-                if (songResultsContainer) songResultsContainer.innerHTML = '';
-                if (songResultsSection) songResultsSection.classList.remove('d-none');
-                
-                // Connect to log stream for song video generation
-                connectToSongVideoLogStream(data.requestId);
-
-                // Add initial message
-                appendSongVideoLogEntry('Song video generation started: You will see logs in real-time as they are generated.');
-
-                // Fallback message if logs are delayed
-                setTimeout(() => {
-                    const logGroup = songResultsContainer.querySelector('.list-group');
-                    if (!logGroup || logGroup.children.length <= 1) {
-                        console.log('No logs received via SSE yet for song video, adding a status message');
-                        appendSongVideoLogEntry('Waiting for logs. This may take a moment.');
-                    }
-                }, 3000);
-            } else {
-                throw new Error('No requestId received from server');
-            }
-        } catch (error) {
-            if (songErrorAlert && songErrorMessage) {
-                songErrorMessage.textContent = error.message || 'An error occurred during song video generation';
-                songErrorAlert.classList.remove('d-none');
-            }
-            if (songLoadingSpinner) songLoadingSpinner.classList.add('d-none');
-        }
     });
 }
 

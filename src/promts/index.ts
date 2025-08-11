@@ -12,11 +12,6 @@ import { musicPrompt } from './video/musicPrompt.js';
 import { hashtagsPrompt } from './video/hashtagsPrompt.js';
 import { characterPrompt } from './video/characterPrompt.js';
 import { shortenVideoPrompt } from './video/shortenVideoPrompt.js';
-import { songMediaPrompt } from './song/songMediaPrompt.js';
-import { songEnhanceMediaPrompt } from './song/songEnhanceMediaPrompt.js';
-import { songShortenPrompt } from './song/songShortenPrompt.js';
-import { songTitleDescPrompt } from './song/songTitleDescPrompt.js';
-import { songHashtagsPrompt } from './song/songHashtagsPrompt.js';
 import { imagePrompt, songWithAnimalsTitleDescPrompt, songWithAnimalsHashtagsPrompt, songWithAnimalsVideoPrompt } from './song_with_animals/index.js';
 
 export {
@@ -29,11 +24,6 @@ export {
     hashtagsPrompt,
     characterPrompt,
     shortenVideoPrompt,
-    songMediaPrompt,
-    songEnhanceMediaPrompt,
-    songShortenPrompt,
-    songTitleDescPrompt,
-    songHashtagsPrompt,
     imagePrompt,
     songWithAnimalsTitleDescPrompt,
     songWithAnimalsHashtagsPrompt,

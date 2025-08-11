@@ -95,29 +95,6 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-// API endpoint for song video generation
-app.post('/api/generate-song-video', async (req, res) => {
-    try {
-        const { input } = req.body;
-        if (!input) {
-            return res.status(400).json({ error: 'Missing input' });
-        }
-        // Generate a unique requestId for this generation
-        const requestId = crypto.randomUUID();
-        // Start song video generation in the background (do not await)
-        processSongVideoGeneration(input, requestId)
-            .catch(err => {
-                console.error('Error in background song video generation:', err);
-                emitLog('Error during song video generation: ' + (err?.message || err), requestId);
-            });
-        // Respond immediately so frontend can connect to SSE
-        return res.json({ success: true, requestId });
-    } catch (err) {
-        console.error('Error in /api/generate-song-video:', err);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 // API endpoint for song with animals generation
 app.post('/api/generate-song-with-animals', async (req, res) => {
     try {
@@ -235,31 +212,6 @@ async function processContentGeneration(
                 emitLog(error, requestId);
             }
         }
-    }
-}
-
-// Song video generation processor
-async function processSongVideoGeneration(
-    input: any,
-    requestId: string
-): Promise<void> {
-    const logs: string[] = [];
-
-    // Wait for SSE client to connect
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log(`[SONG VIDEO] Checking for active connection for requestId: ${requestId}`);
-    console.log(`[SONG VIDEO] Active connections: ${activeConnections.size}`);
-
-    try {
-        const result = await import('./pipeline/songVideoPipeline.js').then(m => m.runSongVideoPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId) }));
-        
-        // Emit completion message with results
-        emitLog(`Song video generation complete. Generated ${result.length} song(s).`, requestId);
-    } catch (err) {
-        const error = `Error during song video generation: ${err}`;
-        logs.push(error);
-        emitLog(error, requestId);
     }
 }
 

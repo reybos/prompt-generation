@@ -35,6 +35,9 @@ const environmentConfig: EnvironmentConfig = {
     // File storage configuration
     generationsDirPath: process.env.GENERATIONS_DIR_PATH,
     generationsDirRelativePath: process.env.GENERATIONS_DIR_RELATIVE_PATH,
+    
+    // Song segmentation configuration
+    songSegmentLines: parseInt(process.env.SONG_SEGMENT_LINES || '3'),
 
     // fal.ai configuration
     falApiKey: process.env.FAL_KEY,
@@ -47,6 +50,14 @@ if (process.env.GENERATIONS_DIR_PATH) {
     console.log(`Using custom generations directory path: ${process.env.GENERATIONS_DIR_PATH}`);
 } else if (process.env.GENERATIONS_DIR_RELATIVE_PATH) {
     console.log(`Using relative generations directory path: ${process.env.GENERATIONS_DIR_RELATIVE_PATH}`);
+}
+
+// Log song segmentation configuration
+console.log(`Using song segmentation: ${environmentConfig.songSegmentLines} lines per segment`);
+
+// Validate song segmentation value
+if (environmentConfig.songSegmentLines < 1 || environmentConfig.songSegmentLines > 10) {
+    console.warn(`Warning: SONG_SEGMENT_LINES value ${environmentConfig.songSegmentLines} is outside recommended range (1-10)`);
 }
 
 // Validate environment configuration

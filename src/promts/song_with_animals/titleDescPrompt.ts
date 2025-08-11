@@ -6,10 +6,10 @@
 import {PromptTemplate} from '@langchain/core/prompts';
 
 const songWithAnimalsTitleDescPromptTemplate: string = `You are a social media expert specializing in children's content.
-Input is a 4-line segment from a children's song with animal characters ({songLyrics}).
+Input is a segment from a children's song with animal characters ({songLyrics}).
 
 TASK
-Generate an engaging title and description for a children's video featuring this 4-line song segment.
+Generate an engaging title and description for a children's video featuring this song segment.
 
 TITLE REQUIREMENTS:
 • Catchy and fun for children

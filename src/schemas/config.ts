@@ -14,6 +14,8 @@ export const EnvironmentConfigSchema = z.object({
     defaultTopic: z.string(),
     generationsDirPath: z.string().optional(),
     generationsDirRelativePath: z.string().optional(),
+    // Song segmentation configuration
+    songSegmentLines: z.number().int().min(1).max(10),
     // fal.ai configuration
     falApiKey: z.string().optional(),
     falDefaultModel: z.string(),

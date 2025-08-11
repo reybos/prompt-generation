@@ -1,12 +1,15 @@
 // Test script for song with animals pipeline
-// This script tests the logic for splitting songs into 4-line segments
+// This script tests the logic for splitting songs into configurable line segments
 
 function splitLyricsIntoSegments(lyrics) {
   const lines = lyrics.split('\n').filter(line => line.trim().length > 0);
   const segments = [];
+  const segmentLines = parseInt(process.env.SONG_SEGMENT_LINES || '3'); // Use environment variable or default to 3
   
-  for (let i = 0; i < lines.length; i += 4) {
-    const segment = lines.slice(i, i + 4).join('\n');
+  console.log(`\n🔧 Using ${segmentLines} lines per segment (from SONG_SEGMENT_LINES=${process.env.SONG_SEGMENT_LINES || '3'})`);
+  
+  for (let i = 0; i < lines.length; i += segmentLines) {
+    const segment = lines.slice(i, i + segmentLines).join('\n');
     if (segment.trim()) {
       segments.push(segment);
     }

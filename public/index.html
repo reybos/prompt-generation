@@ -40,11 +40,6 @@
                             <i class="fas fa-magic"></i> Long Video by theme
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="song-generate-link" href="#">
-                            <i class="fas fa-music"></i> Long Video by Song
-                        </a>
-                    </li>
                     
                     <!-- Mini Discoveries Group -->
                     <li class="nav-item">
@@ -194,74 +189,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Song Video Generation Content -->
-            <div id="song-generate-content" class="content-section d-none">
-                <div class="row">
-                    <div class="col-md-8 mx-auto">
-                        <div class="card shadow">
-                            <div class="card-header bg-info text-white">
-                                <h2 class="h4 mb-0">Long songs for the Mini Marvels channel</h2>
-                            </div>
-                            <div class="card-body">
-                                <form id="songGenerationForm">
-                                    <div class="mb-3">
-                                        <label for="songsJson" class="form-label">
-                                            Songs JSON <span class="text-danger">*</span>
-                                        </label>
-                                        <textarea
-                                                class="form-control"
-                                                id="songsJson"
-                                                rows="10"
-                                                required
-                                        >[
-  {
-    "topic": "all red",
-    "segments": [
-      { "duration": 6, "content": "only melody" },
-      { "duration": 10, "content": "Look around, what do you see?\nRed things everywhere for you and me!\nApples red and fire trucks too\nRed is such a fun color, woo!" }
-    ]
-  }
-]</textarea>
-                                        <div class="form-text">
-                                            Enter an array of songs. Each song is an object with a <code>topic</code> and <code>segments</code> (array of segments with <code>duration</code> in seconds and <code>content</code>). Duration must be 6 or 10 seconds.
-                                        </div>
-                                    </div>
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-info" id="songGenerateBtn">
-                                            <span
-                                                class="spinner-border spinner-border-sm d-none"
-                                                id="songLoadingSpinner"
-                                                role="status"
-                                                aria-hidden="true"
-                                            ></span>
-                                            Generate Song Video
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-5 d-none" id="songResultsSection">
-                    <div class="col-12">
-                        <div class="card shadow">
-                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                                <h2 class="h4 mb-0">Song Video Generation Results</h2>
-                            </div>
-                            <div class="card-body">
-                                <div id="songResultsContainer" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
-                                    <!-- Song results will be dynamically added here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="alert alert-danger mt-4 d-none" id="songErrorAlert" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <span id="songErrorMessage"></span>
                 </div>
             </div>
 

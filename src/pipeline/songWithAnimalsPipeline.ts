@@ -3,22 +3,24 @@ import { PipelineOptions } from '../types/pipeline.js';
 import { imagePrompt, songWithAnimalsTitleDescPrompt, songWithAnimalsHashtagsPrompt, songWithAnimalsVideoPrompt } from '../promts/index.js';
 import { createChain } from '../chains/index.js';
 import { executePipelineStep, safeJsonParse } from '../utils/index.js';
+import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { getGenerationsDir } from '../server.js';
 import { getNextFileNumber } from '../utils/fileUtils.js';
 
 /**
- * Split lyrics into 4-line segments
+ * Split lyrics into segments based on configuration
  * @param lyrics - Full song lyrics
- * @returns Array of 4-line segments
+ * @returns Array of segments with configured number of lines
  */
 function splitLyricsIntoSegments(lyrics: string): string[] {
   const lines = lyrics.split('\n').filter(line => line.trim().length > 0);
   const segments: string[] = [];
+  const segmentLines = config.songSegmentLines;
   
-  for (let i = 0; i < lines.length; i += 4) {
-    const segment = lines.slice(i, i + 4).join('\n');
+  for (let i = 0; i < lines.length; i += segmentLines) {
+    const segment = lines.slice(i, i + segmentLines).join('\n');
     if (segment.trim()) {
       segments.push(segment);
     }
