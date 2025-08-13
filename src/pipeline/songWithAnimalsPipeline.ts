@@ -1,6 +1,7 @@
 import { SongWithAnimalsInput, SongWithAnimalsOutput, SongWithAnimalsImagePrompt, SongWithAnimalsVideoPrompt } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
-import { imagePrompt, songWithAnimalsVideoPrompt } from '../promts/index.js';
+import { createImagePromptWithStyle } from '../promts/song_with_animals/imagePrompt.js';
+import { songWithAnimalsVideoPrompt } from '../promts/index.js';
 import { createChain } from '../chains/index.js';
 import { executePipelineStep, safeJsonParse } from '../utils/index.js';
 import config from '../config/index.js';
@@ -40,6 +41,7 @@ export async function runSongWithAnimalsPipeline(
   options: PipelineOptions = {}
 ): Promise<SongWithAnimalsOutput[]> {
   const results: SongWithAnimalsOutput[] = [];
+  const selectedStyle = options.style || 'default'; // Используем переданный стиль или дефолтный
 
   for (const song of input) {
     const lyrics = song.lyrics;
@@ -58,14 +60,18 @@ export async function runSongWithAnimalsPipeline(
       attempt++;
       try {
         if (options.emitLog && options.requestId) {
-          options.emitLog(`🎵 Generating song with animals... (Attempt ${attempt})`, options.requestId);
+          options.emitLog(`🎵 Generating song with animals with ${selectedStyle} style... (Attempt ${attempt})`, options.requestId);
         }
 
-        // Step 1: Generate image prompts
+        // Step 1: Generate image prompts with selected style
         if (options.emitLog && options.requestId) {
-          options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments...`, options.requestId);
+          options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments using ${selectedStyle} style...`, options.requestId);
         }
-        const imageChain = createChain(imagePrompt, { model: imageModel, temperature: imageTemperature });
+        
+        // Создаем промт с выбранным стилем
+        const imagePromptWithStyle = createImagePromptWithStyle(selectedStyle);
+        const imageChain = createChain(imagePromptWithStyle, { model: imageModel, temperature: imageTemperature });
+        
         const imageJson: string | Record<string, any> | null = await executePipelineStep(
           'SONG WITH ANIMALS IMAGE PROMPTS',
           imageChain,
@@ -113,6 +119,9 @@ export async function runSongWithAnimalsPipeline(
           );
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'SONG WITH ANIMALS VIDEO PROMPTS') : videoJson;
+            if (options.emitLog && options.requestId) {
+              options.emitLog(`🔍 Video prompts parsing: ${JSON.stringify(parsed).substring(0, 200)}...`, options.requestId);
+            }
             if (parsed && typeof parsed === 'object' && Array.isArray(parsed.video_prompts)) {
               const rawVideoPrompts = parsed.video_prompts;
               // Add indices to video prompts (starting from 0)
@@ -120,6 +129,13 @@ export async function runSongWithAnimalsPipeline(
                 ...prompt,
                 index: index
               }));
+              if (options.emitLog && options.requestId) {
+                options.emitLog(`✅ Successfully parsed ${videoPrompts.length} video prompts`, options.requestId);
+              }
+            } else {
+              if (options.emitLog && options.requestId) {
+                options.emitLog(`⚠️ Video prompts parsing issue: parsed.video_prompts is not an array`, options.requestId);
+              }
             }
           } else {
             if (options.emitLog && options.requestId) {
@@ -158,7 +174,7 @@ export async function runSongWithAnimalsPipeline(
           await fs.writeFile(filePath, JSON.stringify(songResult, null, 2), 'utf-8');
         }
         if (options.emitLog && options.requestId) {
-          options.emitLog(`✅ Generation finished`, options.requestId);
+          options.emitLog(`✅ Generation finished with ${selectedStyle} style`, options.requestId);
         }
         finished = true;
       } catch (error) {

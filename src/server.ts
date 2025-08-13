@@ -13,18 +13,6 @@ import crypto from 'crypto';
 import { runContentPipeline } from './pipeline/index.js';
 // Utility functions removed: not implemented
 import config from './config/index.js';
-
-import { z } from 'zod';
-import {
-    GenerateContentRequestSchema,
-    SaveGenerationRequestSchema
-} from './schemas/api.js';
-
-import {
-    GenerateContentRequest,
-    SaveGenerationRequest,
-    GenerationMetadata
-} from './types/api.js';
 import { ContentPackage, PipelineOptions } from './types/pipeline.js';
 
 // Get the directory name using ES modules approach
@@ -98,14 +86,17 @@ app.post('/api/generate', async (req, res) => {
 // API endpoint for song with animals generation
 app.post('/api/generate-song-with-animals', async (req, res) => {
     try {
-        const { input } = req.body;
+        const { input, style } = req.body;
         if (!input) {
             return res.status(400).json({ error: 'Missing input' });
+        }
+        if (!style) {
+            return res.status(400).json({ error: 'Missing style parameter' });
         }
         // Generate a unique requestId for this generation
         const requestId = crypto.randomUUID();
         // Start song with animals generation in the background (do not await)
-        processSongWithAnimalsGeneration(input, requestId)
+        processSongWithAnimalsGeneration(input, requestId, style)
             .catch(err => {
                 console.error('Error in background song with animals generation:', err);
                 emitLog('Error during song with animals generation: ' + (err?.message || err), requestId);
@@ -241,7 +232,8 @@ async function processContentGeneration(
 // Song with animals generation processor
 async function processSongWithAnimalsGeneration(
     input: any,
-    requestId: string
+    requestId: string,
+    style: string
 ): Promise<void> {
     const logs: string[] = [];
 
@@ -252,10 +244,10 @@ async function processSongWithAnimalsGeneration(
     console.log(`[SONG WITH ANIMALS] Active connections: ${activeConnections.size}`);
 
     try {
-        const result = await import('./pipeline/songWithAnimalsPipeline.js').then(m => m.runSongWithAnimalsPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId) }));
+        const result = await import('./pipeline/songWithAnimalsPipeline.js').then(m => m.runSongWithAnimalsPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId), style }));
         
         // Emit completion message with results
-        emitLog(`Song with animals generation complete. Generated ${result.length} song(s).`, requestId);
+        emitLog(`Song with animals generation complete with ${style} style. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during song with animals generation: ${err}`;
         logs.push(error);

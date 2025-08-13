@@ -122,6 +122,7 @@ export interface PipelineOptions {
     channelName?: string;
     requestId?: string;
     emitLog?: (log: string, requestId: string | undefined) => void;
+    style?: string; // Visual style for song with animals pipeline
 }
 
 /* END GENAI */

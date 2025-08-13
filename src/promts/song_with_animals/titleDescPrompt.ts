@@ -55,14 +55,14 @@ Generate an engaging title and description for a children's video featuring this
 TITLE REQUIREMENTS:
 • Catchy and fun for children
 • Include the main animal character(s) from this segment
-• 5-8 words maximum
+• 12-14 words maximum
 • Use action words when possible
 
 DESCRIPTION REQUIREMENTS:
 • Engaging for parents and children
 • Mention the educational value (learning animal sounds, etc.)
 • Include emojis to make it fun
-• 2-3 sentences maximum
+• 3-4 sentences maximum
 • Highlight the interactive/entertaining aspects of this segment
 
 OUTPUT (JSON, no extra commentary):

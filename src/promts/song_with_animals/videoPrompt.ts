@@ -20,15 +20,6 @@ Create a video prompt for each character that includes:
 7. NO speech bubbles, signs, labels, or any textual elements
 8. NO sound effects, sound waves, or any visual representations of sounds
 
-SAFETY AND CONTENT GUIDELINES FOR KIDS' SHORTS:
-- This is children's content designed for kids' shorts platforms
-- Avoid any controversial, dangerous, or inappropriate words, themes, or actions
-- No references to violence, weapons, scary elements, or adult content
-- Keep all content wholesome, educational, and family-friendly
-- Focus on positive emotions, learning, and entertainment
-- Ensure all movements and actions are safe and non-threatening
-- Use gentle, calming, and educational language in descriptions
-
 For each character, suggest a different type of movement based on their nature:
 - Dogs: wagging tail, bouncing, scratching, playful jumping, or running in place
 - Cats: stretching, purring motion, tail swishing, gentle walking, or pouncing

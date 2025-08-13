@@ -3,16 +3,13 @@
  * Exports all prompt templates for song with animals pipeline
  */
 
-import { imagePrompt } from './imagePrompt.js';
-import { songWithAnimalsTitleDescPrompt, songWithAnimalsTitleDescPromptLyricsOnly } from './titleDescPrompt.js';
-import { songWithAnimalsHashtagsPrompt, songWithAnimalsHashtagsPromptLyricsOnly } from './hashtagsPrompt.js';
-import { songWithAnimalsVideoPrompt } from './videoPrompt.js';
-
-export {
-    imagePrompt,
-    songWithAnimalsTitleDescPrompt,
-    songWithAnimalsTitleDescPromptLyricsOnly,
-    songWithAnimalsHashtagsPrompt,
-    songWithAnimalsHashtagsPromptLyricsOnly,
-    songWithAnimalsVideoPrompt,
-}; 
+export { imagePrompt, createImagePromptWithStyle } from './imagePrompt.js';
+export { 
+    songWithAnimalsTitleDescPrompt, 
+    songWithAnimalsTitleDescPromptLyricsOnly 
+} from './titleDescPrompt.js';
+export { 
+    songWithAnimalsHashtagsPrompt, 
+    songWithAnimalsHashtagsPromptLyricsOnly 
+} from './hashtagsPrompt.js';
+export { songWithAnimalsVideoPrompt } from './videoPrompt.js'; 

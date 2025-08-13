@@ -49,6 +49,7 @@ const copyToast = document.getElementById('copyToast');
 const songWithAnimalsLink = document.getElementById('song-with-animals-link');
 const songWithAnimalsContent = document.getElementById('song-with-animals-content');
 const songWithAnimalsForm = document.getElementById('songWithAnimalsForm');
+const songWithAnimalsStyle = document.getElementById('songWithAnimalsStyle');
 const songWithAnimalsResultsSection = document.getElementById('songWithAnimalsResultsSection');
 const songWithAnimalsResultsContainer = document.getElementById('songWithAnimalsResultsContainer');
 const songWithAnimalsErrorAlert = document.getElementById('songWithAnimalsErrorAlert');
@@ -691,11 +692,24 @@ if (songWithAnimalsForm) {
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsResultsContainer) songWithAnimalsResultsContainer.innerHTML = '';
         if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.remove('d-none');
+        
         const lyricsElem = document.getElementById('songWithAnimalsLyrics');
+        const styleElem = document.getElementById('songWithAnimalsStyle');
         const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
+        const selectedStyle = styleElem && styleElem.value ? styleElem.value : '';
+        
         if (!lyricsText) {
             if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
                 songWithAnimalsErrorMessage.textContent = 'Please enter song lyrics';
+                songWithAnimalsErrorAlert.classList.remove('d-none');
+            }
+            if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+            return;
+        }
+        
+        if (!selectedStyle) {
+            if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
+                songWithAnimalsErrorMessage.textContent = 'Please select a visual style';
                 songWithAnimalsErrorAlert.classList.remove('d-none');
             }
             if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
@@ -709,7 +723,10 @@ if (songWithAnimalsForm) {
             const response = await fetch('/api/generate-song-with-animals', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ input: songs })
+                body: JSON.stringify({ 
+                    input: songs,
+                    style: selectedStyle
+                })
             });
 
             const data = await response.json();
@@ -729,7 +746,7 @@ if (songWithAnimalsForm) {
                 connectToSongWithAnimalsLogStream(data.requestId);
 
                 // Add initial message
-                appendSongWithAnimalsLogEntry('Song with animals generation started: You will see logs in real-time as they are generated.');
+                appendSongWithAnimalsLogEntry(`Song with animals generation started with ${selectedStyle} style: You will see logs in real-time as they are generated.`);
 
                 // Fallback message if logs are delayed
                 setTimeout(() => {
