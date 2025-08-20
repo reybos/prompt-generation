@@ -40,6 +40,11 @@
                             <i class="fas fa-magic"></i> Long Video by theme
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="short-study-link" href="#">
+                            <i class="fas fa-graduation-cap"></i> Short Study Topics
+                        </a>
+                    </li>
                     
                     <!-- MINI DISCOVERIES Group -->
                     <li class="nav-item">
@@ -276,6 +281,71 @@ The robot fish says, "Blub, blub, blub!"</textarea>
                 <div class="alert alert-danger mt-4 d-none" id="songWithAnimalsErrorAlert" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <span id="songWithAnimalsErrorMessage"></span>
+                </div>
+                
+
+            </div>
+
+            <!-- Short Study Generation Content -->
+            <div id="short-study-content" class="content-section d-none">
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card shadow">
+                            <div class="card-header bg-info text-white">
+                                <h2 class="h4 mb-0">Mini Marvels - Short Study Topics Generator</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="shortStudyForm">
+                                    <div class="mb-3">
+                                        <label for="shortStudyTopics" class="form-label">
+                                            Study Topics <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea
+                                                class="form-control"
+                                                id="shortStudyTopics"
+                                                rows="10"
+                                                required
+                                        >Mathematics: Addition and subtraction with colorful objects
+English: Learning colors through fun activities
+Science: Forest animals and their habitats
+Geography: Basic map reading for kids</textarea>
+                                        <div class="form-text">
+                                            Enter educational topics for children. Each line will become a separate topic to process.
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-info" id="shortStudyGenerateBtn">
+                                            <span
+                                                class="spinner-border spinner-border-sm d-none"
+                                                id="shortStudyLoadingSpinner"
+                                                role="status"
+                                                aria-hidden="true"
+                                            ></span>
+                                            Generate Short Study Topics
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5 d-none" id="shortStudyResultsSection">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header bg-success text-white d-flex justify-between align-items-center">
+                                <h2 class="h4 mb-0">Short Study Topics Generation Results</h2>
+                            </div>
+                            <div class="card-body">
+                                <div id="shortStudyResultsContainer" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Short study results will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-4 d-none" id="shortStudyErrorAlert" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="shortStudyErrorMessage"></span>
                 </div>
                 
 

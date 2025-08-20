@@ -205,3 +205,42 @@ export interface HorrorOutput {
     hashtags: string[];
 }
 
+/**
+ * Short study input: array of topic objects with description
+ */
+export interface ShortStudyInputItem {
+    topic: string; // The study topic description as a string
+}
+
+export type ShortStudyInput = ShortStudyInputItem[];
+
+/**
+ * Short study image prompt (output of image generation step)
+ */
+export interface ShortStudyImagePrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    prompt: string;
+}
+
+/**
+ * Short study video prompt (output of video generation step)
+ */
+export interface ShortStudyVideoPrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    video_prompt: string;
+}
+
+/**
+ * Short study output (final result)
+ */
+export interface ShortStudyOutput {
+    global_style: string;
+    prompts: ShortStudyImagePrompt[];
+    video_prompts: ShortStudyVideoPrompt[];
+    titles: string[];
+    descriptions: string[];
+    hashtags: string[];
+}
+

@@ -132,6 +132,29 @@ app.post('/api/generate-horror', async (req, res) => {
     }
 });
 
+// API endpoint for short study generation
+app.post('/api/generate-short-study', async (req, res) => {
+    try {
+        const { input } = req.body;
+        if (!input) {
+            return res.status(400).json({ error: 'Missing input' });
+        }
+        // Generate a unique requestId for this generation
+        const requestId = crypto.randomUUID();
+        // Start short study generation in the background (do not await)
+        processShortStudyGeneration(input, requestId)
+            .catch(err => {
+                console.error('Error in background short study generation:', err);
+                emitLog('Error during short study generation: ' + (err?.message || err), requestId);
+            });
+        // Respond immediately so frontend can connect to SSE
+        return res.json({ success: true, requestId });
+    } catch (err) {
+        console.error('Error in /api/generate-short-study:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 // API endpoint for getting available styles
@@ -289,6 +312,31 @@ async function processHorrorGeneration(
         emitLog(`Horror animals generation complete. Generated ${result.length} animal(s).`, requestId);
     } catch (err) {
         const error = `Error during horror generation: ${err}`;
+        logs.push(error);
+        emitLog(error, requestId);
+    }
+}
+
+// Short study generation processor
+async function processShortStudyGeneration(
+    input: any,
+    requestId: string
+): Promise<void> {
+    const logs: string[] = [];
+
+    // Wait for SSE client to connect
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log(`[SHORT STUDY] Checking for active connection for requestId: ${requestId}`);
+    console.log(`[SHORT STUDY] Active connections: ${activeConnections.size}`);
+
+    try {
+        const result = await import('./pipeline/shortStudyPipeline.js').then(m => m.runShortStudyPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId) }));
+        
+        // Emit completion message with results
+        emitLog(`Short study topics generation complete. Generated ${result.length} topic(s).`, requestId);
+    } catch (err) {
+        const error = `Error during short study generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }

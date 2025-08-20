@@ -14,6 +14,7 @@ import { characterPrompt } from './video/characterPrompt.js';
 import { shortenVideoPrompt } from './video/shortenVideoPrompt.js';
 import { imagePrompt, songWithAnimalsTitleDescPrompt, songWithAnimalsTitleDescPromptLyricsOnly, songWithAnimalsHashtagsPrompt, songWithAnimalsHashtagsPromptLyricsOnly, songWithAnimalsVideoPrompt, logVideoPrompt, logTitleDescPrompt } from './song_with_animals/index.js';
 import { horrorVideoPrompt, horrorTitleDescPrompt, horrorHashtagsPrompt } from './horror/index.js';
+import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt } from './short_study/index.js';
 
 export {
     narrationPrompt,
@@ -36,4 +37,7 @@ export {
     horrorVideoPrompt,
     horrorTitleDescPrompt,
     horrorHashtagsPrompt,
+    shortStudyVideoPrompt,
+    shortStudyTitleDescPrompt,
+    shortStudyHashtagsPrompt,
 };

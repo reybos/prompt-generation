@@ -66,6 +66,16 @@ const horrorErrorAlert = document.getElementById('horrorErrorAlert');
 const horrorErrorMessage = document.getElementById('horrorErrorMessage');
 const horrorLoadingSpinner = document.getElementById('horrorLoadingSpinner');
 
+// DOM Elements for Short Study Generation
+const shortStudyLink = document.getElementById('short-study-link');
+const shortStudyContent = document.getElementById('short-study-content');
+const shortStudyForm = document.getElementById('shortStudyForm');
+const shortStudyResultsSection = document.getElementById('shortStudyResultsSection');
+const shortStudyResultsContainer = document.getElementById('shortStudyResultsContainer');
+const shortStudyErrorAlert = document.getElementById('shortStudyErrorAlert');
+const shortStudyErrorMessage = document.getElementById('shortStudyErrorMessage');
+const shortStudyLoadingSpinner = document.getElementById('shortStudyLoadingSpinner');
+
 
 
 // Bootstrap instances
@@ -78,6 +88,7 @@ let generatedContent = null;
 let logEventSource = null;
 let songWithAnimalsLogEventSource = null;
 let horrorLogEventSource = null;
+let shortStudyLogEventSource = null;
 
 /**
  * Load available styles from the server and populate the style select
@@ -343,6 +354,123 @@ function appendHorrorLogEntry(log, timestamp) {
 
     // Scroll to the bottom
     horrorResultsContainer.scrollTop = horrorResultsContainer.scrollHeight;
+}
+
+/**
+ * Connect to the SSE log stream for short study generation
+ * @param {string} requestId - The request ID to filter logs by
+ */
+function connectToShortStudyLogStream(requestId) {
+    // Close any existing connection
+    if (shortStudyLogEventSource) {
+        console.log('Closing existing short study log stream connection');
+        shortStudyLogEventSource.close();
+    }
+
+    console.log(`Connecting to short study log stream with requestId: ${requestId}`);
+
+    // Create a new EventSource connection
+    shortStudyLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
+
+    // Handle connection open
+    shortStudyLogEventSource.onopen = () => {
+        console.log('Short study log stream connection established');
+        if (shortStudyResultsContainer && shortStudyResultsContainer.querySelector('.list-group')) {
+            shortStudyResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
+        }
+    };
+
+    // Handle incoming messages
+    shortStudyLogEventSource.onmessage = (event) => {
+        console.log('Received short study SSE message:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'connected') {
+                console.log('Connected to short study log stream');
+            } else if (data.type === 'log') {
+                console.log('Received short study log:', data.log, 'timestamp:', data.timestamp);
+                if (shortStudyResultsContainer && shortStudyResultsContainer.querySelector('.alert-info')) {
+                    shortStudyResultsContainer.innerHTML = '';
+                }
+                appendShortStudyLogEntry(data.log, data.timestamp);
+            } else if (data.type === 'complete') {
+                console.log('Short study generation complete:', data.message);
+                appendShortStudyLogEntry(data.message, data.timestamp);
+                if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.add('d-none');
+                setTimeout(() => {
+                    if (shortStudyLogEventSource) {
+                        console.log('Closing short study log stream connection after completion');
+                        shortStudyLogEventSource.close();
+                        shortStudyLogEventSource = null;
+                    }
+                }, 1000);
+            } else {
+                console.warn('Unknown short study message type:', data.type);
+            }
+        } catch (error) {
+            console.error('Error parsing short study SSE message:', error, event.data);
+        }
+    };
+
+    // Handle errors
+    shortStudyLogEventSource.onerror = (error) => {
+        console.error('Short study log stream error:', error);
+        if (shortStudyResultsContainer && shortStudyResultsContainer.querySelector('.alert-info')) {
+            shortStudyResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
+        }
+        if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.add('d-none');
+        shortStudyLogEventSource.close();
+        shortStudyLogEventSource = null;
+    };
+}
+
+/**
+ * Append a single log entry to the short study display
+ * @param {string} log - The log message to append
+ * @param {string} timestamp - The timestamp for the log entry
+ */
+function appendShortStudyLogEntry(log, timestamp) {
+    // Skip logs containing "Using default channel name"
+    if (log && log.includes("Using default channel name")) {
+        console.log('Skipping channel name log:', log);
+        return;
+    }
+
+    console.log('Appending short study log entry:', log, 'timestamp:', timestamp);
+
+    // Make sure the results section is visible
+    if (shortStudyResultsSection) shortStudyResultsSection.classList.remove('d-none');
+
+    // Create the log item list if it doesn't exist yet
+    if (!shortStudyResultsContainer.querySelector('.list-group')) {
+        console.log('Creating new short study log list');
+        const logList = document.createElement('div');
+        logList.className = 'list-group';
+        shortStudyResultsContainer.appendChild(logList);
+    }
+
+    const logList = shortStudyResultsContainer.querySelector('.list-group');
+
+    // Create and append the new log entry
+    const logItem = document.createElement('div');
+    logItem.className = 'list-group-item';
+
+    if (timestamp) {
+        logItem.innerHTML = `
+      <div class="d-flex justify-content-between align-items-start">
+        <p class="mb-0">${log}</p>
+        <small class="text-muted ms-2">${timestamp}</small>
+      </div>
+    `;
+    } else {
+        logItem.innerHTML = `<p class="mb-0">${log}</p>`;
+    }
+
+    logList.appendChild(logItem);
+
+    // Scroll to the bottom
+    shortStudyResultsContainer.scrollTop = shortStudyResultsContainer.scrollHeight;
 }
 
 
@@ -683,14 +811,18 @@ if (savedLink) {
         if (generateLink) generateLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (horrorLink) horrorLink.classList.remove('active');
+        if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (horrorContent) horrorContent.classList.add('d-none');
+        if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
         if (horrorResultsSection) horrorResultsSection.classList.add('d-none');
         if (horrorErrorAlert) horrorErrorAlert.classList.add('d-none');
+        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
+        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
         if (savedContent) savedContent.classList.remove('d-none');
         if (typeof loadSavedGenerations === 'function') {
             loadSavedGenerations();
@@ -705,15 +837,19 @@ if (generateLink) {
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (horrorLink) horrorLink.classList.remove('active');
+        if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.remove('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (horrorContent) horrorContent.classList.add('d-none');
+        if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.remove('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
         if (horrorResultsSection) horrorResultsSection.classList.add('d-none');
         if (horrorErrorAlert) horrorErrorAlert.classList.add('d-none');
+        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
+        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
     });
 }
 
@@ -724,13 +860,17 @@ if (songWithAnimalsLink) {
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (horrorLink) horrorLink.classList.remove('active');
+        if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (horrorContent) horrorContent.classList.add('d-none');
+        if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.remove('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
+        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
     });
 }
 
@@ -741,13 +881,34 @@ if (horrorLink) {
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
+        if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (horrorContent) horrorContent.classList.remove('d-none');
         if (horrorResultsSection) horrorResultsSection.classList.add('d-none');
         if (horrorErrorAlert) horrorErrorAlert.classList.add('d-none');
+    });
+}
+
+if (shortStudyLink) {
+    shortStudyLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        shortStudyLink.classList.add('active');
+        if (generateLink) generateLink.classList.remove('active');
+        if (savedLink) savedLink.classList.remove('active');
+        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (horrorLink) horrorLink.classList.remove('active');
+        if (generateContent) generateContent.classList.add('d-none');
+        if (savedContent) savedContent.classList.add('d-none');
+        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
+        if (horrorContent) horrorContent.classList.add('d-none');
+        if (resultsSection) resultsSection.classList.add('d-none');
+        if (shortStudyContent) shortStudyContent.classList.remove('d-none');
+        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
+        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
     });
 }
 
@@ -906,6 +1067,81 @@ if (horrorForm) {
                 horrorErrorAlert.classList.remove('d-none');
             }
             if (horrorLoadingSpinner) horrorLoadingSpinner.classList.add('d-none');
+        }
+    });
+}
+
+if (shortStudyForm) {
+    shortStudyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
+        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
+        if (shortStudyResultsContainer) shortStudyResultsContainer.innerHTML = '';
+        if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.remove('d-none');
+        
+        const topicsElem = document.getElementById('shortStudyTopics');
+        const topicsText = topicsElem && topicsElem.value ? topicsElem.value.trim() : '';
+        
+        if (!topicsText) {
+            if (shortStudyErrorAlert && shortStudyErrorMessage) {
+                shortStudyErrorMessage.textContent = 'Please enter study topics';
+                shortStudyErrorAlert.classList.remove('d-none');
+            }
+            if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.add('d-none');
+            return;
+        }
+        
+        // Create the input format expected by the pipeline
+        // Each line becomes a separate topic object
+        const topics = topicsText.split('\n')
+            .filter(line => line.trim().length > 0)
+            .map(topic => ({ topic: topic.trim() }));
+        
+        try {
+            const response = await fetch('/api/generate-short-study', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    input: topics
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'An error occurred during short study generation');
+            }
+
+            if (data.requestId) {
+                console.log('Received requestId for short study generation:', data.requestId);
+
+                // Clear previous results and show results section
+                if (shortStudyResultsContainer) shortStudyResultsContainer.innerHTML = '';
+                if (shortStudyResultsSection) shortStudyResultsSection.classList.remove('d-none');
+                
+                // Connect to log stream for short study generation
+                connectToShortStudyLogStream(data.requestId);
+
+                // Add initial message
+                appendShortStudyLogEntry(`Short study topics generation started: You will see logs in real-time as they are generated.`);
+
+                // Fallback message if logs are delayed
+                setTimeout(() => {
+                    const logGroup = shortStudyResultsContainer.querySelector('.list-group');
+                    if (!logGroup || logGroup.children.length <= 1) {
+                        console.log('No logs received via SSE yet for short study, adding a status message');
+                        appendShortStudyLogEntry('Waiting for logs. This may take a moment.');
+                    }
+                }, 3000);
+            } else {
+                throw new Error('No requestId received from server');
+            }
+        } catch (error) {
+            if (shortStudyErrorAlert && shortStudyErrorMessage) {
+                shortStudyErrorMessage.textContent = error.message || 'An error occurred during short study generation';
+                shortStudyErrorAlert.classList.remove('d-none');
+            }
+            if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.add('d-none');
         }
     });
 }
