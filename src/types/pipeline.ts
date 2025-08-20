@@ -166,3 +166,42 @@ export interface SongWithAnimalsOutput {
     hashtags: string[];
 }
 
+/**
+ * Horror input: array of animal objects with description
+ */
+export interface HorrorInputItem {
+    animal: string; // The animal description as a string
+}
+
+export type HorrorInput = HorrorInputItem[];
+
+/**
+ * Horror image prompt (output of image generation step)
+ */
+export interface HorrorImagePrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    prompt: string;
+}
+
+/**
+ * Horror video prompt (output of video generation step)
+ */
+export interface HorrorVideoPrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    video_prompt: string;
+}
+
+/**
+ * Horror output (final result)
+ */
+export interface HorrorOutput {
+    global_style: string;
+    prompts: HorrorImagePrompt[];
+    video_prompts: HorrorVideoPrompt[];
+    titles: string[];
+    descriptions: string[];
+    hashtags: string[];
+}
+

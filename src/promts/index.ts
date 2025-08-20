@@ -13,6 +13,7 @@ import { hashtagsPrompt } from './video/hashtagsPrompt.js';
 import { characterPrompt } from './video/characterPrompt.js';
 import { shortenVideoPrompt } from './video/shortenVideoPrompt.js';
 import { imagePrompt, songWithAnimalsTitleDescPrompt, songWithAnimalsTitleDescPromptLyricsOnly, songWithAnimalsHashtagsPrompt, songWithAnimalsHashtagsPromptLyricsOnly, songWithAnimalsVideoPrompt, logVideoPrompt, logTitleDescPrompt } from './song_with_animals/index.js';
+import { horrorVideoPrompt, horrorTitleDescPrompt, horrorHashtagsPrompt } from './horror/index.js';
 
 export {
     narrationPrompt,
@@ -32,4 +33,7 @@ export {
     songWithAnimalsVideoPrompt,
     logVideoPrompt,
     logTitleDescPrompt,
+    horrorVideoPrompt,
+    horrorTitleDescPrompt,
+    horrorHashtagsPrompt,
 };

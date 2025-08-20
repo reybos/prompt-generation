@@ -109,6 +109,29 @@ app.post('/api/generate-song-with-animals', async (req, res) => {
     }
 });
 
+// API endpoint for horror generation
+app.post('/api/generate-horror', async (req, res) => {
+    try {
+        const { input } = req.body;
+        if (!input) {
+            return res.status(400).json({ error: 'Missing input' });
+        }
+        // Generate a unique requestId for this generation
+        const requestId = crypto.randomUUID();
+        // Start horror generation in the background (do not await)
+        processHorrorGeneration(input, requestId)
+            .catch(err => {
+                console.error('Error in background horror animals generation:', err);
+                emitLog('Error during horror animals generation: ' + (err?.message || err), requestId);
+            });
+        // Respond immediately so frontend can connect to SSE
+        return res.json({ success: true, requestId });
+    } catch (err) {
+        console.error('Error in /api/generate-horror:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 // API endpoint for getting available styles
@@ -241,6 +264,31 @@ async function processSongWithAnimalsGeneration(
         emitLog(`Song with animals generation complete with ${style} style. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during song with animals generation: ${err}`;
+        logs.push(error);
+        emitLog(error, requestId);
+    }
+}
+
+// Horror generation processor
+async function processHorrorGeneration(
+    input: any,
+    requestId: string
+): Promise<void> {
+    const logs: string[] = [];
+
+    // Wait for SSE client to connect
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log(`[HORROR] Checking for active connection for requestId: ${requestId}`);
+    console.log(`[HORROR] Active connections: ${activeConnections.size}`);
+
+    try {
+        const result = await import('./pipeline/horrorPipeline.js').then(m => m.runHorrorPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId) }));
+        
+        // Emit completion message with results
+        emitLog(`Horror animals generation complete. Generated ${result.length} animal(s).`, requestId);
+    } catch (err) {
+        const error = `Error during horror generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }

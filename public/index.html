@@ -41,15 +41,27 @@
                         </a>
                     </li>
                     
-                    <!-- Mini Discoveries Group -->
+                    <!-- MINI DISCOVERIES Group -->
                     <li class="nav-item">
                         <h6 class="sidebar-heading text-muted text-uppercase small fw-bold px-3 py-2 mb-1 mt-3">
-                            Mini Discoveries
+                            MINI DISCOVERIES
                         </h6>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="song-with-animals-link" href="#">
                             <i class="fas fa-paw"></i> Shorts by Song
+                        </a>
+                    </li>
+                    
+                    <!-- Happy Barn Group -->
+                    <li class="nav-item">
+                        <h6 class="sidebar-heading text-muted text-uppercase small fw-bold px-3 py-2 mb-1 mt-3">
+                            Happy Barn
+                        </h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="horror-link" href="#">
+                            <i class="fas fa-ghost"></i> Horror Animals
                         </a>
                     </li>
                     
@@ -264,6 +276,71 @@ The robot fish says, "Blub, blub, blub!"</textarea>
                 <div class="alert alert-danger mt-4 d-none" id="songWithAnimalsErrorAlert" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <span id="songWithAnimalsErrorMessage"></span>
+                </div>
+                
+
+            </div>
+
+            <!-- Horror Generation Content -->
+            <div id="horror-content" class="content-section d-none">
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card shadow">
+                            <div class="card-header bg-dark text-white">
+                                <h2 class="h4 mb-0">Happy Barn - Horror Animals Generator</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="horrorForm">
+                                    <div class="mb-3">
+                                        <label for="horrorAnimals" class="form-label">
+                                            Animal Descriptions <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea
+                                                class="form-control"
+                                                id="horrorAnimals"
+                                                rows="10"
+                                                required
+                                        >A ghostly wolf with glowing red eyes, howling at the moon
+A vampire bat with sharp fangs, hanging upside down in a dark cave
+A witch's black cat with green eyes, sitting on a broomstick
+A monster spider with eight hairy legs, spinning a web of shadows</textarea>
+                                        <div class="form-text">
+                                            Enter descriptions of horror animals. Each line will become a separate animal to process.
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-dark" id="horrorGenerateBtn">
+                                            <span
+                                                class="spinner-border spinner-border-sm d-none"
+                                                id="horrorLoadingSpinner"
+                                                role="status"
+                                                aria-hidden="true"
+                                            ></span>
+                                            Generate Horror Animals
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5 d-none" id="horrorResultsSection">
+                    <div class="col-12">
+                        <div class="card shadow">
+                                                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                    <h2 class="h4 mb-0">Horror Animals Generation Results</h2>
+                                </div>
+                            <div class="card-body">
+                                <div id="horrorResultsContainer" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Horror results will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-4 d-none" id="horrorErrorAlert" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="horrorErrorMessage"></span>
                 </div>
                 
 
