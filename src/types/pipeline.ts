@@ -197,12 +197,12 @@ export interface HorrorVideoPrompt {
  * Horror output (final result)
  */
 export interface HorrorOutput {
-    global_style: string;
-    prompts: HorrorImagePrompt[];
-    video_prompts: HorrorVideoPrompt[];
-    titles: string[];
-    descriptions: string[];
-    hashtags: string[];
+    animal: string; // The animal description for this generation
+    prompt: HorrorImagePrompt;
+    video_prompt: HorrorVideoPrompt;
+    title: string;
+    description: string;
+    hashtags: string;
 }
 
 /**

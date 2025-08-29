@@ -25,13 +25,14 @@ export async function runHorrorPipeline(
     const animalDescription = animal.animal;
 
     // Set models and temperatures for each step
-    const imageModel = 'anthropic/claude-3.7-sonnet';
-    const imageTemperature = 0.3;
-    const videoModel = 'anthropic/claude-3.7-sonnet';
-    const videoTemperature = 0.5;
-    const titleDescModel = 'anthropic/claude-3.7-sonnet';
+    // const imageModel = 'anthropic/claude-3.7-sonnet';
+    const imageModel = 'openai/gpt-5-chat';
+    const imageTemperature = 0.4;
+    const videoModel = 'openai/gpt-5-chat';
+    const videoTemperature = 0.7;
+    const titleDescModel = 'openai/gpt-5-chat';
     const titleDescTemperature = 0.7;
-    const hashtagsModel = 'anthropic/claude-3.7-sonnet';
+    const hashtagsModel = 'openai/gpt-5-chat';
     const hashtagsTemperature = 0.4;
 
     let attempt = 0;
@@ -61,11 +62,10 @@ export async function runHorrorPipeline(
         if (imageJson) {
           const parsed = typeof imageJson === 'string' ? safeJsonParse(imageJson, 'HORROR IMAGE PROMPTS') : imageJson;
           if (parsed && typeof parsed === 'object') {
-            const rawPrompts = Array.isArray(parsed.prompts) ? parsed.prompts : [];
-            if (rawPrompts.length > 0) {
-              // Take the first (and only) prompt for the animal
+            if (parsed.prompt) {
               prompt = {
-                ...rawPrompts[0],
+                line: animalDescription,
+                prompt: parsed.prompt,
                 index: 0
               };
             }
@@ -111,21 +111,18 @@ export async function runHorrorPipeline(
             if (options.emitLog && options.requestId) {
               options.emitLog(`🔍 Video prompt parsing: ${JSON.stringify(parsed).substring(0, 200)}...`, options.requestId);
             }
-            if (parsed && typeof parsed === 'object' && Array.isArray(parsed.video_prompts)) {
-              const rawVideoPrompts = parsed.video_prompts;
-              if (rawVideoPrompts.length > 0) {
-                // Take the first (and only) video prompt for the animal
-                videoPrompt = {
-                  ...rawVideoPrompts[0],
-                  index: 0
-                };
-                if (options.emitLog && options.requestId) {
-                  options.emitLog(`✅ Successfully parsed video prompt`, options.requestId);
-                }
+            if (parsed && typeof parsed === 'object' && parsed.video_prompt) {
+              videoPrompt = {
+                line: animalDescription,
+                video_prompt: parsed.video_prompt,
+                index: 0
+              };
+              if (options.emitLog && options.requestId) {
+                options.emitLog(`✅ Successfully parsed video prompt`, options.requestId);
               }
             } else {
               if (options.emitLog && options.requestId) {
-                options.emitLog(`⚠️ Video prompt parsing issue: parsed.video_prompts is not an array`, options.requestId);
+                options.emitLog(`⚠️ Video prompt parsing issue: parsed.video_prompt is missing`, options.requestId);
               }
             }
           } else {
@@ -226,12 +223,12 @@ export async function runHorrorPipeline(
         }
 
         const animalResult: HorrorOutput = {
-          global_style: '',
-          prompts: [prompt],
-          video_prompts: [videoPrompt],
-          titles: [title],
-          descriptions: [description],
-          hashtags: [hashtagsStr]
+          animal: animalDescription,
+          prompt: prompt,
+          video_prompt: videoPrompt,
+          title: title,
+          description: description,
+          hashtags: hashtagsStr
         };
         results.push(animalResult);
         
