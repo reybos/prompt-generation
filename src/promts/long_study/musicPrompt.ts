@@ -9,7 +9,7 @@ const musicPromptTemplate: string = `
 You are a creative music producer for a children's educational YouTube channel (ages 2–6).
 Given the video topic and script, generate a detailed description for an original, wordless (instrumental) background song that could be created using an AI music generation tool.
 
-IMPORTANT: The description MUST NOT be more than 200 characters. This is critically important—if the description exceeds 200 characters, the prompt will not work. The music is for children, so ensure the description is concise, vivid, and age-appropriate.
+IMPORTANT: The description MUST NOT be more than 600 characters. This is critically important—if the description exceeds 600 characters, the prompt will not work. The music is for children, so ensure the description is concise, vivid, and age-appropriate.
 
 The description should be suitable for generating instrumental music and must NOT include any lyrics or vocals. Focus on mood, style, tempo, and suggested instruments (e.g., ukulele, bells, marimba, piano, light acoustic, xylophone, etc.), making sure the music is appropriate for preschoolers, matches the video's atmosphere (cheerful, calm, playful, etc.), and does not distract from narration.
 

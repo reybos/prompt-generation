@@ -19,7 +19,7 @@ Your task:
 * Expand and enrich the original narration from the script, using the visual details and actions described in the enhanced media prompts.
 * Make sure each narration is short enough to be spoken comfortably within the scene's duration (6 or 10 seconds).
 * For 6-second scenes, narration should be no more than 2 short sentences, and should not exceed 20 words in total.
-* For 10-second scenes, narration should be no more than 3 sentences, and should not exceed 35 words in total.
+* For 10-second scenes, narration should be no more than 2 sentences, and should not exceed 25 words in total.
 * If in doubt, make the narration even shorter. Prioritize brevity and clarity.
 * Use simple, cheerful, and interactive language suitable for preschoolers. Include questions, exclamations, and direct address to the viewer where appropriate, but always from the narrator's perspective.
 * Ensure the narration matches the visual actions, emotions, and transitions described in the enhanced media prompts.

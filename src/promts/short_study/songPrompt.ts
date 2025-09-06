@@ -14,7 +14,7 @@ Task:
 - Include the topic naturally in the lyrics.
 - Add playful words, onomatopoeia, or short exclamations to make it more engaging.
 
-Then, create a **Suno.com prompt** (maximum 200 characters) to generate an **upbeat, cheerful, short song** based on the text. 
+Then, create a **Suno.com prompt** (maximum 600 characters) to generate an **upbeat, cheerful, short song** based on the text. 
 - Style: bright, playful, fun, and catchy for toddlers.
 
 CRITICAL OUTPUT FORMAT REQUIREMENTS:
@@ -28,7 +28,7 @@ CRITICAL OUTPUT FORMAT REQUIREMENTS:
 5. NO control characters, NO unescaped newlines, NO unescaped quotes
 
 EXAMPLE OF CORRECT FORMAT:
-{{ "song_text": "the complete song lyrics", "music_prompt": "Suno.com prompt for music generation (max 200 chars)" }}
+{{ "song_text": "the complete song lyrics", "music_prompt": "Suno.com prompt for music generation (max 600 chars)" }}
 
 INPUT:
 {topicDescription}

@@ -5,36 +5,37 @@ import {PromptTemplate} from '@langchain/core/prompts';
 
 export const shortStudyTitleDescPrompt = new PromptTemplate({
     inputVariables: ["topicDescription", "song_text"],
-    template: `You are an expert content creator specializing in **children's educational YouTube Shorts**.
+    template: `You are a senior YouTube content strategist and SEO expert specializing in **children's educational YouTube Shorts**. 
 
-Input is a study topic description ({topicDescription}) and song text ({song_text}).
+Input: study topic description ({topicDescription}) and song text ({song_text}).
 
 TASK:
-1. Use the topic description and song text to generate an **engaging, SEO-optimized title** suitable for toddlers (ages 2-6) and their parents.
-2. Generate an **informative, fun, and educational description** optimized for YouTube search, using relevant keywords from the topic and song text.
-3. Make the title **short, catchy, and easy to read** (max 70 characters).
-4. Make the description **up to 3000 characters**, including:
-   - Brief summary of what children will learn
-   - Engaging language for kids and parents
-   - Call-to-action (like subscribe, watch more, etc.)
-   - Relevant keywords naturally integrated
-5. Ensure the title and description are fully suitable for **YouTube Shorts format**.
+1. Generate an **engaging, SEO-optimized title** (max 70 characters) for toddlers (ages 2-6) and parents. Make it catchy, curiosity-driven, and include main keywords from the topic (e.g., "firefighter song", "builder song", "animal sounds").  
+2. Generate an **educational and fun description** (up to 1000 characters) optimized for YouTube search, following this structure:  
+   - Hook: 1-2 sentences that grab attention  
+   - Learning Summary: what children will learn (vocabulary, sounds, actions, pretend play)  
+   - Parent Appeal: why this is safe, educational, and engaging  
+   - Call-to-Action: like, subscribe, watch more  
+   - Naturally include relevant keywords from topic and song text  
+   - Use playful emojis to make it friendly for kids and parents  
 
-CRITICAL OUTPUT FORMAT REQUIREMENTS:
-1. Return ONLY valid JSON - no markdown, no code blocks, no extra text
-2. Start response with {{ and end with }}
-3. Use double quotes for all strings
-4. Escape ALL special characters in description:
-   - Newlines: use \\n (not actual line breaks)
-   - Quotes: use \\" (not actual quotes)
-   - Backslashes: use \\\\ (not single backslash)
-5. Description must be ONE continuous string with escaped newlines
-6. NO control characters, NO unescaped newlines, NO unescaped quotes
+3. Make description **ONE continuous string** with escaped newlines (\\n) and quotes (\\"), fully suitable for **YouTube Shorts format**.  
+4. Avoid repetition, filler phrases, and overly long blocks. Keep it **clear, concise, and persuasive**.  
+5. Ensure **SEO keywords are in the first 1-2 sentences** where possible.  
 
-EXAMPLE OF CORRECT FORMAT:
+CRITICAL OUTPUT FORMAT:
+1. Return ONLY valid JSON, no markdown or extra text  
+2. Start with {{ and end with }}  
+3. Double quotes for all strings  
+4. Escape all special characters:
+   - Newlines: \\n
+   - Quotes: \\"  
+   - Backslashes: \\\\
+
+EXAMPLE OUTPUT:
 {{
   "title": "Fun Learning Song for Kids",
-  "description": "Learn with this fun song!\\n\\nWhat kids will learn:\\n- Basic concepts\\n- Fun activities\\n\\nSubscribe for more!"
+  "description": "Sing, clap, and dance along with this fun kids song!\\n\\nWhat kids will learn:\\n- Basic concepts\\n- Vocabulary\\n- Movement skills\\n\\nSafe, parent-approved content! Subscribe for more fun learning videos."
 }}
 
 INPUT:

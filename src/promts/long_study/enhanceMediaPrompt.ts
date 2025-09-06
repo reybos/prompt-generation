@@ -8,7 +8,7 @@ import { PromptTemplate } from '@langchain/core/prompts';
 // --- Duration Requirements ---
 const DURATION_REQUIREMENTS = `
 * IMPORTANT - SCENE DURATION:
- - Each scene has a specific duration value (6 seconds)
+ - Each scene has a specific duration value (10 seconds)
  - DO NOT modify the duration values provided in the input
  - Preserve the exact duration value for each scene in your output
  - The duration is provided as a separate field in the JSON, not in the prompt text
@@ -74,14 +74,14 @@ Return the improved prompts as a JSON array without any markdown formatting or c
 CRITICAL: You MUST output exactly the same number of scenes as in the input media_prompts. Do NOT add or remove any scenes.
 
 [
- {{ "scene": 0, "scene_type": "introduction", "image_prompt": "...", "video_prompt": "...", "duration": 6 }},
- {{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 6 }},
- {{ "scene": 2, "scene_type": "main", "video_prompt": "...", "duration": 6 }},
+ {{ "scene": 0, "scene_type": "introduction", "image_prompt": "...", "video_prompt": "...", "duration": 10 }},
+ {{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
+ {{ "scene": 2, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
  ...
- {{ "scene": N, "scene_type": "finale", "video_prompt": "...", "duration": 6 }}
+ {{ "scene": N, "scene_type": "finale", "video_prompt": "...", "duration": 10 }}
 ]
 
-IMPORTANT: The duration field must be preserved exactly as it was in the input. Only the value 6 is allowed, with no additional symbols or text.
+IMPORTANT: The duration field must be preserved exactly as it was in the input. Only the value 10 is allowed, with no additional symbols or text.
 CRITICAL: Each video_prompt and image_prompt in the output must be no more than 1500 characters in length.
 CRITICAL: Count the input scenes and output exactly that many scenes. If input has 10 scenes, output exactly 10 scenes.
 `;
@@ -98,6 +98,22 @@ Here is the script of the video:
 
 Your task:
 For Scene 0, enhance both the image and video prompts with more specific details about the main character. For all subsequent scenes, enhance only the video prompts. Make sure the character's appearance, style, and unique features are always the same and clearly match the character description across all scenes, emphasizing their key traits and accessories.
+
+**VISUAL ENHANCEMENT**: While maintaining character consistency within this video, consider adding distinctive visual elements for variety:
+
+1. **Character Accessories** - Consider adding:
+   - Hats, scarves, glasses, jewelry, backpacks, tools, magical items, seasonal accessories
+   - Or create your own unique accessories that fit the character
+
+2. **Environmental Details** - Consider adding:
+   - Weather effects, seasonal elements, time of day indicators, atmospheric particles, background characters, architectural details
+   - Or develop your own environmental elements that enhance the scene
+
+3. **Visual Effects** - Consider adding:
+   - Sparkles, glowing effects, motion lines, shadow details, texture variations, color gradients
+   - Or create your own visual effects that add interest and depth
+
+Use these as inspiration to make this video visually distinctive and engaging.
 `;
 
 const enhanceMediaPromptTemplate = `

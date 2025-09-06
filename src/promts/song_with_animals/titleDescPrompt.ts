@@ -61,9 +61,10 @@ You will generate a YouTube TITLE and DESCRIPTION for a children's song video fe
 
 GOALS:
 • Maximize search discoverability (SEO keywords, trending phrases, parent-focused search terms)
-• Maximize CTR (make it emotional, fun, curiosity-driven)
+• Maximize CTR with curiosity-driven, family-friendly wording
 • Appeal to both kids (fun, colorful) and parents (safe, educational)
 • Encourage engagement (watch time, likes, comments, subscriptions)
+• Keep the description visually engaging with emojis, short sentences, and lists
 
 ---
 
@@ -71,37 +72,34 @@ GOALS:
 • Use this pattern: "[Theme/Setting] Animal Sounds Song | [Extra Context for Kids/Parents] | [Fun Engagement Hook]"
 • Include: Theme (Farm, Jungle, Ocean, Space, Safari, etc.), "Animal Sounds Song"
 • Add characters or main animals (e.g., "With Cow, Sheep, and Chickens")
-• Make it curiosity-driven, fun, and family-friendly
-• Include trending keywords: "Nursery Rhymes", "Learning Songs", "Educational Songs for Kids"
-• Length: 15–25 words (optimized for YouTube display & Shorts shelf)
+• Use fun emojis (🎶 🐄 🐞 🚀 🎃 etc.)
+• Keep 15–22 words (optimized for YouTube Shorts display)
 
 💡 TITLE EXAMPLES:
 - "Halloween Farm Animal Sounds Song 🎃 | Fun Songs for Kids and Toddlers | Nursery Rhymes with Animals"
-- "Safari Animal Sounds Song 🐘 | Learn Animal Names & Sounds | Fun Educational Songs for Preschoolers"
-- "Dinosaur Song for Kids 🦖 | Learn Dinosaur Names | Nursery Rhymes & Fun Learning Songs"
+- "Robot Insect Adventure 🐞🤖 | Bug Sounds for Toddlers | Fun Learning Songs for Kids"
+- "Space Animal Sounds Song 🚀🐱 | Nursery Rhymes for Kids | Educational Songs for Preschoolers"
 
 ---
 
 📌 **DESCRIPTION STRATEGY**:
-• Write 200–300 words (optimized for SEO + watch time)
+• Length: 120–180 words (shorter than traditional SEO, optimized for Shorts audience)
 • Structure:
-  1. HOOK (exciting intro: "Sing and dance with [animals] in this fun educational video!")
-  2. VIDEO SUMMARY (theme, setting, main animals, animation style, unique features)
-  3. EDUCATIONAL VALUE (learning animal names, sounds, colors, movements, early learning)
-  4. CALL TO ACTION (Subscribe, Like, Share, Watch More)
-• Describe the song's unique features and animal characters
-• Mention educational benefits (learning animal names, sounds, etc.)
-• Include search keywords naturally: "nursery rhymes", "kids songs", "learning songs", "educational videos for toddlers", "songs for preschoolers"
-• Use engaging emojis to make it friendly and fun
-• Write in professional yet playful tone for parents & kids
-• Emphasize SAFE and FAMILY-FRIENDLY content
+  1. **HOOK** (fun intro with emojis, set the scene, introduce animals/characters)
+  2. **WHAT KIDS LEARN** (bullet list with emojis: sounds, names, vocabulary, movement, imagination)
+  3. **STYLE / VIBE** (retro, steampunk, cozy, spooky-but-not-scary, etc. — depending on input)
+  4. **CALL TO ACTION** (Subscribe, Like, Comment, Share)
+• Emphasize educational value AND fun
+• Use playful, parent-friendly tone
+• Naturally include keywords: "nursery rhymes", "kids songs", "learning songs", "educational videos for toddlers", "songs for preschoolers"
+• End with a strong CTA
 
 ---
 
 OUTPUT (STRICT JSON ONLY, NO EXTRA TEXT):
 {{
-  "title": "Catchy, SEO-optimized video title here",
-  "description": "Engaging 200–300 word description with emojis, hashtags, keywords, and call-to-action here"
+  "title": "Catchy, SEO-optimized video title with emojis",
+  "description": "Engaging 120–180 word description with emojis, bullet points, educational value, and a call-to-action"
 }}
 
 INPUT:
