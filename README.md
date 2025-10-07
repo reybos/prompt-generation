@@ -1,14 +1,23 @@
-# Prompt Generation
+# Prompt Content Generation
 
-A Node.js/TypeScript pipeline for generating educational video content for children using the fal.ai API.
+A comprehensive Node.js/TypeScript pipeline for generating educational video content for children using the fal.ai API. Features multiple specialized pipelines for different content types with a modern web interface.
 
-## Installation
+## 🚀 Features
+
+- **Multiple Content Pipelines**: Halloween, Horror, Study (Short/Long), Song with Animals
+- **AI-Powered Generation**: Uses fal.ai API with Claude models for high-quality content
+- **Web Interface**: User-friendly interface for content generation and management
+- **Modular Architecture**: TypeScript-based with clean separation of concerns
+- **Style Support**: Multiple visual styles for different content types
+- **Async Processing**: Support for both synchronous and asynchronous content generation
+
+## 📦 Installation
 
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/your-username/prompt_generation.git
-cd prompt_generation
+git clone https://github.com/reybos/prompt-content-generation.git
+cd prompt-content-generation
 ```
 
 2. **Install dependencies**
@@ -17,7 +26,7 @@ cd prompt_generation
 npm install
 ```
 
-3. **Create a `.env` file** with your [fal.ai](https://fal.ai) API key and optional configurations:
+3. **Create a `.env` file** with your [fal.ai](https://fal.ai) API key:
 
 ```dotenv
 # Required for content generation
@@ -27,9 +36,10 @@ FAL_DEFAULT_MODEL=anthropic/claude-3.7-sonnet
 # Optional: Configure generations directory location
 # GENERATIONS_DIR_PATH=/absolute/path/to/generations
 # GENERATIONS_DIR_RELATIVE_PATH=../generations
-```
 
-See `.env.example` for more configuration options.
+# Optional: Song segmentation configuration
+SONG_SEGMENT_LINES=3
+```
 
 4. **Build the TypeScript code**
 
@@ -38,63 +48,128 @@ npm run build
 ```
 
 This will:
-
 - Compile TypeScript files into JavaScript in the `dist/` directory
 - Copy static assets from the `public/` directory to `dist/public/`
 
----
+## 🎯 Usage
 
-## Usage
+### Web Interface
 
-### Setup and Launch
-
-#### Building the Project
-
-Build the TypeScript code and copy static assets:
-
-```bash
-npm run build
-```
-
-You need to run this command:
-
-- After cloning the repository
-- After making changes to TypeScript files
-- After pulling updates from the repository
-
-#### Running the Application
-
-##### Web Interface
-
-Start the web server with:
+Start the web server:
 
 ```bash
 npm run web
 ```
 
 Then open your browser and navigate to:
-
 ```
 http://localhost:4000
 ```
 
-After generation, you can:
+The web interface provides:
+- **Theme Selection**: Choose from different content pipelines
+- **JSON Input**: Enter topics organized by themes
+- **Real-time Logs**: Monitor generation progress
+- **Content Management**: View and save generated content
 
-- View the saved generations
-- View the content in JSON format
-- Save generations to specific themes
+### Available Pipelines
 
-The web interface provides a user-friendly form to:
+#### 🎃 Halloween Pipeline
+- Generates Halloween-themed educational content
+- Includes image prompts, video prompts, titles, and descriptions
+- Specialized for spooky but child-friendly content
 
-- Enter topics organized by themes in JSON format
-- Generate content for multiple topics at once
-- View real-time logs of the generation process
+#### 👻 Horror Pipeline  
+- Creates horror-themed educational content
+- Advanced prompt engineering for engaging scary content
+- Includes hashtag generation for social media
 
-### Song with Animals Pipeline
+#### 📚 Study Pipelines
+- **Short Study**: Quick educational content generation
+- **Long Study**: Comprehensive educational content with async processing
+- Includes character prompts, media enhancement, and narration
 
-The application also includes a specialized pipeline for generating short educational videos with animals:
+#### 🎵 Song with Animals Pipeline
+- **Automatic Segmentation**: Splits songs into 3-line segments
+- **Multi-format Output**: Generates images, videos, titles, descriptions, and hashtags
+- **Visual Styles**: Support for Classic, Steampunk, Futuristic, and Halloween styles
+- **Scalable Content**: One song generates multiple content pieces
 
-- **Unified Pipeline**: Generates image prompts, video prompts, titles, descriptions, and hashtags in one complete workflow
-- **Visual Styles**: Support for different visual styles (Classic, Steampunk)
-- **Segment-based Generation**: Automatically groups content into segments for better organization
-- **Complete Output**: All necessary content is generated and saved automatically
+### Development
+
+#### Building the Project
+
+```bash
+npm run build
+```
+
+#### Development Mode
+
+```bash
+npm run dev
+```
+
+#### Type Checking
+
+```bash
+npm run type-check
+```
+
+## 🏗️ Architecture
+
+```
+src/
+├── chains/          # LangChain integration
+├── config/          # Configuration management
+├── pipeline/        # Content generation pipelines
+├── promts/          # Prompt templates by theme
+├── schemas/         # Data validation schemas
+├── services/        # External service integrations
+├── types/           # TypeScript type definitions
+└── utils/           # Utility functions
+```
+
+## 📋 Available Scripts
+
+- `npm run build` - Build TypeScript to JavaScript
+- `npm run start` - Start the application
+- `npm run web` - Start with web interface
+- `npm run dev` - Development mode with hot reload
+- `npm run type-check` - TypeScript type checking
+- `npm run clean` - Clean build directory
+
+## 🔧 Configuration
+
+### Environment Variables
+
+- `FAL_KEY` - Your fal.ai API key (required)
+- `FAL_DEFAULT_MODEL` - Default model for content generation
+- `GENERATIONS_DIR_PATH` - Absolute path to generations directory
+- `GENERATIONS_DIR_RELATIVE_PATH` - Relative path to generations directory
+- `SONG_SEGMENT_LINES` - Number of lines per song segment (default: 3)
+
+### Content Pipelines
+
+Each pipeline is designed for specific content types:
+
+- **Halloween**: Spooky educational content
+- **Horror**: Engaging scary content for older children
+- **Study**: Traditional educational content
+- **Song with Animals**: Music-based educational content with automatic segmentation
+
+## 📖 Documentation
+
+- [Song with Animals Pipeline](documentation/SONG_WITH_ANIMALS_PIPELINE.md)
+- [Async Pipeline](documentation/ASYNC_PIPELINE_README.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and type checking
+5. Submit a pull request
+
+## 📄 License
+
+ISC License
