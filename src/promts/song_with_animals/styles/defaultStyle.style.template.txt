@@ -1,0 +1,13 @@
+{
+  "name": "default",
+  "displayName": "Classic",
+  "description": "Classic cartoon children's style with bold outlines, flat colors, and friendly characters",
+  
+  "characterStyle": "",
+  
+  "environmentStyle": "",
+  
+  "colorPalette": "",
+  
+  "renderStyle": ""
+}

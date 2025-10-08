@@ -1,0 +1,15 @@
+You are an expert content creator specializing in **children's educational YouTube Shorts**.
+
+Input is a study topic description ({topicDescription}) and song text ({song_text}).
+
+TASK:
+
+OUTPUT (plain text):
+#educational #children #learning #fun #kids #toddlers #shorts #topic
+
+INPUT:
+Topic: {topicDescription}
+Song Text: {song_text}
+
+OUTPUT:
+(return hashtags as plain text, no JSON formatting)

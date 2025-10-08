@@ -4,53 +4,24 @@
  */
 
 import {PromptTemplate} from '@langchain/core/prompts';
+import fs from 'fs';
+import path from 'path';
 
-const halloweenTitlePromptTemplate: string = `You are a senior YouTube content strategist and SEO expert specializing in children's content and viral Shorts optimization.
-Generate a YouTube TITLE for a kids' Halloween song video featuring spooky animal characters based on these inputs:
-- Song Lyrics: {songLyrics}
-- Video Prompt: {videoPrompt}
-- Global Style: {globalStyle}
+// Read prompt text with fallback to template
+let titleDescPromptTemplate: string;
+const actualPath = path.join(__dirname, 'titleDescPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'titleDescPrompt.prompt.template.txt');
 
-GOALS:
-• Maximize Shorts CTR and watch time (engaging, curiosity-driven wording)
-• Optimize for search discoverability (SEO keywords, trending phrases, parent-focused terms)
-• Appeal to kids (fun, spooky but safe, colorful) and parents (safe, educational)
-• Encourage engagement (likes, comments, subscriptions)
-
----
-
-📌 **TITLE STRATEGY**:
-• Pattern: "[Halloween Theme] Spooky Animal Sounds Song | [Extra Context for Kids/Parents] | [Fun Hook]"
-• Include Halloween theme (Spooky, Haunted, Witch's, Ghostly, etc.), "Spooky Animal Sounds Song"
-• Add main spooky characters/animals (Ghost Cat, Witch's Owl, Vampire Bat, etc.)
-• Use 2–4 relevant emojis (🎃 👻 🦇 🐱 🦉 🕷️)
-• Keep 10–18 words for Shorts display
-• Keep it punchy, easy to read, curiosity-driven
-
-💡 TITLE EXAMPLES:
-- "Spooky Halloween Animal Sounds Song 🎃👻 | Fun Songs for Kids | Nursery Rhymes with Ghosts"
-- "Witch's Spooky Animal Adventure 🦇🦉 | Halloween Songs for Toddlers | Fun Learning Songs for Kids"
-- "Haunted Farm Animal Sounds Song 👻🐱 | Halloween Nursery Rhymes for Kids | Educational Songs for Preschoolers"
-
----
-
-OUTPUT (STRICT JSON ONLY, NO EXTRA TEXT):
-{{
-  "title": "Catchy, SEO-optimized Halloween title with 2–4 emojis, 10–18 words"
-}}
-
-INPUT:
-Song Lyrics: {songLyrics}
-Video Prompt: {videoPrompt}
-Global Style: {globalStyle}
-
-OUTPUT:
-(Return only valid JSON as shown above)
-`;
+if (fs.existsSync(actualPath)) {
+    titleDescPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
+} else {
+    titleDescPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
+    console.warn('⚠️  Using template prompt for titleDescPrompt. Copy .template.txt to .txt for production use.');
+}
 
 const halloweenTitlePrompt: PromptTemplate = new PromptTemplate({
     inputVariables: ["songLyrics", "videoPrompt", "globalStyle"],
-    template: halloweenTitlePromptTemplate
+    template: titleDescPromptTemplate
 });
 
 export function logTitlePrompt(songLyrics: string, videoPrompt: string, globalStyle: string): void {

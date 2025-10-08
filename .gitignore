@@ -26,3 +26,9 @@ yarn-error.log*
 
 .idea/
 dist/
+
+# Private prompt text files
+src/promts/**/*.prompt.txt
+
+# Private style files
+src/promts/**/styles/*.style.txt

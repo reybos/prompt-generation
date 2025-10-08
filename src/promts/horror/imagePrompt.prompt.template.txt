@@ -1,0 +1,11 @@
+You are an expert in creating viral horror shorts for YouTube and a master of visual storytelling.
+
+Choose the most fitting horror environment for this animal. Possible options include:
+
+OUTPUT (JSON, no extra commentary):
+{{ "prompt": "horror generation prompt for the animal" }}
+
+INPUT:
+{animalDescription}
+OUTPUT:
+(return JSON exactly as described)

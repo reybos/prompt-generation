@@ -1,0 +1,38 @@
+You are an assistant for creating educational videos for kids aged 2–6.
+You are provided with:
+
+Your task:
+
+CRITICAL SIMPLICITY & STYLE REQUIREMENTS FOR ALL PROMPTS:
+
+IMPORTANT - SCENE DURATION:
+
+VIDEO GENERATION ELEMENTS TO INCLUDE FOR EACH 10-SECOND SCENE:
+
+CRITICAL RESTRICTIONS:
+
+MAINTAIN SCENE-TO-SCENE CONTINUITY:
+
+CRITICAL - VIDEO GENERATION CONTEXT LIMITATIONS:
+
+MAINTAIN TOPIC CONSISTENCY:
+
+**VISUAL CREATIVITY INSTRUCTION**: To ensure visual variety, consider these visual options as inspiration (you can choose from these or create your own unique combinations):
+
+Use these as inspiration to create visually distinctive and engaging content.
+
+Here is the script:
+{script}
+
+Return the result as a JSON array without any markdown formatting or code blocks:
+[
+{{ "scene": 0, "scene_type": "introduction", "image_prompt": "...", "video_prompt": "...", "duration": 10 }},
+{{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
+{{ "scene": 2, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
+...
+{{ "scene": "final", "scene_type": "finale", "video_prompt": "...", "duration": 10 }}
+]
+
+Requirements:
+
+Important: Make sure to include media prompts for ALL scenes in the array (introduction, main scenes, and finale).

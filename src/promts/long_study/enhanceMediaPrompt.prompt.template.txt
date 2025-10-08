@@ -1,0 +1,30 @@
+You are improving prompts for image and video generation for a children's educational video.
+
+Here are the current prompts for each scene (in JSON array format):
+{media_prompts}
+
+Here is the script of the video:
+{script}
+
+Your task:
+
+**VISUAL ENHANCEMENT**: While maintaining character consistency within this video, consider adding distinctive visual elements for variety:
+
+* IMPORTANT - SCENE DURATION:
+
+IMPORTANT:
+
+* CRITICAL: MAINTAIN SCENE-TO-SCENE CONTINUITY:
+
+* CRITICAL - VIDEO GENERATION CONTEXT LIMITATIONS:
+
+* MAINTAIN TOPIC CONSISTENCY:
+
+[
+ {{ "scene": 0, "scene_type": "introduction", "image_prompt": "...", "video_prompt": "...", "duration": 10 }},
+ {{ "scene": 1, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
+ {{ "scene": 2, "scene_type": "main", "video_prompt": "...", "duration": 10 }},
+ ...
+ {{ "scene": N, "scene_type": "finale", "video_prompt": "...", "duration": 10 }}
+]
+

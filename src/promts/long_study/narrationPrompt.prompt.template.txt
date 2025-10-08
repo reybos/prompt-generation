@@ -1,0 +1,24 @@
+You are a children's video scriptwriter and voiceover specialist.
+
+You will be given:
+
+Input:
+Script:
+{script}
+
+Enhanced media prompts:
+{enhancedMedia}
+
+Output format:
+Return a JSON array, one object per scene, with these fields:
+- scene: (number or "final")
+- scene_type: ("introduction", "main", or "finale")
+- narration: (detailed narration text for this scene)
+
+Example output:
+[
+  {{ "scene": 0, "scene_type": "introduction", "narration": "Welcome to a colorful adventure! Look at the beautiful meadow—so many colors to explore. Are you ready to discover something new today?" }},
+  {{ "scene": 1, "scene_type": "main", "narration": "A red butterfly flutters by, its wings shining brightly. Can you spot something red around you?" }},
+  {{ "scene": 2, "scene_type": "main", "narration": "Near the stream, a green frog jumps with joy. What other green things can you find?" }},
+  {{ "scene": "final", "scene_type": "finale", "narration": "What a fun day of learning! Which color was your favorite? See you next time for more adventures!" }}
+]

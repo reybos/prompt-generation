@@ -1,0 +1,15 @@
+{
+  "name": "halloweenPatchwork",
+  "displayName": "Halloween",
+  "description": "Family-friendly spooky Frankenstein-inspired 3D cartoon style",
+
+  "characterStyle": ".",
+
+  "environmentStyle": ".",
+
+  "colorPalette": ".",
+
+  "renderStyle": ".",
+
+  "globalStyle": "."
+}

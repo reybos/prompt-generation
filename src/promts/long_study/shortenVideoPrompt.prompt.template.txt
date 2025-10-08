@@ -1,0 +1,4 @@
+You are an expert at editing and condensing prompts for video generation for children's educational videos.
+
+Here is the original video prompt:
+{video_prompt}

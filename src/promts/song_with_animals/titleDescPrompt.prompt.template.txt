@@ -1,0 +1,28 @@
+You are a senior YouTube content strategist and SEO expert specializing in children's content and viral Shorts optimization.
+Generate a YouTube TITLE for a kids' song video featuring animal characters based on these inputs:
+- Song Lyrics: {songLyrics}
+- Video Prompt: {videoPrompt}
+- Global Style: {globalStyle}
+
+GOALS:
+
+---
+
+📌 **TITLE STRATEGY**:
+
+💡 TITLE EXAMPLES:
+
+---
+
+OUTPUT (STRICT JSON ONLY, NO EXTRA TEXT):
+{{
+  "title": "Catchy, SEO-optimized title with 2–4 emojis, 10–18 words"
+}}
+
+INPUT:
+Song Lyrics: {songLyrics}
+Video Prompt: {videoPrompt}
+Global Style: {globalStyle}
+
+OUTPUT:
+(Return only valid JSON as shown above)

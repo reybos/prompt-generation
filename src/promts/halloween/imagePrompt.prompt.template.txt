@@ -1,0 +1,19 @@
+Input is a sequence of valid call-and-response lines from a children's Halloween song ({songLyrics}).
+Each line describes a different animal character.
+
+TASK
+
+EXAMPLES:
+
+OUTPUT (JSON only, no commentary):
+{{
+  "global_style": "",
+  "prompts": [
+    {{ "line": "original song line", "prompt": "detailed image prompt for this line" }}
+  ]
+}}
+
+INPUT:
+{songLyrics}
+OUTPUT:
+(return JSON exactly as described)

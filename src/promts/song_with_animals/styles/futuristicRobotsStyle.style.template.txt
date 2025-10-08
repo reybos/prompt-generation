@@ -1,0 +1,13 @@
+{
+  "name": "futuristic-robots",
+  "displayName": "Futuristic Robots",
+  "description": "Bright, high-tech futuristic robot style for all types of characters",
+  
+  "characterStyle": ".",
+  
+  "environmentStyle": ".",
+  
+  "colorPalette": ".",
+  
+  "renderStyle": "."
+}

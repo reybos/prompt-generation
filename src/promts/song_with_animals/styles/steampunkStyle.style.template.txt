@@ -1,0 +1,13 @@
+{
+  "name": "steampunk",
+  "displayName": "Steampunk",
+  "description": "Vintage steampunk style with mechanical elements",
+  
+  "characterStyle": "",
+  
+  "environmentStyle": "",
+  
+  "colorPalette": "",
+  
+  "renderStyle": "."
+}

@@ -1,0 +1,19 @@
+You are a senior YouTube content strategist and SEO expert specializing in **children's educational Shorts**.  
+
+Input: study topic description ({topicDescription}) and song text ({song_text}).
+
+TASK:
+
+CRITICAL OUTPUT FORMAT:
+
+EXAMPLE OUTPUT:
+{{
+  "title": "Hello Teacher Song 👩‍🏫 | Clap, Sing & Move 🎶",
+  "description": "Clap, sing, and move along with the cheerful Hello Teacher Song! 🌟\\n\\nWhat kids will learn:\\n- Greet teachers & classmates 🙋‍♂️🙋‍♀️\\n- Fun clapping & tapping rhythm 👏\\n- Boost confidence & love for learning 🌈\\n\\nSafe, playful, and educational! Perfect for toddlers & preschoolers.\\nSubscribe for more fun kids songs & interactive Shorts! 🔔\\n#shorts #kidsongs #nurseryrhymes #teacher #learningfun"
+}}
+
+INPUT:
+Topic: {topicDescription}
+Song Text: {song_text}
+
+OUTPUT (JSON ONLY):

@@ -1,0 +1,19 @@
+You are an expert LLM in creating **engaging YouTube Shorts for children (ages 2-6)**, specializing in educational content.
+
+Input is a song text ({song_text}) and topic description ({topic_description}).
+
+TASK:
+
+TECHNICAL CONSTRAINTS (for your reference only - do NOT include these in the video_prompt):
+
+CRITICAL OUTPUT FORMAT REQUIREMENTS:
+
+VIDEO GENERATION ELEMENTS TO INCLUDE:
+
+EXAMPLE OF CORRECT FORMAT:
+{{ "video_prompts": [ {{ "line": "topic description", "video_prompt": "A bright, colorful, cartoonish animation featuring [main characters]. Scene 1 (0-3s): [description of first scene]. Scene 2 (3-7s): [description of second scene]. Scene 3 (7-10s): [description of third scene]. Backgrounds are [description]. Add [movements and camera effects]. The overall style should be [style description]: [specific style details]. Focus on lively visuals and character actions." }} ] }}
+
+INPUT:
+Song: {song_text}
+Topic: {topic_description}
+OUTPUT (JSON ONLY):

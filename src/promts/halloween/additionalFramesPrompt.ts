@@ -1,50 +1,27 @@
 import { PromptTemplate } from '@langchain/core/prompts';
+import fs from 'fs';
+import path from 'path';
+
+// Read prompt text with fallback to template
+let additionalFramesPromptTemplate: string;
+const actualPath = path.join(__dirname, 'additionalFramesPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'additionalFramesPrompt.prompt.template.txt');
+
+if (fs.existsSync(actualPath)) {
+    additionalFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
+} else {
+    additionalFramesPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
+    console.warn('⚠️  Using template prompt for halloweenGroupImagePrompt. Copy .template.txt to .txt for production use.');
+}
 
 /**
  * Halloween group image prompt template
  * Creates group thumbnails for every 3 characters
  */
-export const halloweenGroupImagePrompt = PromptTemplate.fromTemplate(`
-You are an expert in creating YouTube videos and thumbnails. Your task is to combine three individual character prompts into a single group prompt for generating a thumbnail image.  
-
-Inputs:  
-- global_style: a short style description that sets the shared artistic and atmospheric tone  
-- prompts: three structured inputs, each containing a "line" and a detailed "prompt" describing one Halloween-style patchwork character  
-
-Instructions:  
-1. Carefully read the three input prompts and extract the key character details (appearance, patchwork fabrics, glowing eyes, stitched features, posture, and personality).  
-2. Write a **single unified group prompt** in the same descriptive style as the examples.  
-3. The output must:  
-   - Describe all three characters together in one scene, each with their unique traits preserved.  
-   - Explicitly state that all characters are **standing side by side on the ground** and **facing the camera**.  
-   - Include environment details (fog, pumpkins, moonlight, graveyard, forest, garden, etc.) consistent with the given global_style.  
-   - End with a short "Environment" paragraph that sets the atmosphere, ground texture, lighting, and mood.  
-   - Match the tone of the provided examples: spooky yet family-friendly, whimsical Halloween atmosphere.  
-4. **CRITICAL: The final group prompt must be NO LONGER than 1500 characters. Be concise and precise.**
-5. Output only the final group prompt, without explanations, quotes, or additional commentary.  
-
-Now combine the provided global_style and three prompts into one final thumbnail prompt.
-
-Format of the answer:
-Rewrite the scene description in this format:
-A group of three [style] characters stand together in [environment]:
- • Character 1 — [short physical description]. 
- • Character 2 — [short physical description]. 
- • Character 3 — [short physical description]. 
-
-Environment Animation:  
-[Describe subtle].
-
-Global Style: {globalStyle}
-
-Three Character Prompts:
-{prompts}
-
-Return your response as a JSON object with the following structure:
-{{
-  "group_image_prompt": "The unified group prompt for thumbnail generation"
-}}
-`);
+export const halloweenGroupImagePrompt = new PromptTemplate({ 
+    inputVariables: ["globalStyle", "prompts"],
+    template: additionalFramesPromptTemplate 
+});
 
 /**
  * Halloween group video prompt template

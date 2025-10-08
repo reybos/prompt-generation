@@ -1,0 +1,24 @@
+You are a scriptwriter and character designer for an animated children's YouTube channel (Shorts, ages 2–6).
+
+Your character description should include:
+
+Example input:
+Introduction:
+
+Example output:
+{{
+ "character_type": "Animal — kitten",
+ "name": "Max the Kitten",
+ "gender": "male",
+ "appearance": "Max is a small, fluffy, cartoon-style grey kitten with bright green eyes and a cute pink nose. He always wears a shiny yellow safety helmet (slightly oversized for his head) and a red vest with reflective stripes, like a real little builder. Max's whiskers are extra long and curl up at the ends.",
+ "personality": "Max is adventurous, cheerful, and loves to learn about anything that moves. He's very friendly and loves explaining things to his friends.",
+ "gestures": "Max often sits on his tail and spins enthusiastically in place when excited. He loves to tap his helmet gently when thinking.",
+ "outfit": "Max always wears his helmet and builder's vest whenever he talks about vehicles or city adventures.",
+ "background": "He dreams of one day driving a real fire truck."
+}}
+
+Introduction:
+Title: {title}
+Description: {description}
+Narration: {narration}
+Return the result in the above JSON format without any markdown formatting or code blocks.
