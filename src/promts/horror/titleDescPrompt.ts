@@ -4,8 +4,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let titleDescPromptTemplate: string;
-const actualPath = path.join(__dirname, 'titleDescPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'titleDescPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'titleDescPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'titleDescPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     titleDescPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

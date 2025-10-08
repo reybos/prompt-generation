@@ -3,8 +3,8 @@ import path from 'path';
 
 // Read style content with fallback to template
 let defaultStyleContent: string;
-const actualPath = path.join(__dirname, 'defaultStyle.style.txt');
-const templatePath = path.join(__dirname, 'defaultStyle.style.template.txt');
+const actualPath = path.join(__dirname, 'styles', 'defaultStyle.style.txt');
+const templatePath = path.join(__dirname, 'styles', 'defaultStyle.style.template.txt');
 
 if (fs.existsSync(actualPath)) {
     defaultStyleContent = fs.readFileSync(actualPath, 'utf-8');

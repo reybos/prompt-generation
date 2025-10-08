@@ -9,8 +9,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let enhanceMediaPromptTemplate: string;
-const actualPath = path.join(__dirname, 'enhanceMediaPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'enhanceMediaPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'enhanceMediaPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'enhanceMediaPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     enhanceMediaPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
@@ -26,8 +26,8 @@ const enhanceMediaPrompt = new PromptTemplate({
 
 // Read prompt text with fallback to template
 let shortenVideoPromptTemplate: string;
-const shortenActualPath = path.join(__dirname, 'shortenVideoPrompt.prompt.txt');
-const shortenTemplatePath = path.join(__dirname, 'shortenVideoPrompt.prompt.template.txt');
+const shortenActualPath = path.join(__dirname, 'prompts', 'shortenVideoPrompt.prompt.txt');
+const shortenTemplatePath = path.join(__dirname, 'prompts', 'shortenVideoPrompt.prompt.template.txt');
 
 if (fs.existsSync(shortenActualPath)) {
     shortenVideoPromptTemplate = fs.readFileSync(shortenActualPath, 'utf-8');

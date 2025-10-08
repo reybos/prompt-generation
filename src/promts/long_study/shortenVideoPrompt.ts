@@ -4,8 +4,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let shortenVideoPromptTemplate: string;
-const actualPath = path.join(__dirname, 'shortenVideoPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'shortenVideoPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'shortenVideoPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'shortenVideoPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     shortenVideoPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

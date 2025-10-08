@@ -3,8 +3,8 @@ import path from 'path';
 
 // Read style content with fallback to template
 let halloweenPatchworkStyleContent: string;
-const actualPath = path.join(__dirname, 'halloweenPatchworkStyle.style.txt');
-const templatePath = path.join(__dirname, 'halloweenPatchworkStyle.style.template.txt');
+const actualPath = path.join(__dirname, 'styles', 'halloweenPatchworkStyle.style.txt');
+const templatePath = path.join(__dirname, 'styles', 'halloweenPatchworkStyle.style.template.txt');
 
 if (fs.existsSync(actualPath)) {
     halloweenPatchworkStyleContent = fs.readFileSync(actualPath, 'utf-8');

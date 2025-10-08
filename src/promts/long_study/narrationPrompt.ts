@@ -9,8 +9,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let narrationPromptTemplate: string;
-const actualPath = path.join(__dirname, 'narrationPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'narrationPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'narrationPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'narrationPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     narrationPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

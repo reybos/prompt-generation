@@ -3,8 +3,8 @@ import path from 'path';
 
 // Read style content with fallback to template
 let futuristicRobotsStyleContent: string;
-const actualPath = path.join(__dirname, 'futuristicRobotsStyle.style.txt');
-const templatePath = path.join(__dirname, 'futuristicRobotsStyle.style.template.txt');
+const actualPath = path.join(__dirname, 'styles', 'futuristicRobotsStyle.style.txt');
+const templatePath = path.join(__dirname, 'styles', 'futuristicRobotsStyle.style.template.txt');
 
 if (fs.existsSync(actualPath)) {
     futuristicRobotsStyleContent = fs.readFileSync(actualPath, 'utf-8');

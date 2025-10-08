@@ -28,7 +28,7 @@ yarn-error.log*
 dist/
 
 # Private prompt text files
-src/promts/**/*.prompt.txt
+src/promts/**/prompts/*.prompt.txt
 
 # Private style files
-src/promts/**/styles/*.style.txt
+src/promts/**/styles/styles/*.style.txt

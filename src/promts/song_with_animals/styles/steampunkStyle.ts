@@ -3,8 +3,8 @@ import path from 'path';
 
 // Read style content with fallback to template
 let steampunkStyleContent: string;
-const actualPath = path.join(__dirname, 'steampunkStyle.style.txt');
-const templatePath = path.join(__dirname, 'steampunkStyle.style.template.txt');
+const actualPath = path.join(__dirname, 'styles', 'steampunkStyle.style.txt');
+const templatePath = path.join(__dirname, 'styles', 'steampunkStyle.style.template.txt');
 
 if (fs.existsSync(actualPath)) {
     steampunkStyleContent = fs.readFileSync(actualPath, 'utf-8');

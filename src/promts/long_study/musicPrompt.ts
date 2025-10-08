@@ -9,8 +9,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let musicPromptTemplate: string;
-const actualPath = path.join(__dirname, 'musicPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'musicPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'musicPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'musicPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     musicPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

@@ -9,8 +9,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let mediaPromptTemplate: string;
-const actualPath = path.join(__dirname, 'mediaPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'mediaPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'mediaPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'mediaPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     mediaPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

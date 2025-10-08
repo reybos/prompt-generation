@@ -12,8 +12,8 @@ const RANDOM_SEED = Math.floor(Math.random() * 10000);
 
 // Read prompt text with fallback to template
 let scriptPromptTemplate: string;
-const actualPath = path.join(__dirname, 'scriptPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'scriptPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'scriptPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'scriptPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     scriptPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

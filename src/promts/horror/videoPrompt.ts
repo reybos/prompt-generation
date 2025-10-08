@@ -5,8 +5,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let horrorVideoPromptTemplate: string;
-const actualPath = path.join(__dirname, 'videoPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'videoPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'videoPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'videoPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     horrorVideoPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

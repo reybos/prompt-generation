@@ -4,8 +4,8 @@ import path from 'path';
 
 // Read prompt text with fallback to template
 let additionalFramesPromptTemplate: string;
-const actualPath = path.join(__dirname, 'additionalFramesPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'additionalFramesPrompt.prompt.template.txt');
+const actualPath = path.join(__dirname, 'prompts', 'additionalFramesPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'additionalFramesPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
     additionalFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');

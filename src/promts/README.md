@@ -101,16 +101,41 @@ Files with visual style configurations:
 ```
 src/promts/
 ├── long_study/          # Long-form educational content prompts
-├── short_study/         # Short-form educational content prompts  
+│   ├── prompts/         # All prompt files organized here
+│   │   ├── *.prompt.template.txt
+│   │   └── *.prompt.txt (gitignored)
+│   └── *.ts            # TypeScript logic files
+├── short_study/         # Short-form educational content prompts
+│   ├── prompts/         # All prompt files organized here
+│   │   ├── *.prompt.template.txt
+│   │   └── *.prompt.txt (gitignored)
+│   └── *.ts            # TypeScript logic files
 ├── horror/              # Horror content prompts
+│   ├── prompts/         # All prompt files organized here
+│   │   ├── *.prompt.template.txt
+│   │   └── *.prompt.txt (gitignored)
+│   └── *.ts            # TypeScript logic files
 ├── halloween/           # Halloween-themed content prompts
+│   ├── prompts/         # All prompt files organized here
+│   │   ├── *.prompt.template.txt
+│   │   └── *.prompt.txt (gitignored)
+│   └── *.ts            # TypeScript logic files
 ├── song_with_animals/   # Animal song content prompts
+│   ├── prompts/         # All prompt files organized here
+│   │   ├── *.prompt.template.txt
+│   │   └── *.prompt.txt (gitignored)
+│   ├── styles/          # Style configurations
+│   │   ├── styles/      # All style files organized here
+│   │   │   ├── *.style.template.txt
+│   │   │   └── *.style.txt (gitignored)
+│   │   └── *.ts        # TypeScript logic files
+│   └── *.ts            # TypeScript logic files
 └── index.ts            # Main exports file
 ```
 
 Each subdirectory contains:
-- `*.ts` files with TypeScript logic
-- `*.prompt.template.txt` files with template prompt content
-- `*.prompt.txt` files with actual prompt content (gitignored)
-- `*.style.template.txt` files with template style content (in styles/ subdirectories)
-- `*.style.txt` files with actual style content (gitignored, in styles/ subdirectories)
+- `prompts/` subdirectory with all prompt files organized together
+- `styles/` subdirectory (where applicable) with:
+  - `styles/` subdirectory containing all style files organized together
+  - `*.ts` files with TypeScript logic for styles
+- `*.ts` files with TypeScript logic in the main directory
