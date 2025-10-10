@@ -4,8 +4,13 @@
  */
 
 import { PromptTemplate } from '@langchain/core/prompts';
+import { getDirname } from '../../utils/fileUtils.js';
 import fs from 'fs';
 import path from 'path';
+
+
+// Get __dirname equivalent for ES modules
+const __dirname = getDirname(import.meta.url);
 
 // Random seed for consistent character selection within a video
 const RANDOM_SEED = Math.floor(Math.random() * 10000);

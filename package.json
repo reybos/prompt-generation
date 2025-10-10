@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "type": "module",
     "scripts": {
-        "build": "tsc && copyfiles \"public/**/*\" dist/",
+        "build": "tsc && copyfiles \"public/**/*\" dist/ && copyfiles \"src/promts/**/*.txt\" dist/ --up 1",
         "start": "node dist/index.js",
         "generate": "node dist/index.js",
         "help": "node dist/index.js --help",

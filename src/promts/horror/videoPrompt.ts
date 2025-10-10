@@ -1,7 +1,12 @@
 // Horror Video Prompt
 import {PromptTemplate} from '@langchain/core/prompts';
+import { getDirname } from '../../utils/fileUtils.js';
 import fs from 'fs';
 import path from 'path';
+
+
+// Get __dirname equivalent for ES modules
+const __dirname = getDirname(import.meta.url);
 
 // Read prompt text with fallback to template
 let horrorVideoPromptTemplate: string;

@@ -1,5 +1,10 @@
 import fs from 'fs';
+import { getDirname } from '../../../utils/fileUtils.js';
 import path from 'path';
+
+
+// Get __dirname equivalent for ES modules
+const __dirname = getDirname(import.meta.url);
 
 // Read style content with fallback to template
 let retroRobotsStyleContent: string;

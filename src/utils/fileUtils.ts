@@ -31,6 +31,15 @@ import { getGenerationsDir } from '../server.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Get __dirname equivalent for ES modules
+ * Use this in any file that needs to access the current directory
+ */
+export function getDirname(importMetaUrl: string): string {
+    const filename = fileURLToPath(importMetaUrl);
+    return path.dirname(filename);
+}
+
 // Calculate project root (where package.json is located)
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 

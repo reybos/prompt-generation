@@ -1,6 +1,11 @@
 import {PromptTemplate} from '@langchain/core/prompts';
+import { getDirname } from '../../utils/fileUtils.js';
 import fs from 'fs';
 import path from 'path';
+
+
+// Get __dirname equivalent for ES modules
+const __dirname = getDirname(import.meta.url);
 
 // Read prompt text with fallback to template
 let titleDescPromptTemplate: string;
@@ -15,13 +20,13 @@ if (fs.existsSync(actualPath)) {
 }
 
 export const shortStudyTitleDescPrompt = new PromptTemplate({
-    inputVariables: ["topic", "script"],
+    inputVariables: ["topicDescription", "song_text"],
     template: titleDescPromptTemplate
 });
 
-export function logTitleDescPrompt(topic: string, script: string): void {
+export function logTitleDescPrompt(topicDescription: string, song_text: string): void {
     console.log('\n=== SHORT STUDY TITLE DESC PROMPT ===');
-    console.log('Topic:', topic);
-    console.log('Script:', script);
+    console.log('Topic Description:', topicDescription);
+    console.log('Song Text:', song_text);
     console.log('=====================================\n');
 }
