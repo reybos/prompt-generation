@@ -40,7 +40,6 @@ export function safeJsonParse<T = Record<string, any>>(
                         .replace(/\r/g, '\\r')
                         .replace(/\t/g, '\\t')
                         .replace(/\f/g, '\\f')
-                        .replace(/\b/g, '\\b')
                         .replace(/\v/g, '\\v');
                     return `"${escaped}"`;
                 });

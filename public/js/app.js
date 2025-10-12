@@ -247,7 +247,7 @@ function appendSongWithAnimalsLogEntry(log, timestamp) {
     const logItem = document.createElement('div');
     logItem.className = 'list-group-item';
 
-    if (timestamp) {
+    if (timestamp && timestamp !== 'Invalid Date') {
         logItem.innerHTML = `
       <div class="d-flex justify-content-between align-items-start">
         <p class="mb-0">${log}</p>
@@ -592,7 +592,7 @@ function appendHorrorLogEntry(log, timestamp) {
     const logItem = document.createElement('div');
     logItem.className = 'list-group-item';
 
-    if (timestamp) {
+    if (timestamp && timestamp !== 'Invalid Date') {
         logItem.innerHTML = `
       <div class="d-flex justify-content-between align-items-start">
         <p class="mb-0">${log}</p>
@@ -709,7 +709,7 @@ function appendShortStudyLogEntry(log, timestamp) {
     const logItem = document.createElement('div');
     logItem.className = 'list-group-item';
 
-    if (timestamp) {
+    if (timestamp && timestamp !== 'Invalid Date') {
         logItem.innerHTML = `
       <div class="d-flex justify-content-between align-items-start">
         <p class="mb-0">${log}</p>
@@ -830,7 +830,7 @@ function appendLogEntry(log, timestamp) {
     const logItem = document.createElement('div');
     logItem.className = 'list-group-item';
 
-    if (timestamp) {
+    if (timestamp && timestamp !== 'Invalid Date') {
         logItem.innerHTML = `
       <div class="d-flex justify-content-between align-items-start">
         <p class="mb-0">${log}</p>
