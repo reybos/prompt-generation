@@ -58,8 +58,8 @@ const songWithAnimalsErrorMessage = document.getElementById('songWithAnimalsErro
 const songWithAnimalsLoadingSpinner = document.getElementById('songWithAnimalsLoadingSpinner');
 
 // DOM Elements for Halloween Generation
-const halloweenLink = document.getElementById('halloween_dance-link');
-const halloweenContent = document.getElementById('halloween_dance-content');
+const halloweenLink = document.getElementById('halloween-link');
+const halloweenContent = document.getElementById('halloween-content');
 const halloweenForm = document.getElementById('halloweenForm');
 const halloweenAdditionalFrames = document.getElementById('halloweenAdditionalFrames');
 const halloweenResultsSection = document.getElementById('halloweenResultsSection');
@@ -69,8 +69,8 @@ const halloweenErrorMessage = document.getElementById('halloweenErrorMessage');
 const halloweenLoadingSpinner = document.getElementById('halloweenLoadingSpinner');
 
 // DOM Elements for Halloween Transform Generation
-const halloweenTransformLink = document.getElementById('halloween_dance-transform-link');
-const halloweenTransformContent = document.getElementById('halloween_dance-transform-content');
+const halloweenTransformLink = document.getElementById('halloween-transform-link');
+const halloweenTransformContent = document.getElementById('halloween-transform-content');
 const halloweenTransformForm = document.getElementById('halloweenTransformForm');
 const halloweenTransformAdditionalFrames = document.getElementById('halloweenTransformAdditionalFrames');
 const halloweenTransformResultsSection = document.getElementById('halloweenTransformResultsSection');
@@ -980,7 +980,7 @@ if (generateLink) {
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
         if (shortStudyContent) shortStudyContent.classList.add('d-none');
-        if (resultsSection) resultsSection.classList.remove('d-none');
+        if (resultsSection) resultsSection.classList.add('d-none');
         if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
         if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
     });
@@ -1045,7 +1045,6 @@ if (halloweenTransformLink) {
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
-        if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
