@@ -1,9 +1,9 @@
-import { HalloweenInput, HalloweenOutput, HalloweenImagePrompt, HalloweenVideoPrompt, HalloweenAdditionalFramePrompt, HalloweenTransformVideoPrompt, HalloweenTransformOutput } from '../types/pipeline.js';
+import { HalloweenInput, HalloweenOutput, HalloweenImagePrompt, HalloweenVideoPrompt, HalloweenAdditionalFramePrompt, HalloweenTransformVideoPrompt, HalloweenTransformOutput, LLMRequest } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { createImagePromptWithStyle } from '../promts/halloween_transform/imagePrompt.js';
 import { halloweenTransformVideoPrompt, halloweenTransformTitlePrompt, halloweenTransformLogVideoPrompt, halloweenTransformLogTitlePrompt, halloweenTransformGroupImagePrompt, halloweenTransformGroupVideoPrompt, logHalloweenTransformGroupImagePrompt, logHalloweenTransformGroupVideoPrompt } from '../promts/index.js';
 import { createChain } from '../chains/index.js';
-import { executePipelineStep, safeJsonParse } from '../utils/index.js';
+import { executePipelineStep, executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
 import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -42,9 +42,9 @@ export async function runHalloweenTransformPipeline(
     const lyrics = song.lyrics;
     const segments = splitLyricsIntoSegments(lyrics);
 
-    const imageModel = 'anthropic/claude-3.7-sonnet';
+    const imageModel = 'anthropic/claude-sonnet-4.5';
     const imageTemperature = 0.3;
-    const videoModel = 'anthropic/claude-3.7-sonnet';
+    const videoModel = 'anthropic/claude-sonnet-4.5';
     const videoTemperature = 0.5;
     const titleModel = 'anthropic/claude-sonnet-4.5';
     const titleTemperature = 0.7;
@@ -54,6 +54,7 @@ export async function runHalloweenTransformPipeline(
     let finished = false;
     while (attempt < maxAttempts && !finished) {
       attempt++;
+      const requests: LLMRequest[] = [];
       try {
         if (options.emitLog && options.requestId) {
           options.emitLog(`🎃 Generating Halloween Transform song with ${selectedStyle} style... (Attempt ${attempt})`, options.requestId);
@@ -64,12 +65,12 @@ export async function runHalloweenTransformPipeline(
         }
 
         const imagePromptWithStyle = createImagePromptWithStyle(selectedStyle);
-        const imageChain = createChain(imagePromptWithStyle, { model: imageModel, temperature: imageTemperature });
-
-        const imageJson: string | Record<string, any> | null = await executePipelineStep(
+        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
           'HALLOWEEN TRANSFORM IMAGE PROMPTS',
-          imageChain,
-          { songLyrics: lyrics }
+          imagePromptWithStyle,
+          { model: imageModel, temperature: imageTemperature },
+          { songLyrics: lyrics },
+          requests
         );
         let globalStyle = '';
         let prompts: HalloweenImagePrompt[] = [];
@@ -91,13 +92,14 @@ export async function runHalloweenTransformPipeline(
         let videoPrompts: HalloweenTransformVideoPrompt[] = [];
         let videoJson: string | Record<string, any> | null = null;
         try {
-          const videoChain = createChain(halloweenTransformVideoPrompt, { model: videoModel, temperature: videoTemperature });
           const imagePromptsJson = JSON.stringify(prompts.map(p => ({ line: p.line, prompt: p.prompt, index: p.index })));
           halloweenTransformLogVideoPrompt(imagePromptsJson);
-          videoJson = await executePipelineStep(
+          videoJson = await executePipelineStepWithTracking(
             'HALLOWEEN TRANSFORM VIDEO PROMPTS',
-            videoChain,
-            { image_prompts: imagePromptsJson }
+            halloweenTransformVideoPrompt,
+            { model: videoModel, temperature: videoTemperature },
+            { image_prompts: imagePromptsJson },
+            requests
           );
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'HALLOWEEN TRANSFORM VIDEO PROMPTS') : videoJson;
@@ -143,12 +145,13 @@ export async function runHalloweenTransformPipeline(
           let title = '';
           let titleJson: string | Record<string, any> | null = null;
           try {
-            const titleChain = createChain(halloweenTransformTitlePrompt, { model: titleModel, temperature: titleTemperature });
             halloweenTransformLogTitlePrompt(segmentLines, segmentVideoPrompts, globalStyle);
-            titleJson = await executePipelineStep(
+            titleJson = await executePipelineStepWithTracking(
               'HALLOWEEN TRANSFORM TITLE',
-              titleChain,
-              { songLyrics: segmentLines, videoPrompt: segmentVideoPrompts, globalStyle: globalStyle }
+              halloweenTransformTitlePrompt,
+              { model: titleModel, temperature: titleTemperature },
+              { songLyrics: segmentLines, videoPrompt: segmentVideoPrompts, globalStyle: globalStyle },
+              requests
             );
             if (titleJson) {
               const parsed = typeof titleJson === 'string' ? safeJsonParse(titleJson, 'HALLOWEEN TRANSFORM TITLE') : titleJson;
@@ -196,12 +199,13 @@ export async function runHalloweenTransformPipeline(
               while (imageAttempts < maxImageAttempts && !groupImagePrompt) {
                 imageAttempts++;
                 if (options.emitLog && options.requestId) options.emitLog(`🖼️ Generating group image prompt (attempt ${imageAttempts}/${maxImageAttempts})...`, options.requestId);
-                const groupImageChain = createChain(halloweenTransformGroupImagePrompt, { model: groupImageModel, temperature: groupImageTemperature });
                 logHalloweenTransformGroupImagePrompt(globalStyle, threePrompts);
-                const groupImageJson: string | Record<string, any> | null = await executePipelineStep(
+                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
                   'HALLOWEEN TRANSFORM GROUP IMAGE',
-                  groupImageChain,
-                  { globalStyle: globalStyle, prompts: threePrompts }
+                  halloweenTransformGroupImagePrompt,
+                  { model: groupImageModel, temperature: groupImageTemperature },
+                  { globalStyle: globalStyle, prompts: threePrompts },
+                  requests
                 );
                 if (groupImageJson) {
                   const parsed = typeof groupImageJson === 'string' ? safeJsonParse(groupImageJson, 'HALLOWEEN TRANSFORM GROUP IMAGE') : groupImageJson;
@@ -227,12 +231,13 @@ export async function runHalloweenTransformPipeline(
               while (videoAttempts < maxVideoAttempts && !groupVideoPrompt) {
                 videoAttempts++;
                 if (options.emitLog && options.requestId) options.emitLog(`🎬 Generating group video prompt (attempt ${videoAttempts}/${maxVideoAttempts})...`, options.requestId);
-                const groupVideoChain = createChain(halloweenTransformGroupVideoPrompt, { model: groupVideoModel, temperature: groupVideoTemperature });
                 logHalloweenTransformGroupVideoPrompt(groupImagePrompt);
-                const groupVideoJson: string | Record<string, any> | null = await executePipelineStep(
+                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
                   'HALLOWEEN TRANSFORM GROUP VIDEO',
-                  groupVideoChain,
-                  { groupImagePrompt: groupImagePrompt }
+                  halloweenTransformGroupVideoPrompt,
+                  { model: groupVideoModel, temperature: groupVideoTemperature },
+                  { groupImagePrompt: groupImagePrompt },
+                  requests
                 );
                 if (groupVideoJson) {
                   const parsed = typeof groupVideoJson === 'string' ? safeJsonParse(groupVideoJson, 'HALLOWEEN TRANSFORM GROUP VIDEO') : groupVideoJson;
@@ -271,7 +276,8 @@ export async function runHalloweenTransformPipeline(
           prompts,
           video_prompts: videoPrompts,
           titles,
-          additional_frames: additionalFrames.length > 0 ? additionalFrames : undefined
+          additional_frames: additionalFrames.length > 0 ? additionalFrames : undefined,
+          requests: requests.length > 0 ? requests : undefined
         };
         results.push(songResult);
 

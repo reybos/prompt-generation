@@ -19,11 +19,20 @@ import { FalLLM, FalLLMResponse } from '../types/llm.js';
 export class FalChatModel extends BaseChatModel {
     private falLLM: FalLLM;
     private options: LLMOptions;
+    private lastRequestId: string | undefined;
 
     constructor(options: LLMOptions = {}) {
         super({});
         this.options = options;
         this.falLLM = createFalLLM(options);
+        this.lastRequestId = undefined;
+    }
+
+    /**
+     * Get the last request ID from the most recent LLM call
+     */
+    getLastRequestId(): string | undefined {
+        return this.lastRequestId;
     }
 
     _llmType(): string {
@@ -58,6 +67,11 @@ export class FalChatModel extends BaseChatModel {
 
         // Call fal.ai LLM
         const response: FalLLMResponse = await this.falLLM.call(prompt, systemPrompt);
+        
+        // Store requestId for tracking
+        if (response.requestId) {
+            this.lastRequestId = response.requestId;
+        }
 
         return {
             generations: [{

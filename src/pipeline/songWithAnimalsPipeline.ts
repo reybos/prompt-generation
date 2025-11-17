@@ -1,10 +1,10 @@
-import { SongWithAnimalsInput, SongWithAnimalsOutput, SongWithAnimalsImagePrompt, SongWithAnimalsVideoPrompt, SongWithAnimalsAdditionalFramePrompt } from '../types/pipeline.js';
+import { SongWithAnimalsInput, SongWithAnimalsOutput, SongWithAnimalsImagePrompt, SongWithAnimalsVideoPrompt, SongWithAnimalsAdditionalFramePrompt, LLMRequest } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { createImagePromptWithStyle } from '../promts/song_with_animals/imagePrompt.js';
 import { getStyle } from '../promts/song_with_animals/styles/styleConfig.js';
 import { songWithAnimalsVideoPrompt, songWithAnimalsTitlePrompt, logVideoPrompt, logTitlePrompt, songWithAnimalsGroupImagePrompt, songWithAnimalsGroupVideoPrompt, logSongWithAnimalsGroupImagePrompt, logSongWithAnimalsGroupVideoPrompt } from '../promts/index.js';
 import { createChain } from '../chains/index.js';
-import { executePipelineStep, safeJsonParse } from '../utils/index.js';
+import { executePipelineStep, executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
 import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -80,6 +80,7 @@ export async function runSongWithAnimalsPipeline(
     let finished = false;
     while (attempt < maxAttempts && !finished) {
       attempt++;
+      const requests: LLMRequest[] = [];
       try {
         if (options.emitLog && options.requestId) {
           options.emitLog(`🎵 Generating song with animals with ${selectedStyle} style... (Attempt ${attempt})`, options.requestId);
@@ -108,12 +109,12 @@ export async function runSongWithAnimalsPipeline(
 
         // Создаем промт с выбранным стилем
         const imagePromptWithStyle = createImagePromptWithStyle(selectedStyle);
-        const imageChain = createChain(imagePromptWithStyle, { model: imageModel, temperature: imageTemperature });
-        
-        const imageJson: string | Record<string, any> | null = await executePipelineStep(
+        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
           'SONG WITH ANIMALS IMAGE PROMPTS',
-          imageChain,
-          { songLyrics: lyrics }
+          imagePromptWithStyle,
+          { model: imageModel, temperature: imageTemperature },
+          { songLyrics: lyrics },
+          requests
         );
         let prompts: SongWithAnimalsImagePrompt[] = [];
         if (imageJson) {
@@ -147,21 +148,21 @@ export async function runSongWithAnimalsPipeline(
         let videoPrompts: SongWithAnimalsVideoPrompt[] = [];
         let videoJson: string | Record<string, any> | null = null;
         try {
-          const videoChain = createChain(songWithAnimalsVideoPrompt, { model: videoModel, temperature: videoTemperature });
-          
           // Prepare image prompts as formatted string for the prompt
           const imagePromptsFormatted = prompts.map(p => `Line: "${p.line}"\nPrompt: ${p.prompt}`).join('\n\n');
           
           // Логируем видео промт в консоль
           logVideoPrompt(globalStyle, imagePromptsFormatted);
           
-          videoJson = await executePipelineStep(
+          videoJson = await executePipelineStepWithTracking(
             'SONG WITH ANIMALS VIDEO PROMPTS',
-            videoChain,
+            songWithAnimalsVideoPrompt,
+            { model: videoModel, temperature: videoTemperature },
             { 
               global_style: globalStyle,
               image_prompts: imagePromptsFormatted
-            }
+            },
+            requests
           );
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'SONG WITH ANIMALS VIDEO PROMPTS') : videoJson;
@@ -235,19 +236,19 @@ export async function runSongWithAnimalsPipeline(
           let title = '';
           let titleJson: string | Record<string, any> | null = null;
           try {
-            const titleChain = createChain(songWithAnimalsTitlePrompt, { model: titleModel, temperature: titleTemperature });
-            
             // Логируем title промт в консоль
             logTitlePrompt(segmentLines, segmentVideoPrompts, globalStyle);
             
-            titleJson = await executePipelineStep(
+            titleJson = await executePipelineStepWithTracking(
               'SONG WITH ANIMALS TITLE',
-              titleChain,
+              songWithAnimalsTitlePrompt,
+              { model: titleModel, temperature: titleTemperature },
               { 
                 songLyrics: segmentLines,
                 videoPrompt: segmentVideoPrompts,
                 globalStyle: globalStyle
-              }
+              },
+              requests
             );
             if (titleJson) {
               const parsed = typeof titleJson === 'string' ? safeJsonParse(titleJson, 'SONG WITH ANIMALS TITLE') : titleJson;
@@ -333,20 +334,20 @@ export async function runSongWithAnimalsPipeline(
                   options.emitLog(`🖼️ Generating group image prompt (attempt ${imageAttempts}/${maxImageAttempts})...`, options.requestId);
                 }
                 
-                const groupImageChain = createChain(songWithAnimalsGroupImagePrompt, { 
-                  model: groupImageModel, 
-                  temperature: groupImageTemperature 
-                });
-                
                 logSongWithAnimalsGroupImagePrompt(globalStyle, threePrompts);
                 
-                const groupImageJson: string | Record<string, any> | null = await executePipelineStep(
+                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
                   'SONG WITH ANIMALS GROUP IMAGE',
-                  groupImageChain,
+                  songWithAnimalsGroupImagePrompt,
+                  { 
+                    model: groupImageModel, 
+                    temperature: groupImageTemperature 
+                  },
                   { 
                     globalStyle: globalStyle,
                     prompts: threePrompts
-                  }
+                  },
+                  requests
                 );
 
                 if (groupImageJson) {
@@ -395,19 +396,19 @@ export async function runSongWithAnimalsPipeline(
                   options.emitLog(`🎬 Generating group video prompt (attempt ${videoAttempts}/${maxVideoAttempts})...`, options.requestId);
                 }
                 
-                const groupVideoChain = createChain(songWithAnimalsGroupVideoPrompt, { 
-                  model: groupVideoModel, 
-                  temperature: groupVideoTemperature 
-                });
-                
                 logSongWithAnimalsGroupVideoPrompt(groupImagePrompt);
                 
-                const groupVideoJson: string | Record<string, any> | null = await executePipelineStep(
+                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
                   'SONG WITH ANIMALS GROUP VIDEO',
-                  groupVideoChain,
+                  songWithAnimalsGroupVideoPrompt,
+                  { 
+                    model: groupVideoModel, 
+                    temperature: groupVideoTemperature 
+                  },
                   { 
                     groupImagePrompt: groupImagePrompt
-                  }
+                  },
+                  requests
                 );
 
                 if (groupVideoJson) {
@@ -472,7 +473,8 @@ export async function runSongWithAnimalsPipeline(
           prompts,
           video_prompts: videoPrompts,
           titles,
-          additional_frames: additionalFrames.length > 0 ? additionalFrames : undefined
+          additional_frames: additionalFrames.length > 0 ? additionalFrames : undefined,
+          requests: requests.length > 0 ? requests : undefined
         };
         results.push(songResult);
 

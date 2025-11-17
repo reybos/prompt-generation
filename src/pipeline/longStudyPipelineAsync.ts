@@ -15,7 +15,7 @@ import {
     narrationPrompt,
 } from '../promts/index.js';
 import config from '../config/index.js';
-import { ContentPackage, PipelineOptions } from '../types/pipeline.js';
+import { ContentPackage, PipelineOptions, LLMRequest } from '../types/pipeline.js';
 import { Runnable } from '@langchain/core/runnables';
 import { ChainValues } from '@langchain/core/utils/types';
 import fs from 'fs/promises';
@@ -55,12 +55,14 @@ interface AsyncRequest {
  * @param step - The pipeline step to submit
  * @param topic - The topic being processed
  * @param theme - The theme being processed
+ * @param requests - Array to store request tracking information
  * @returns The request ID
  */
 async function submitPipelineStep(
     step: PipelineStep,
     topic: string,
-    theme: string
+    theme: string,
+    requests: LLMRequest[]
 ): Promise<string> {
     const chain: Runnable<ChainValues, string> = createChain(step.promptTemplate, { 
         model: step.model, 
@@ -81,6 +83,13 @@ async function submitPipelineStep(
             temperature: step.temperature
         }
     );
+    
+    // Store request information
+    requests.push({
+        prompt: formattedPrompt,
+        model: step.model,
+        requestId: requestId
+    });
     
     return requestId;
 }
@@ -193,6 +202,7 @@ async function runContentPipelineAsync(
             
             while (attempt < maxTopicAttempts && !finished) {
                 attempt++;
+                const requests: LLMRequest[] = [];
                 try {
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`🚀 Starting async generation for "${topic}"... (Attempt ${attempt})`, options.requestId);
@@ -209,7 +219,7 @@ async function runContentPipelineAsync(
                         contextName: 'script'
                     };
                     
-                    const scriptRequestId = await submitPipelineStep(scriptStep, topic, theme);
+                    const scriptRequestId = await submitPipelineStep(scriptStep, topic, theme, requests);
                     
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`📝 Script request submitted for "${topic}" (ID: ${scriptRequestId})`, options.requestId);
@@ -258,7 +268,7 @@ async function runContentPipelineAsync(
                         contextName: 'media'
                     };
                     
-                    const mediaRequestId = await submitPipelineStep(mediaStep, topic, theme);
+                    const mediaRequestId = await submitPipelineStep(mediaStep, topic, theme, requests);
                     
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`🖼️ Media prompts request submitted for "${topic}" (ID: ${mediaRequestId})`, options.requestId);
@@ -362,10 +372,10 @@ async function runContentPipelineAsync(
 
                     // Submit all remaining steps
                     const [enhanceMediaRequestId, musicRequestId, titleDescRequestId, hashtagsRequestId] = await Promise.all([
-                        submitPipelineStep(enhanceMediaStep, topic, theme),
-                        submitPipelineStep(musicStep, topic, theme),
-                        submitPipelineStep(titleDescStep, topic, theme),
-                        submitPipelineStep(hashtagsStep, topic, theme)
+                        submitPipelineStep(enhanceMediaStep, topic, theme, requests),
+                        submitPipelineStep(musicStep, topic, theme, requests),
+                        submitPipelineStep(titleDescStep, topic, theme, requests),
+                        submitPipelineStep(hashtagsStep, topic, theme, requests)
                     ]);
                     
                     if (options.emitLog && options.requestId) {
@@ -457,7 +467,7 @@ async function runContentPipelineAsync(
                     const finalEnhancedMediaStr = JSON.stringify(finalEnhancedMedia, null, 2);
                     narrationStep.params.enhancedMedia = finalEnhancedMediaStr;
                     
-                    const narrationRequestId = await submitPipelineStep(narrationStep, topic, theme);
+                    const narrationRequestId = await submitPipelineStep(narrationStep, topic, theme, requests);
                     
                     if (options.emitLog && options.requestId) {
                         options.emitLog(`🎤 Narration request submitted for "${topic}" (ID: ${narrationRequestId})`, options.requestId);
@@ -559,6 +569,7 @@ async function runContentPipelineAsync(
                         music: musicResult as any,
                         titleDesc: titleDescResult as any,
                         hashtags: typeof hashtagsResult === 'string' ? hashtagsResult : JSON.stringify(hashtagsResult),
+                        requests: requests.length > 0 ? requests : undefined
                     };
 
                     // Save to file in unprocessed folder

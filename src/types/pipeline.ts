@@ -113,6 +113,7 @@ export interface ContentPackage {
     music: MusicSuggestion;
     titleDesc: TitleDescription;
     hashtags: string;
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
 }
 
 /**
@@ -124,6 +125,15 @@ export interface PipelineOptions {
     emitLog?: (log: string, requestId: string | undefined) => void;
     style?: string; // Visual style for song with animals pipeline
     generateAdditionalFrames?: boolean; // Flag to generate additional frames
+}
+
+/**
+ * LLM request tracking information
+ */
+export interface LLMRequest {
+    prompt: string; // The prompt that was sent to LLM
+    model: string; // The model version used
+    requestId?: string; // Request ID if available
 }
 
 /* END GENAI */
@@ -174,6 +184,7 @@ export interface SongWithAnimalsOutput {
     video_prompts: SongWithAnimalsVideoPrompt[];
     titles: string[];
     additional_frames?: SongWithAnimalsAdditionalFramePrompt[]; // Optional additional frames
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
 }
 
 /**
@@ -220,6 +231,7 @@ export interface ShortStudyOutput {
     title: string;
     description: string;
     hashtags: string;
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
 }
 
 /**
@@ -268,6 +280,7 @@ export interface HalloweenOutput {
     video_prompts: HalloweenVideoPrompt[];
     titles: string[];
     additional_frames?: HalloweenAdditionalFramePrompt[]; // Optional additional frames
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
 }
 
 /**
@@ -289,5 +302,6 @@ export interface HalloweenTransformOutput {
     video_prompts: HalloweenTransformVideoPrompt[];
     titles: string[];
     additional_frames?: HalloweenAdditionalFramePrompt[]; // Optional additional frames
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
 }
 

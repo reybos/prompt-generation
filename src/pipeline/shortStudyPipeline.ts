@@ -1,8 +1,8 @@
-import { ShortStudyInput, ShortStudyOutput, ShortStudyVideoPrompt, ShortStudySongPrompt } from '../types/pipeline.js';
+import { ShortStudyInput, ShortStudyOutput, ShortStudyVideoPrompt, ShortStudySongPrompt, LLMRequest } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logVideoPrompt, shortStudyLogTitleDescPrompt } from '../promts/index.js';
 import { createChain } from '../chains/index.js';
-import { executePipelineStep, safeJsonParse } from '../utils/index.js';
+import { executePipelineStep, executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { getGenerationsDir } from '../server.js';
@@ -38,6 +38,7 @@ export async function runShortStudyPipeline(
     let finished = false;
     while (attempt < maxAttempts && !finished) {
       attempt++;
+      const requests: LLMRequest[] = [];
       try {
         if (options.emitLog && options.requestId) {
           options.emitLog(`📚 Generating short study content... (Attempt ${attempt})`, options.requestId);
@@ -50,12 +51,12 @@ export async function runShortStudyPipeline(
         
         let songPrompt: ShortStudySongPrompt | null = null;
         try {
-          const songChain = createChain(shortStudySongPrompt, { model: songModel, temperature: songTemperature });
-          
-          const songJson: string | Record<string, any> | null = await executePipelineStep(
+          const songJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
             'SHORT STUDY SONG',
-            songChain,
-            { topicDescription: topicDescription }
+            shortStudySongPrompt,
+            { model: songModel, temperature: songTemperature },
+            { topicDescription: topicDescription },
+            requests
           );
           
           if (songJson) {
@@ -100,18 +101,18 @@ export async function runShortStudyPipeline(
         let videoPrompt: ShortStudyVideoPrompt | null = null;
         let videoJson: string | Record<string, any> | null = null;
         try {
-          const videoChain = createChain(shortStudyVideoPrompt, { model: videoModel, temperature: videoTemperature });
-          
           // Логируем видео промт в консоль
           logVideoPrompt(songPrompt.song_text, topicDescription);
           
-          videoJson = await executePipelineStep(
+          videoJson = await executePipelineStepWithTracking(
             'SHORT STUDY VIDEO PROMPTS',
-            videoChain,
+            shortStudyVideoPrompt,
+            { model: videoModel, temperature: videoTemperature },
             { 
               song_text: songPrompt.song_text,
               topic_description: topicDescription
-            }
+            },
+            requests
           );
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'SHORT STUDY VIDEO PROMPTS') : videoJson;
@@ -176,18 +177,18 @@ export async function runShortStudyPipeline(
         let description = '';
         let titleDescJson: string | Record<string, any> | null = null;
         try {
-          const titleDescChain = createChain(shortStudyTitleDescPrompt, { model: titleDescModel, temperature: titleDescTemperature });
-          
           // Логируем title/description промт в консоль
           shortStudyLogTitleDescPrompt(topicLine, songText);
           
-          titleDescJson = await executePipelineStep(
+          titleDescJson = await executePipelineStepWithTracking(
             'SHORT STUDY TITLE & DESCRIPTION',
-            titleDescChain,
+            shortStudyTitleDescPrompt,
+            { model: titleDescModel, temperature: titleDescTemperature },
             { 
               topicDescription: topicLine,
               song_text: songText
-            }
+            },
+            requests
           );
           if (titleDescJson) {
             const parsed = typeof titleDescJson === 'string' ? safeJsonParse(titleDescJson, 'SHORT STUDY TITLE & DESCRIPTION') : titleDescJson;
@@ -215,16 +216,17 @@ export async function runShortStudyPipeline(
         
         let hashtagsStr: string | null = null;
         try {
-          const hashtagsChain = createChain(shortStudyHashtagsPrompt, { model: hashtagsModel, temperature: hashtagsTemperature });
-          hashtagsStr = await executePipelineStep(
+          hashtagsStr = await executePipelineStepWithTracking(
             'SHORT STUDY HASHTAGS',
-            hashtagsChain,
+            shortStudyHashtagsPrompt,
+            { model: hashtagsModel, temperature: hashtagsTemperature },
             { 
               topicDescription: topicLine,
               song_text: songText
             },
+            requests,
             false // Don't parse as JSON, hashtags are returned as plain string
-          );
+          ) as string | null;
           if (hashtagsStr && typeof hashtagsStr === 'string') {
             hashtagsStr = hashtagsStr.trim();
           } else {
@@ -245,7 +247,8 @@ export async function runShortStudyPipeline(
           video_prompt: videoPrompt,
           title: title,
           description: description,
-          hashtags: hashtagsStr
+          hashtags: hashtagsStr,
+          requests: requests.length > 0 ? requests : undefined
         };
         results.push(topicResult);
 
