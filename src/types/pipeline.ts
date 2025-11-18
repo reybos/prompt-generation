@@ -131,7 +131,9 @@ export interface PipelineOptions {
  * LLM request tracking information
  */
 export interface LLMRequest {
-    prompt: string; // The prompt that was sent to LLM
+    prompt: string; // The formatted prompt that was sent to LLM (template with inserted params)
+    systemPrompt: string; // The prompt template (instructions/rules before data insertion)
+    params: Record<string, any>; // Parameters that were inserted into placeholders
     model: string; // The model version used
     requestId?: string; // Request ID if available
 }

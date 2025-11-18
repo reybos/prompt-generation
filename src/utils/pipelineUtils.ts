@@ -68,7 +68,10 @@ export async function executePipelineStepWithTracking<T = Record<string, any>>(
     parseJson: boolean = true,
     contextName: string | null = null
 ): Promise<T | string | null> {
-    // Format the prompt
+    // Get the template (system prompt) - this is the prompt structure/instructions before data insertion
+    const systemPrompt = promptTemplate.template;
+    
+    // Format the prompt with parameters
     const formattedPrompt = await promptTemplate.format(params);
     
     // Create LLM instance (we need to keep reference to get requestId later)
@@ -88,7 +91,9 @@ export async function executePipelineStepWithTracking<T = Record<string, any>>(
     // Store request information
     const model = options.model || 'unknown';
     requests.push({
-        prompt: formattedPrompt,
+        prompt: formattedPrompt, // Formatted prompt with inserted data
+        systemPrompt: systemPrompt, // Template/instructions before data insertion
+        params: params, // Parameters that were inserted into placeholders
         model: model,
         requestId: requestId
     });

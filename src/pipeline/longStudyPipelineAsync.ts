@@ -69,13 +69,17 @@ async function submitPipelineStep(
         temperature: step.temperature 
     });
     
+    // Get the template (system prompt) - this is the prompt structure/instructions before data insertion
+    const systemPrompt = step.promptTemplate.template;
+    
     // Format the prompt with parameters
     const formattedPrompt = await step.promptTemplate.format(step.params);
     
     // Submit to queue with tracking
+    // Note: submitToQueueWithTracking doesn't use systemPrompt separately, it's all in formattedPrompt
     const requestId = await submitToQueueWithTracking(
         formattedPrompt,
-        undefined, // system prompt
+        undefined, // System prompt is part of formattedPrompt in this case
         step.stepName,
         topic,
         {
@@ -86,7 +90,9 @@ async function submitPipelineStep(
     
     // Store request information
     requests.push({
-        prompt: formattedPrompt,
+        prompt: formattedPrompt, // Formatted prompt with inserted data
+        systemPrompt: systemPrompt, // Template/instructions before data insertion
+        params: step.params, // Parameters that were inserted into placeholders
         model: step.model,
         requestId: requestId
     });
