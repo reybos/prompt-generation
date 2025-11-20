@@ -1,8 +1,7 @@
 import { ShortStudyInput, ShortStudyOutput, ShortStudyVideoPrompt, ShortStudySongPrompt, LLMRequest } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logVideoPrompt, shortStudyLogTitleDescPrompt } from '../promts/index.js';
-import { createChain } from '../chains/index.js';
-import { executePipelineStep, executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
+import { executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { getGenerationsDir } from '../server.js';

@@ -7,5 +7,6 @@
 export * from './jsonParser.js';
 export * from './pipelineUtils.js';
 export * from './fileUtils.js';
+export * from './promptUtils.js';
 
 /* END GENAI */

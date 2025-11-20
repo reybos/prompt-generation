@@ -4,7 +4,7 @@
  * Implements the main content generation pipeline using FAL.AI queue for async processing
  */
 import { createChain } from '../chains/index.js';
-import { safeJsonParse } from '../utils/index.js';
+import { safeJsonParse, extractSystemPrompt } from '../utils/index.js';
 import {
     scriptPrompt,
     mediaPrompt,
@@ -69,10 +69,8 @@ async function submitPipelineStep(
         temperature: step.temperature 
     });
     
-    // Get the template (system prompt) - this is the prompt structure/instructions before data insertion
-    // Template can be string or MessageContent, convert to string
-    const templateValue = step.promptTemplate.template;
-    const systemPrompt = typeof templateValue === 'string' ? templateValue : JSON.stringify(templateValue);
+    // Extract system prompt using utility function
+    const systemPrompt = extractSystemPrompt(step.promptTemplate);
     
     // Format the prompt with parameters
     const formattedPrompt = await step.promptTemplate.format(step.params);

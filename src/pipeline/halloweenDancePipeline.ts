@@ -2,8 +2,7 @@ import { HalloweenInput, HalloweenOutput, HalloweenImagePrompt, HalloweenVideoPr
 import { PipelineOptions } from '../types/pipeline.js';
 import { createImagePromptWithStyle } from '../promts/halloween_dance/imagePrompt.js';
 import { halloweenVideoPrompt, halloweenTitlePrompt, halloweenLogVideoPrompt, halloweenLogTitlePrompt, halloweenGroupImagePrompt, halloweenGroupVideoPrompt, logHalloweenGroupImagePrompt, logHalloweenGroupVideoPrompt } from '../promts/index.js';
-import { createChain } from '../chains/index.js';
-import { executePipelineStep, executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
+import { executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
 import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';

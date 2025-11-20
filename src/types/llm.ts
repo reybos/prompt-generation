@@ -7,7 +7,6 @@ import { PromptTemplate } from '@langchain/core/prompts';
 import { Runnable } from '@langchain/core/runnables';
 import { ChainValues } from '@langchain/core/utils/types';
 import { LLMOptions } from './config.js';
-import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 
 /**
  * fal.ai LLM response
@@ -61,16 +60,6 @@ export interface QueueStatus {
  */
 export type ChainParameters = Record<string, any>;
 
-/**
- * Pipeline step function
- */
-export type PipelineStepFunction = <T = Record<string, any>>(
-    stepName: string,
-    chain: Runnable<ChainValues, string>,
-    params: ChainParameters,
-    parseJson?: boolean,
-    contextName?: string | null
-) => Promise<T | string | null>;
 
 /**
  * Chain factory function
@@ -81,9 +70,5 @@ export type ChainFactory = (
     outputKey?: string
 ) => Runnable<ChainValues, string>;
 
-/**
- * Generic LLM model factory function
- */
-export type GenericLLMFactory = (options?: LLMOptions) => BaseChatModel;
 
 /* END GENAI */
