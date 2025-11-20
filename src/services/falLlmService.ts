@@ -31,9 +31,12 @@ const createFalLLM = (options: LLMOptions = {}): FalLLM => {
                 // Poll for the result from the queue
                 const result: any = await pollForResult(requestId);
 
+                // Safely access result data with fallback values
+                const data = result?.data || result || {};
+                
                 return {
-                    text: result.data.output || '',
-                    reasoning: result.data.reasoning,
+                    text: data.output || '',
+                    reasoning: data.reasoning,
                     requestId: requestId,
                 };
             } catch (error) {

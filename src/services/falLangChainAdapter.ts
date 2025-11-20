@@ -18,12 +18,10 @@ import { FalLLM, FalLLMResponse } from '../types/llm.js';
  */
 export class FalChatModel extends BaseChatModel {
     private falLLM: FalLLM;
-    private options: LLMOptions;
     private lastRequestId: string | undefined;
 
     constructor(options: LLMOptions = {}) {
         super({});
-        this.options = options;
         this.falLLM = createFalLLM(options);
         this.lastRequestId = undefined;
     }
