@@ -69,7 +69,9 @@ export async function executePipelineStepWithTracking<T = Record<string, any>>(
     contextName: string | null = null
 ): Promise<T | string | null> {
     // Get the template (system prompt) - this is the prompt structure/instructions before data insertion
-    const systemPrompt = promptTemplate.template;
+    // Template can be string or MessageContent, convert to string
+    const templateValue = promptTemplate.template;
+    const systemPrompt = typeof templateValue === 'string' ? templateValue : JSON.stringify(templateValue);
     
     // Format the prompt with parameters
     const formattedPrompt = await promptTemplate.format(params);

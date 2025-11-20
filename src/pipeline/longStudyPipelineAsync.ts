@@ -70,7 +70,9 @@ async function submitPipelineStep(
     });
     
     // Get the template (system prompt) - this is the prompt structure/instructions before data insertion
-    const systemPrompt = step.promptTemplate.template;
+    // Template can be string or MessageContent, convert to string
+    const templateValue = step.promptTemplate.template;
+    const systemPrompt = typeof templateValue === 'string' ? templateValue : JSON.stringify(templateValue);
     
     // Format the prompt with parameters
     const formattedPrompt = await step.promptTemplate.format(step.params);

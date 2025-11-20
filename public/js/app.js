@@ -991,6 +991,7 @@ if (confirmSaveBtn) {
 if (savedLink) {
     savedLink.addEventListener('click', (e) => {
         e.preventDefault();
+        hideError(); // Hide main error alert when navigating
         savedLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
@@ -1021,6 +1022,7 @@ if (savedLink) {
 if (generateLink) {
     generateLink.addEventListener('click', (e) => {
         e.preventDefault();
+        hideError(); // Hide main error alert when navigating
         generateLink.classList.add('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
@@ -1048,6 +1050,7 @@ if (generateLink) {
 if (songWithAnimalsLink) {
     songWithAnimalsLink.addEventListener('click', (e) => {
         e.preventDefault();
+        hideError(); // Hide main error alert when navigating
         songWithAnimalsLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
@@ -1075,6 +1078,7 @@ if (songWithAnimalsLink) {
 if (halloweenLink) {
     halloweenLink.addEventListener('click', (e) => {
         e.preventDefault();
+        hideError(); // Hide main error alert when navigating
         halloweenLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
@@ -1099,6 +1103,7 @@ if (halloweenLink) {
 if (halloweenTransformLink) {
     halloweenTransformLink.addEventListener('click', (e) => {
         e.preventDefault();
+        hideError(); // Hide main error alert when navigating
         halloweenTransformLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
@@ -1122,6 +1127,7 @@ if (halloweenTransformLink) {
 if (shortStudyLink) {
     shortStudyLink.addEventListener('click', (e) => {
         e.preventDefault();
+        hideError(); // Hide main error alert when navigating
         shortStudyLink.classList.add('active');
         if (generateLink) generateLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
