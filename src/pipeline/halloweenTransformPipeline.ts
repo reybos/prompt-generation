@@ -64,13 +64,13 @@ export async function runHalloweenTransformPipeline(
         }
 
         const imagePromptWithStyle = createImagePromptWithStyle(selectedStyle);
-        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-          'HALLOWEEN TRANSFORM IMAGE PROMPTS',
-          imagePromptWithStyle,
-          { model: imageModel, temperature: imageTemperature },
-          { songLyrics: lyrics },
+        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+          stepName: 'HALLOWEEN TRANSFORM IMAGE PROMPTS',
+          promptTemplate: imagePromptWithStyle,
+          options: { model: imageModel, temperature: imageTemperature },
+          params: { songLyrics: lyrics },
           requests
-        );
+        });
         let globalStyle = '';
         let prompts: HalloweenImagePrompt[] = [];
         if (imageJson) {
@@ -93,13 +93,13 @@ export async function runHalloweenTransformPipeline(
         try {
           const imagePromptsJson = JSON.stringify(prompts.map(p => ({ line: p.line, prompt: p.prompt, index: p.index })));
           halloweenTransformLogVideoPrompt(imagePromptsJson);
-          videoJson = await executePipelineStepWithTracking(
-            'HALLOWEEN TRANSFORM VIDEO PROMPTS',
-            halloweenTransformVideoPrompt,
-            { model: videoModel, temperature: videoTemperature },
-            { image_prompts: imagePromptsJson },
+          videoJson = await executePipelineStepWithTracking({
+            stepName: 'HALLOWEEN TRANSFORM VIDEO PROMPTS',
+            promptTemplate: halloweenTransformVideoPrompt,
+            options: { model: videoModel, temperature: videoTemperature },
+            params: { image_prompts: imagePromptsJson },
             requests
-          );
+          });
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'HALLOWEEN TRANSFORM VIDEO PROMPTS') : videoJson;
             if (options.emitLog && options.requestId) {
@@ -145,13 +145,13 @@ export async function runHalloweenTransformPipeline(
           let titleJson: string | Record<string, any> | null = null;
           try {
             halloweenTransformLogTitlePrompt(segmentLines, segmentVideoPrompts, globalStyle);
-            titleJson = await executePipelineStepWithTracking(
-              'HALLOWEEN TRANSFORM TITLE',
-              halloweenTransformTitlePrompt,
-              { model: titleModel, temperature: titleTemperature },
-              { songLyrics: segmentLines, videoPrompt: segmentVideoPrompts, globalStyle: globalStyle },
+            titleJson = await executePipelineStepWithTracking({
+              stepName: 'HALLOWEEN TRANSFORM TITLE',
+              promptTemplate: halloweenTransformTitlePrompt,
+              options: { model: titleModel, temperature: titleTemperature },
+              params: { songLyrics: segmentLines, videoPrompt: segmentVideoPrompts, globalStyle: globalStyle },
               requests
-            );
+            });
             if (titleJson) {
               const parsed = typeof titleJson === 'string' ? safeJsonParse(titleJson, 'HALLOWEEN TRANSFORM TITLE') : titleJson;
               if (parsed && typeof parsed === 'object') title = parsed.title || '';
@@ -199,13 +199,13 @@ export async function runHalloweenTransformPipeline(
                 imageAttempts++;
                 if (options.emitLog && options.requestId) options.emitLog(`🖼️ Generating group image prompt (attempt ${imageAttempts}/${maxImageAttempts})...`, options.requestId);
                 logHalloweenTransformGroupImagePrompt(globalStyle, threePrompts);
-                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-                  'HALLOWEEN TRANSFORM GROUP IMAGE',
-                  halloweenTransformGroupImagePrompt,
-                  { model: groupImageModel, temperature: groupImageTemperature },
-                  { globalStyle: globalStyle, prompts: threePrompts },
+                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+                  stepName: 'HALLOWEEN TRANSFORM GROUP IMAGE',
+                  promptTemplate: halloweenTransformGroupImagePrompt,
+                  options: { model: groupImageModel, temperature: groupImageTemperature },
+                  params: { globalStyle: globalStyle, prompts: threePrompts },
                   requests
-                );
+                });
                 if (groupImageJson) {
                   const parsed = typeof groupImageJson === 'string' ? safeJsonParse(groupImageJson, 'HALLOWEEN TRANSFORM GROUP IMAGE') : groupImageJson;
                   if (parsed && typeof parsed === 'object' && parsed.group_image_prompt) {
@@ -231,13 +231,13 @@ export async function runHalloweenTransformPipeline(
                 videoAttempts++;
                 if (options.emitLog && options.requestId) options.emitLog(`🎬 Generating group video prompt (attempt ${videoAttempts}/${maxVideoAttempts})...`, options.requestId);
                 logHalloweenTransformGroupVideoPrompt(groupImagePrompt);
-                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-                  'HALLOWEEN TRANSFORM GROUP VIDEO',
-                  halloweenTransformGroupVideoPrompt,
-                  { model: groupVideoModel, temperature: groupVideoTemperature },
-                  { groupImagePrompt: groupImagePrompt },
+                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+                  stepName: 'HALLOWEEN TRANSFORM GROUP VIDEO',
+                  promptTemplate: halloweenTransformGroupVideoPrompt,
+                  options: { model: groupVideoModel, temperature: groupVideoTemperature },
+                  params: { groupImagePrompt: groupImagePrompt },
                   requests
-                );
+                });
                 if (groupVideoJson) {
                   const parsed = typeof groupVideoJson === 'string' ? safeJsonParse(groupVideoJson, 'HALLOWEEN TRANSFORM GROUP VIDEO') : groupVideoJson;
                   if (parsed && typeof parsed === 'object' && parsed.group_video_prompt) {

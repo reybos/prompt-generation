@@ -34,11 +34,11 @@ export interface ExecutePipelineStepOptions {
 }
 
 /**
- * Execute a pipeline step with request tracking (new improved version)
+ * Execute a pipeline step with request tracking
  * @param opts - Options object containing all parameters
  * @returns The result of the pipeline step (parsed JSON or raw string)
  */
-export async function executePipelineStepWithTrackingV2<T = Record<string, any>>(
+export async function executePipelineStepWithTracking<T = Record<string, any>>(
     opts: ExecutePipelineStepOptions
 ): Promise<T | string | null> {
     // Validate required parameters
@@ -119,37 +119,5 @@ export async function executePipelineStepWithTrackingV2<T = Record<string, any>>
     }
 }
 
-/**
- * Execute a pipeline step with request tracking
- * @deprecated Use executePipelineStepWithTrackingV2 with options object instead
- * @param stepName - Name of the pipeline step
- * @param promptTemplate - The prompt template to use
- * @param options - Options for the LLM (model, temperature)
- * @param params - Parameters to pass to the chain
- * @param requests - Array to store request tracking information
- * @param parseJson - Whether to parse the result as JSON (default: true)
- * @param contextName - Optional context name for JSON parsing errors
- * @returns The result of the pipeline step (parsed JSON or raw string)
- */
-export async function executePipelineStepWithTracking<T = Record<string, any>>(
-    stepName: string,
-    promptTemplate: PromptTemplate,
-    options: LLMOptions,
-    params: ChainParameters,
-    requests: LLMRequest[],
-    parseJson: boolean = true,
-    contextName: string | null = null
-): Promise<T | string | null> {
-    // Use the new version internally for consistency
-    return executePipelineStepWithTrackingV2<T>({
-        stepName,
-        promptTemplate,
-        options,
-        params,
-        requests,
-        parseJson,
-        contextName: contextName || undefined
-    });
-}
 
 /* END GENAI */

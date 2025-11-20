@@ -108,13 +108,13 @@ export async function runSongWithAnimalsPipeline(
 
         // Создаем промт с выбранным стилем
         const imagePromptWithStyle = createImagePromptWithStyle(selectedStyle);
-        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-          'SONG WITH ANIMALS IMAGE PROMPTS',
-          imagePromptWithStyle,
-          { model: imageModel, temperature: imageTemperature },
-          { songLyrics: lyrics },
+        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+          stepName: 'SONG WITH ANIMALS IMAGE PROMPTS',
+          promptTemplate: imagePromptWithStyle,
+          options: { model: imageModel, temperature: imageTemperature },
+          params: { songLyrics: lyrics },
           requests
-        );
+        });
         let prompts: SongWithAnimalsImagePrompt[] = [];
         if (imageJson) {
           const parsed = typeof imageJson === 'string' ? safeJsonParse(imageJson, 'SONG WITH ANIMALS IMAGE PROMPTS') : imageJson;
@@ -153,16 +153,16 @@ export async function runSongWithAnimalsPipeline(
           // Логируем видео промт в консоль
           logVideoPrompt(globalStyle, imagePromptsFormatted);
           
-          videoJson = await executePipelineStepWithTracking(
-            'SONG WITH ANIMALS VIDEO PROMPTS',
-            songWithAnimalsVideoPrompt,
-            { model: videoModel, temperature: videoTemperature },
-            { 
+          videoJson = await executePipelineStepWithTracking({
+            stepName: 'SONG WITH ANIMALS VIDEO PROMPTS',
+            promptTemplate: songWithAnimalsVideoPrompt,
+            options: { model: videoModel, temperature: videoTemperature },
+            params: { 
               global_style: globalStyle,
               image_prompts: imagePromptsFormatted
             },
             requests
-          );
+          });
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'SONG WITH ANIMALS VIDEO PROMPTS') : videoJson;
             if (options.emitLog && options.requestId) {
@@ -238,17 +238,17 @@ export async function runSongWithAnimalsPipeline(
             // Логируем title промт в консоль
             logTitlePrompt(segmentLines, segmentVideoPrompts, globalStyle);
             
-            titleJson = await executePipelineStepWithTracking(
-              'SONG WITH ANIMALS TITLE',
-              songWithAnimalsTitlePrompt,
-              { model: titleModel, temperature: titleTemperature },
-              { 
+            titleJson = await executePipelineStepWithTracking({
+              stepName: 'SONG WITH ANIMALS TITLE',
+              promptTemplate: songWithAnimalsTitlePrompt,
+              options: { model: titleModel, temperature: titleTemperature },
+              params: { 
                 songLyrics: segmentLines,
                 videoPrompt: segmentVideoPrompts,
                 globalStyle: globalStyle
               },
               requests
-            );
+            });
             if (titleJson) {
               const parsed = typeof titleJson === 'string' ? safeJsonParse(titleJson, 'SONG WITH ANIMALS TITLE') : titleJson;
               if (parsed && typeof parsed === 'object') {
@@ -335,19 +335,19 @@ export async function runSongWithAnimalsPipeline(
                 
                 logSongWithAnimalsGroupImagePrompt(globalStyle, threePrompts);
                 
-                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-                  'SONG WITH ANIMALS GROUP IMAGE',
-                  songWithAnimalsGroupImagePrompt,
-                  { 
+                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+                  stepName: 'SONG WITH ANIMALS GROUP IMAGE',
+                  promptTemplate: songWithAnimalsGroupImagePrompt,
+                  options: { 
                     model: groupImageModel, 
                     temperature: groupImageTemperature 
                   },
-                  { 
+                  params: { 
                     globalStyle: globalStyle,
                     prompts: threePrompts
                   },
                   requests
-                );
+                });
 
                 if (groupImageJson) {
                   const parsed = typeof groupImageJson === 'string' ? 
@@ -397,18 +397,18 @@ export async function runSongWithAnimalsPipeline(
                 
                 logSongWithAnimalsGroupVideoPrompt(groupImagePrompt);
                 
-                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-                  'SONG WITH ANIMALS GROUP VIDEO',
-                  songWithAnimalsGroupVideoPrompt,
-                  { 
+                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+                  stepName: 'SONG WITH ANIMALS GROUP VIDEO',
+                  promptTemplate: songWithAnimalsGroupVideoPrompt,
+                  options: { 
                     model: groupVideoModel, 
                     temperature: groupVideoTemperature 
                   },
-                  { 
+                  params: { 
                     groupImagePrompt: groupImagePrompt
                   },
                   requests
-                );
+                });
 
                 if (groupVideoJson) {
                   const parsed = typeof groupVideoJson === 'string' ? 

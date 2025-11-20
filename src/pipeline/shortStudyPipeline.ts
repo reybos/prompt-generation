@@ -50,13 +50,13 @@ export async function runShortStudyPipeline(
         
         let songPrompt: ShortStudySongPrompt | null = null;
         try {
-          const songJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-            'SHORT STUDY SONG',
-            shortStudySongPrompt,
-            { model: songModel, temperature: songTemperature },
-            { topicDescription: topicDescription },
+          const songJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+            stepName: 'SHORT STUDY SONG',
+            promptTemplate: shortStudySongPrompt,
+            options: { model: songModel, temperature: songTemperature },
+            params: { topicDescription: topicDescription },
             requests
-          );
+          });
           
           if (songJson) {
             const parsed = typeof songJson === 'string' ? safeJsonParse(songJson, 'SHORT STUDY SONG') : songJson;
@@ -103,16 +103,16 @@ export async function runShortStudyPipeline(
           // Логируем видео промт в консоль
           logVideoPrompt(songPrompt.song_text, topicDescription);
           
-          videoJson = await executePipelineStepWithTracking(
-            'SHORT STUDY VIDEO PROMPTS',
-            shortStudyVideoPrompt,
-            { model: videoModel, temperature: videoTemperature },
-            { 
+          videoJson = await executePipelineStepWithTracking({
+            stepName: 'SHORT STUDY VIDEO PROMPTS',
+            promptTemplate: shortStudyVideoPrompt,
+            options: { model: videoModel, temperature: videoTemperature },
+            params: { 
               song_text: songPrompt.song_text,
               topic_description: topicDescription
             },
             requests
-          );
+          });
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'SHORT STUDY VIDEO PROMPTS') : videoJson;
             if (options.emitLog && options.requestId) {
@@ -179,16 +179,16 @@ export async function runShortStudyPipeline(
           // Логируем title/description промт в консоль
           shortStudyLogTitleDescPrompt(topicLine, songText);
           
-          titleDescJson = await executePipelineStepWithTracking(
-            'SHORT STUDY TITLE & DESCRIPTION',
-            shortStudyTitleDescPrompt,
-            { model: titleDescModel, temperature: titleDescTemperature },
-            { 
+          titleDescJson = await executePipelineStepWithTracking({
+            stepName: 'SHORT STUDY TITLE & DESCRIPTION',
+            promptTemplate: shortStudyTitleDescPrompt,
+            options: { model: titleDescModel, temperature: titleDescTemperature },
+            params: { 
               topicDescription: topicLine,
               song_text: songText
             },
             requests
-          );
+          });
           if (titleDescJson) {
             const parsed = typeof titleDescJson === 'string' ? safeJsonParse(titleDescJson, 'SHORT STUDY TITLE & DESCRIPTION') : titleDescJson;
             if (parsed && typeof parsed === 'object') {
@@ -215,17 +215,17 @@ export async function runShortStudyPipeline(
         
         let hashtagsStr: string | null = null;
         try {
-          hashtagsStr = await executePipelineStepWithTracking(
-            'SHORT STUDY HASHTAGS',
-            shortStudyHashtagsPrompt,
-            { model: hashtagsModel, temperature: hashtagsTemperature },
-            { 
+          hashtagsStr = await executePipelineStepWithTracking({
+            stepName: 'SHORT STUDY HASHTAGS',
+            promptTemplate: shortStudyHashtagsPrompt,
+            options: { model: hashtagsModel, temperature: hashtagsTemperature },
+            params: { 
               topicDescription: topicLine,
               song_text: songText
             },
             requests,
-            false // Don't parse as JSON, hashtags are returned as plain string
-          ) as string | null;
+            parseJson: false // Don't parse as JSON, hashtags are returned as plain string
+          }) as string | null;
           if (hashtagsStr && typeof hashtagsStr === 'string') {
             hashtagsStr = hashtagsStr.trim();
           } else {

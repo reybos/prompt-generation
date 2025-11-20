@@ -91,13 +91,13 @@ export async function runHalloweenPipeline(
         
         // Создаем промт с Halloween стилем
         const imagePromptWithStyle = createImagePromptWithStyle(selectedStyle);
-        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-          'HALLOWEEN IMAGE PROMPTS',
-          imagePromptWithStyle,
-          { model: imageModel, temperature: imageTemperature },
-          { songLyrics: lyrics },
+        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+          stepName: 'HALLOWEEN IMAGE PROMPTS',
+          promptTemplate: imagePromptWithStyle,
+          options: { model: imageModel, temperature: imageTemperature },
+          params: { songLyrics: lyrics },
           requests
-        );
+        });
         let globalStyle = '';
         let prompts: HalloweenImagePrompt[] = [];
         if (imageJson) {
@@ -131,16 +131,16 @@ export async function runHalloweenPipeline(
           // Логируем видео промт в консоль
           halloweenLogVideoPrompt(globalStyle, imagePromptsFormatted);
           
-          videoJson = await executePipelineStepWithTracking(
-            'HALLOWEEN VIDEO PROMPTS',
-            halloweenVideoPrompt,
-            { model: videoModel, temperature: videoTemperature },
-            { 
+          videoJson = await executePipelineStepWithTracking({
+            stepName: 'HALLOWEEN VIDEO PROMPTS',
+            promptTemplate: halloweenVideoPrompt,
+            options: { model: videoModel, temperature: videoTemperature },
+            params: { 
               global_style: globalStyle,
               image_prompts: imagePromptsFormatted
             },
             requests
-          );
+          });
           if (videoJson) {
             const parsed = typeof videoJson === 'string' ? safeJsonParse(videoJson, 'HALLOWEEN VIDEO PROMPTS') : videoJson;
             if (options.emitLog && options.requestId) {
@@ -216,17 +216,17 @@ export async function runHalloweenPipeline(
             // Логируем title промт в консоль
             halloweenLogTitlePrompt(segmentLines, segmentVideoPrompts, globalStyle);
             
-            titleJson = await executePipelineStepWithTracking(
-              'HALLOWEEN TITLE',
-              halloweenTitlePrompt,
-              { model: titleModel, temperature: titleTemperature },
-              { 
+            titleJson = await executePipelineStepWithTracking({
+              stepName: 'HALLOWEEN TITLE',
+              promptTemplate: halloweenTitlePrompt,
+              options: { model: titleModel, temperature: titleTemperature },
+              params: { 
                 songLyrics: segmentLines,
                 videoPrompt: segmentVideoPrompts,
                 globalStyle: globalStyle
               },
               requests
-            );
+            });
             if (titleJson) {
               const parsed = typeof titleJson === 'string' ? safeJsonParse(titleJson, 'HALLOWEEN TITLE') : titleJson;
               if (parsed && typeof parsed === 'object') {
@@ -313,19 +313,19 @@ export async function runHalloweenPipeline(
                 
                 logHalloweenGroupImagePrompt(globalStyle, threePrompts);
                 
-                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-                  'HALLOWEEN GROUP IMAGE',
-                  halloweenGroupImagePrompt,
-                  { 
+                const groupImageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+                  stepName: 'HALLOWEEN GROUP IMAGE',
+                  promptTemplate: halloweenGroupImagePrompt,
+                  options: { 
                     model: groupImageModel, 
                     temperature: groupImageTemperature 
                   },
-                  { 
+                  params: { 
                     globalStyle: globalStyle,
                     prompts: threePrompts
                   },
                   requests
-                );
+                });
 
                 if (groupImageJson) {
                   const parsed = typeof groupImageJson === 'string' ? 
@@ -375,18 +375,18 @@ export async function runHalloweenPipeline(
                 
                 logHalloweenGroupVideoPrompt(groupImagePrompt);
                 
-                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking(
-                  'HALLOWEEN GROUP VIDEO',
-                  halloweenGroupVideoPrompt,
-                  { 
+                const groupVideoJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+                  stepName: 'HALLOWEEN GROUP VIDEO',
+                  promptTemplate: halloweenGroupVideoPrompt,
+                  options: { 
                     model: groupVideoModel, 
                     temperature: groupVideoTemperature 
                   },
-                  { 
+                  params: { 
                     groupImagePrompt: groupImagePrompt
                   },
                   requests
-                );
+                });
 
                 if (groupVideoJson) {
                   const parsed = typeof groupVideoJson === 'string' ? 
