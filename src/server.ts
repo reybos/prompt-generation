@@ -10,7 +10,7 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import crypto from 'crypto';
 
-import { runContentPipeline, runHalloweenTransformPipeline } from './pipeline/index.js';
+import { runContentPipeline, runHalloweenTransformPipeline, runHalloweenTransformTwoFramePipeline } from './pipeline/index.js';
 // Utility functions removed: not implemented
 import config from './config/index.js';
 import { ContentPackage, PipelineOptions, HalloweenInput } from './types/pipeline.js';
@@ -174,6 +174,29 @@ app.post('/api/generate-halloween-transform', async (req, res) => {
         return res.json({ success: true, requestId });
     } catch (err) {
         console.error('Error in /api/generate-halloween_dance-transform:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API endpoint for Halloween Transform Two Frame generation
+app.post('/api/generate-halloween-transform-two-frame', async (req, res) => {
+    try {
+        const { input, generateAdditionalFrames } = req.body;
+        if (!input) {
+            return res.status(400).json({ error: 'Missing input' });
+        }
+        // Generate a unique requestId for this generation
+        const requestId = crypto.randomUUID();
+        // Start Halloween Transform Two Frame generation in the background (do not await)
+        processHalloweenTransformTwoFrameGeneration(input, requestId, generateAdditionalFrames)
+            .catch(err => {
+                console.error('Error in background Halloween Transform Two Frame generation:', err);
+                emitLog('Error during Halloween Transform Two Frame generation: ' + (err?.message || err), requestId);
+            });
+        // Respond immediately so frontend can connect to SSE
+        return res.json({ success: true, requestId });
+    } catch (err) {
+        console.error('Error in /api/generate-halloween-transform-two-frame:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -403,6 +426,37 @@ async function processHalloweenTransformGeneration(
         emitLog(`Halloween Transform generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during Halloween Transform generation: ${err}`;
+        logs.push(error);
+        emitLog(error, requestId);
+    }
+}
+
+// Halloween Transform Two Frame generation processor
+async function processHalloweenTransformTwoFrameGeneration(
+    input: HalloweenInput,
+    requestId: string,
+    generateAdditionalFrames?: boolean
+): Promise<void> {
+    const logs: string[] = [];
+
+    // Wait for SSE client to connect
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log(`[HALLOWEEN TRANSFORM TWO FRAME] Checking for active connection for requestId: ${requestId}`);
+    console.log(`[HALLOWEEN TRANSFORM TWO FRAME] Active connections: ${activeConnections.size}`);
+
+    try {
+        const result = await runHalloweenTransformTwoFramePipeline(input, { 
+            requestId, 
+            emitLog: (log: string, reqId?: string) => emitLog(log, reqId),
+            generateAdditionalFrames: generateAdditionalFrames || false
+        });
+        
+        // Emit completion message with results
+        const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
+        emitLog(`Halloween Transform Two Frame generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+    } catch (err) {
+        const error = `Error during Halloween Transform Two Frame generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }

@@ -79,6 +79,17 @@ const halloweenTransformErrorAlert = document.getElementById('halloweenTransform
 const halloweenTransformErrorMessage = document.getElementById('halloweenTransformErrorMessage');
 const halloweenTransformLoadingSpinner = document.getElementById('halloweenTransformLoadingSpinner');
 
+// DOM Elements for Halloween Transform Two Frame Generation
+const halloweenTransformTwoFrameLink = document.getElementById('halloween-transform-two-frame-link');
+const halloweenTransformTwoFrameContent = document.getElementById('halloween-transform-two-frame-content');
+const halloweenTransformTwoFrameForm = document.getElementById('halloweenTransformTwoFrameForm');
+const halloweenTransformTwoFrameAdditionalFrames = document.getElementById('halloweenTransformTwoFrameAdditionalFrames');
+const halloweenTransformTwoFrameResultsSection = document.getElementById('halloweenTransformTwoFrameResultsSection');
+const halloweenTransformTwoFrameResultsContainer = document.getElementById('halloweenTransformTwoFrameResultsContainer');
+const halloweenTransformTwoFrameErrorAlert = document.getElementById('halloweenTransformTwoFrameErrorAlert');
+const halloweenTransformTwoFrameErrorMessage = document.getElementById('halloweenTransformTwoFrameErrorMessage');
+const halloweenTransformTwoFrameLoadingSpinner = document.getElementById('halloweenTransformTwoFrameLoadingSpinner');
+
 // DOM Elements for Short Study Generation
 const shortStudyLink = document.getElementById('short-study-link');
 const shortStudyContent = document.getElementById('short-study-content');
@@ -102,6 +113,7 @@ let logEventSource = null;
 let songWithAnimalsLogEventSource = null;
 let halloweenLogEventSource = null;
 let halloweenTransformLogEventSource = null;
+let halloweenTransformTwoFrameLogEventSource = null;
 let shortStudyLogEventSource = null;
 
 /**
@@ -516,6 +528,133 @@ function appendHalloweenTransformLogEntry(log, timestamp) {
 
     // Scroll to the bottom
     halloweenTransformResultsContainer.scrollTop = halloweenTransformResultsContainer.scrollHeight;
+}
+
+/**
+ * Connect to the SSE log stream for Halloween Transform Two Frame generation
+ * @param {string} requestId - The request ID to filter logs by
+ */
+function connectToHalloweenTransformTwoFrameLogStream(requestId) {
+    // Close any existing connection
+    if (halloweenTransformTwoFrameLogEventSource) {
+        console.log('Closing existing Halloween Transform Two Frame log stream connection');
+        halloweenTransformTwoFrameLogEventSource.close();
+    }
+
+    console.log(`Connecting to Halloween Transform Two Frame log stream with requestId: ${requestId}`);
+
+    // Create a new EventSource connection
+    halloweenTransformTwoFrameLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
+
+    // Handle connection open
+    halloweenTransformTwoFrameLogEventSource.onopen = () => {
+        console.log('Halloween Transform Two Frame log stream connection established');
+        if (halloweenTransformTwoFrameResultsContainer && halloweenTransformTwoFrameResultsContainer.querySelector('.list-group')) {
+            halloweenTransformTwoFrameResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
+        }
+    };
+
+    // Handle incoming messages
+    halloweenTransformTwoFrameLogEventSource.onmessage = (event) => {
+        console.log('Received Halloween Transform Two Frame SSE message:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'connected') {
+                console.log('Connected to Halloween Transform Two Frame log stream');
+            } else if (data.type === 'log') {
+                console.log('Received Halloween Transform Two Frame log:', data.log, 'timestamp:', data.timestamp);
+                if (halloweenTransformTwoFrameResultsContainer && halloweenTransformTwoFrameResultsContainer.querySelector('.alert-info')) {
+                    halloweenTransformTwoFrameResultsContainer.innerHTML = '';
+                }
+                appendHalloweenTransformTwoFrameLogEntry(data.log, data.timestamp);
+            } else if (data.type === 'complete') {
+                console.log('Halloween Transform Two Frame generation complete:', data.message);
+                appendHalloweenTransformTwoFrameLogEntry(data.message, data.timestamp);
+                if (halloweenTransformTwoFrameLoadingSpinner) halloweenTransformTwoFrameLoadingSpinner.classList.add('d-none');
+                setTimeout(() => {
+                    if (halloweenTransformTwoFrameLogEventSource) {
+                        console.log('Closing Halloween Transform Two Frame log stream connection after completion');
+                        halloweenTransformTwoFrameLogEventSource.close();
+                        halloweenTransformTwoFrameLogEventSource = null;
+                    }
+                }, 1000);
+            } else {
+                console.warn('Unknown Halloween Transform Two Frame message type:', data.type);
+            }
+        } catch (error) {
+            console.error('Error parsing Halloween Transform Two Frame SSE message:', error, event.data);
+        }
+    };
+
+    // Handle errors
+    halloweenTransformTwoFrameLogEventSource.onerror = (error) => {
+        console.error('Halloween Transform Two Frame log stream error:', error);
+        if (halloweenTransformTwoFrameResultsContainer && halloweenTransformTwoFrameResultsContainer.querySelector('.alert-info')) {
+            halloweenTransformTwoFrameResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
+        }
+        if (halloweenTransformTwoFrameLoadingSpinner) halloweenTransformTwoFrameLoadingSpinner.classList.add('d-none');
+        halloweenTransformTwoFrameLogEventSource.close();
+        halloweenTransformTwoFrameLogEventSource = null;
+    };
+}
+
+/**
+ * Append a single log entry to the Halloween Transform Two Frame display
+ * @param {string} log - The log message to append
+ * @param {string} timestamp - The timestamp for the log entry
+ */
+function appendHalloweenTransformTwoFrameLogEntry(log, timestamp) {
+    // Skip logs containing "Using default channel name"
+    if (log && log.includes("Using default channel name")) {
+        console.log('Skipping channel name log:', log);
+        return;
+    }
+
+    console.log('Appending Halloween Transform Two Frame log entry:', log, 'timestamp:', timestamp);
+
+    // Make sure the results section is visible
+    if (halloweenTransformTwoFrameResultsSection) {
+        halloweenTransformTwoFrameResultsSection.classList.remove('d-none');
+    }
+
+    // Create or get the log list
+    let logList = halloweenTransformTwoFrameResultsContainer.querySelector('.list-group');
+    if (!logList) {
+        logList = document.createElement('div');
+        logList.className = 'list-group';
+        halloweenTransformTwoFrameResultsContainer.appendChild(logList);
+    }
+
+    // Create log entry
+    const logItem = document.createElement('div');
+    logItem.className = 'list-group-item list-group-item-action';
+    
+    let formattedTime = '';
+    if (timestamp) {
+        try {
+            const date = new Date(timestamp);
+            if (!isNaN(date.getTime())) {
+                formattedTime = date.toLocaleTimeString();
+            } else {
+                formattedTime = timestamp;
+            }
+        } catch (e) {
+            formattedTime = timestamp;
+        }
+    }
+    
+    logItem.innerHTML = `
+        <div class="d-flex w-100 justify-content-between">
+            <h6 class="mb-1">${log}</h6>
+            <small class="text-muted">${formattedTime}</small>
+        </div>
+    `;
+
+    logList.appendChild(logItem);
+
+    // Scroll to the bottom
+    halloweenTransformTwoFrameResultsContainer.scrollTop = halloweenTransformTwoFrameResultsContainer.scrollHeight;
 }
 
 /**
@@ -997,6 +1136,7 @@ if (savedLink) {
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
+        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
@@ -1008,6 +1148,9 @@ if (savedLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
         if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
@@ -1028,6 +1171,7 @@ if (generateLink) {
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
+        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.remove('d-none');
         if (savedContent) savedContent.classList.add('d-none');
@@ -1040,6 +1184,9 @@ if (generateLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
         if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
@@ -1056,6 +1203,7 @@ if (songWithAnimalsLink) {
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
+        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
@@ -1065,6 +1213,9 @@ if (songWithAnimalsLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
         if (shortStudyContent) shortStudyContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.remove('d-none');
@@ -1097,6 +1248,9 @@ if (halloweenLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
     });
 }
 
@@ -1109,6 +1263,7 @@ if (halloweenTransformLink) {
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
+        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (shortStudyLink) shortStudyLink.classList.remove('active');
         if (generateContent) generateContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
@@ -1121,6 +1276,41 @@ if (halloweenTransformLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.remove('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
+    });
+}
+
+if (halloweenTransformTwoFrameLink) {
+    halloweenTransformTwoFrameLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideError(); // Hide main error alert when navigating
+        halloweenTransformTwoFrameLink.classList.add('active');
+        if (generateLink) generateLink.classList.remove('active');
+        if (savedLink) savedLink.classList.remove('active');
+        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (halloweenLink) halloweenLink.classList.remove('active');
+        if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
+        if (shortStudyLink) shortStudyLink.classList.remove('active');
+        if (generateContent) generateContent.classList.add('d-none');
+        if (savedContent) savedContent.classList.add('d-none');
+        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
+        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
+        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenContent) halloweenContent.classList.add('d-none');
+        if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
+        if (halloweenErrorAlert) halloweenErrorAlert.classList.add('d-none');
+        if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
+        if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
+        if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (shortStudyContent) shortStudyContent.classList.add('d-none');
+        if (resultsSection) resultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.remove('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
+        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
+        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
     });
 }
 
@@ -1145,6 +1335,9 @@ if (shortStudyLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (shortStudyContent) shortStudyContent.classList.remove('d-none');
         if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
@@ -1246,6 +1439,9 @@ if (halloweenForm) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
         if (halloweenResultsContainer) halloweenResultsContainer.innerHTML = '';
         if (halloweenLoadingSpinner) halloweenLoadingSpinner.classList.remove('d-none');
@@ -1350,6 +1546,62 @@ if (halloweenTransformForm) {
                 halloweenTransformErrorAlert.classList.remove('d-none');
             }
             if (halloweenTransformLoadingSpinner) halloweenTransformLoadingSpinner.classList.add('d-none');
+        }
+    });
+}
+
+if (halloweenTransformTwoFrameForm) {
+    halloweenTransformTwoFrameForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsContainer) halloweenTransformTwoFrameResultsContainer.innerHTML = '';
+        if (halloweenTransformTwoFrameLoadingSpinner) halloweenTransformTwoFrameLoadingSpinner.classList.remove('d-none');
+        
+        const lyricsElem = document.getElementById('halloweenTransformTwoFrameLyrics');
+        const additionalFramesElem = document.getElementById('halloweenTransformTwoFrameAdditionalFrames');
+        const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
+        const generateAdditionalFrames = additionalFramesElem && additionalFramesElem.checked;
+        
+        if (!lyricsText) {
+            if (halloweenTransformTwoFrameErrorAlert && halloweenTransformTwoFrameErrorMessage) {
+                halloweenTransformTwoFrameErrorMessage.textContent = 'Please enter song lyrics';
+                halloweenTransformTwoFrameErrorAlert.classList.remove('d-none');
+            }
+            if (halloweenTransformTwoFrameLoadingSpinner) halloweenTransformTwoFrameLoadingSpinner.classList.add('d-none');
+            return;
+        }
+        
+        // Create the input format expected by the pipeline
+        const songs = [{ lyrics: lyricsText }];
+        
+        try {
+            const response = await fetch('/api/generate-halloween-transform-two-frame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    input: songs,
+                    generateAdditionalFrames: generateAdditionalFrames
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'An error occurred during Halloween Transform Two Frame generation');
+            }
+
+            // Start listening for logs via SSE
+            if (data.requestId) {
+                connectToHalloweenTransformTwoFrameLogStream(data.requestId);
+            }
+        } catch (error) {
+            console.error('Error generating Halloween Transform Two Frame content:', error);
+            if (halloweenTransformTwoFrameErrorAlert && halloweenTransformTwoFrameErrorMessage) {
+                halloweenTransformTwoFrameErrorMessage.textContent = error.message || 'An error occurred during Halloween Transform Two Frame generation';
+                halloweenTransformTwoFrameErrorAlert.classList.remove('d-none');
+            }
+            if (halloweenTransformTwoFrameLoadingSpinner) halloweenTransformTwoFrameLoadingSpinner.classList.add('d-none');
         }
     });
 }

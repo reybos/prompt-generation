@@ -1,0 +1,24 @@
+You are an expert in creating YouTube videos and thumbnails. Your task is to combine three individual character prompts into a single group prompt for generating a thumbnail image.
+
+Inputs:  
+- global_style: a short style description that sets the shared artistic and atmospheric tone  
+- prompts: three structured inputs, each containing a "line" and a detailed "prompt" describing one Halloween-style patchwork character  
+
+Instructions:
+
+Format of the answer:
+Rewrite the scene description in this format:
+A group of three [style] characters stand together in [environment]:
+
+Environment Animation:  
+[Describe subtle].
+
+Global Style: {globalStyle}
+
+Three Character Prompts:
+{prompts}
+
+Return your response as a JSON object with the following structure:
+{{
+  "group_image_prompt": "The unified group prompt for thumbnail generation"
+}}

@@ -15,6 +15,7 @@ import { shortenVideoPrompt } from './long_study/shortenVideoPrompt.js';
 import { imagePrompt, songWithAnimalsTitlePrompt, songWithAnimalsVideoPrompt, logVideoPrompt, logTitlePrompt, songWithAnimalsGroupImagePrompt, songWithAnimalsGroupVideoPrompt, logSongWithAnimalsGroupImagePrompt, logSongWithAnimalsGroupVideoPrompt } from './song_with_animals/index.js';
 import { imagePrompt as halloweenImagePrompt, halloweenTitlePrompt, halloweenVideoPrompt, logVideoPrompt as halloweenLogVideoPrompt, logTitlePrompt as halloweenLogTitlePrompt, halloweenGroupImagePrompt, halloweenGroupVideoPrompt, logHalloweenGroupImagePrompt, logHalloweenGroupVideoPrompt } from './halloween_dance/index.js';
 import { imagePrompt as halloweenTransformImagePrompt, halloweenTransformTitlePrompt, halloweenTransformVideoPrompt, logVideoPrompt as halloweenTransformLogVideoPrompt, logTitlePrompt as halloweenTransformLogTitlePrompt, halloweenTransformGroupImagePrompt, halloweenTransformGroupVideoPrompt, logHalloweenTransformGroupImagePrompt, logHalloweenTransformGroupVideoPrompt } from './halloween_transform/index.js';
+import { imagePrompt as halloweenTransformTwoFrameImagePrompt, halloweenTransformTwoFrameTitlePrompt, halloweenTransformTwoFrameVideoPrompt, logVideoPrompt as halloweenTransformTwoFrameLogVideoPrompt, logTitlePrompt as halloweenTransformTwoFrameLogTitlePrompt, halloweenTransformTwoFrameGroupImagePrompt, halloweenTransformTwoFrameGroupVideoPrompt, logHalloweenTransformTwoFrameGroupImagePrompt, logHalloweenTransformTwoFrameGroupVideoPrompt } from './halloween_transform_two_frame/index.js';
 import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logTitleDescPrompt as shortStudyLogTitleDescPrompt } from './short_study/index.js';
 
 export {
@@ -54,6 +55,15 @@ export {
     halloweenTransformGroupVideoPrompt,
     logHalloweenTransformGroupImagePrompt,
     logHalloweenTransformGroupVideoPrompt,
+    halloweenTransformTwoFrameImagePrompt,
+    halloweenTransformTwoFrameTitlePrompt,
+    halloweenTransformTwoFrameVideoPrompt,
+    halloweenTransformTwoFrameLogVideoPrompt,
+    halloweenTransformTwoFrameLogTitlePrompt,
+    halloweenTransformTwoFrameGroupImagePrompt,
+    halloweenTransformTwoFrameGroupVideoPrompt,
+    logHalloweenTransformTwoFrameGroupImagePrompt,
+    logHalloweenTransformTwoFrameGroupVideoPrompt,
     shortStudyVideoPrompt,
     shortStudyTitleDescPrompt,
     shortStudyHashtagsPrompt,

@@ -1,0 +1,27 @@
+Generate a YouTube TITLE for a kids' Halloween song video featuring spooky animal characters based on these inputs:
+- Song Lyrics: {songLyrics}
+- Video Prompt: {videoPrompt}
+- Global Style: {globalStyle}
+
+GOALS:
+
+---
+
+📌 **TITLE STRATEGY**:
+
+💡 TITLE EXAMPLES:
+
+---
+
+OUTPUT (STRICT JSON ONLY, NO EXTRA TEXT):
+{{
+  "title": "Catchy, SEO-optimized Halloween title with 2–4 emojis, 10–18 words"
+}}
+
+INPUT:
+Song Lyrics: {songLyrics}
+Video Prompt: {videoPrompt}
+Global Style: {globalStyle}
+
+OUTPUT:
+(Return only valid JSON as shown above)
