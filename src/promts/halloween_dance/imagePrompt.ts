@@ -29,7 +29,6 @@ const imagePrompt: PromptTemplate = new PromptTemplate({
     template: imagePromptTemplate
 });
 
-// Функция возвращает промт с фиксированным Halloween стилем
 export function createImagePromptWithStyle(styleName: string = 'halloweenPatchwork'): PromptTemplate {
     console.log('=== CREATE HALLOWEEN IMAGE PROMPT DEBUG ===');
     console.log('Using fixed Halloween style:', styleName);
