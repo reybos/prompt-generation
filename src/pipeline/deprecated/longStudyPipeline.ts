@@ -4,7 +4,7 @@
  * Implements the main content generation pipeline using FAL.AI async queue
  */
 import { runContentPipelineAsync } from './longStudyPipelineAsync.js';
-import { ContentPackage, PipelineOptions } from '../types/pipeline.js';
+import { ContentPackage, PipelineOptions } from '../../types/pipeline.js';
 
 /**
  * Run the complete content generation pipeline using FAL.AI async queue

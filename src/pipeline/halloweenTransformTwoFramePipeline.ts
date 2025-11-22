@@ -6,7 +6,7 @@ import { executePipelineStepWithTracking, safeJsonParse } from '../utils/index.j
 import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
-import { getGenerationsDir } from '../server.js';
+import { getGenerationsDir } from '../config/index.js';
 import { getNextFileNumber } from '../utils/fileUtils.js';
 
 function splitLyricsIntoSegments(lyrics: string): string[] {

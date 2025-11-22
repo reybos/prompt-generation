@@ -1,11 +1,11 @@
-import { ShortStudyInput, ShortStudyOutput, ShortStudyVideoPrompt, ShortStudySongPrompt, LLMRequest } from '../types/pipeline.js';
-import { PipelineOptions } from '../types/pipeline.js';
-import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logVideoPrompt, shortStudyLogTitleDescPrompt } from '../promts/index.js';
-import { executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
+import { ShortStudyInput, ShortStudyOutput, ShortStudyVideoPrompt, ShortStudySongPrompt, LLMRequest } from '../../types/pipeline.js';
+import { PipelineOptions } from '../../types/pipeline.js';
+import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logVideoPrompt, shortStudyLogTitleDescPrompt } from '../../promts/index.js';
+import { executePipelineStepWithTracking, safeJsonParse } from '../../utils/index.js';
 import fs from 'fs/promises';
 import path from 'path';
-import { getGenerationsDir } from '../server.js';
-import { getNextFileNumber } from '../utils/fileUtils.js';
+import { getGenerationsDir } from '../../config/index.js';
+import { getNextFileNumber } from '../../utils/index.js';
 
 /**
  * Run the complete short study generation pipeline (including titles, descriptions and hashtags)

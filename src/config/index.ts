@@ -5,6 +5,7 @@
  */
 import environmentConfig from './environment.js';
 import { OutputFormat, AppConfig } from '../types/config.js';
+import path from 'path';
 
 /**
  * Output format options
@@ -22,6 +23,18 @@ const config: AppConfig = {
     ...environmentConfig,
     outputFormats,
 };
+
+/**
+ * Utility to resolve the generations directory
+ */
+export function getGenerationsDir() {
+    if (config.generationsDirPath) {
+        return config.generationsDirPath;
+    } else if (config.generationsDirRelativePath) {
+        return path.resolve(process.cwd(), config.generationsDirRelativePath);
+    }
+    return null;
+}
 
 export default config;
 /* END GENAI */

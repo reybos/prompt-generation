@@ -10,9 +10,9 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import crypto from 'crypto';
 
-import { runContentPipeline, runHalloweenTransformPipeline, runHalloweenTransformTwoFramePipeline, runPoemsPipeline } from './pipeline/index.js';
+import { runHalloweenTransformPipeline, runHalloweenTransformTwoFramePipeline, runPoemsPipeline } from './pipeline/index.js';
 // Utility functions removed: not implemented
-import config from './config/index.js';
+import config, { getGenerationsDir } from './config/index.js';
 import { ContentPackage, PipelineOptions, HalloweenInput, PoemsInput } from './types/pipeline.js';
 
 // Get the directory name using ES modules approach
@@ -60,29 +60,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// API endpoint for content generation
-app.post('/api/generate', async (req, res) => {
-    try {
-        const { topics, channelName, model } = req.body;
-        if (!topics) {
-            return res.status(400).json({ error: 'Missing topics' });
-        }
-        // Generate a unique requestId for this generation
-        const requestId = crypto.randomUUID();
-        // Start content generation in the background (do not await)
-        processContentGeneration(topics, requestId)
-            .catch(err => {
-                console.error('Error in background content generation:', err);
-                emitLog('Error during content generation: ' + (err?.message || err), requestId);
-            });
-        // Respond immediately so frontend can connect to SSE
-        return res.json({ success: true, requestId });
-    } catch (err) {
-        console.error('Error in /api/generate:', err);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 // API endpoint for song with animals generation
 app.post('/api/generate-song-with-animals', async (req, res) => {
     try {
@@ -105,29 +82,6 @@ app.post('/api/generate-song-with-animals', async (req, res) => {
         return res.json({ success: true, requestId });
     } catch (err) {
         console.error('Error in /api/generate-song-with-animals:', err);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// API endpoint for short study generation
-app.post('/api/generate-short-study', async (req, res) => {
-    try {
-        const { input } = req.body;
-        if (!input) {
-            return res.status(400).json({ error: 'Missing input' });
-        }
-        // Generate a unique requestId for this generation
-        const requestId = crypto.randomUUID();
-        // Start short study generation in the background (do not await)
-        processShortStudyGeneration(input, requestId)
-            .catch(err => {
-                console.error('Error in background short study generation:', err);
-                emitLog('Error during short study generation: ' + (err?.message || err), requestId);
-            });
-        // Respond immediately so frontend can connect to SSE
-        return res.json({ success: true, requestId });
-    } catch (err) {
-        console.error('Error in /api/generate-short-study:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -275,65 +229,6 @@ function emitLog(log: string, requestId?: string): void {
     logEmitter.emit('log', { log, requestId: safeRequestId, timestamp });
 }
 
-// Content generation processor
-async function processContentGeneration(
-    topics: Record<string, string[]>,
-    requestId: string
-): Promise<void> {
-    const logs: string[] = [];
-    const savedFiles: ContentPackage[] = [];
-
-    // Wait for SSE client to connect
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log(`[GENERATE] Checking for active connection for requestId: ${requestId}`);
-    console.log(`[GENERATE] Active connections: ${activeConnections.size}`);
-
-    for (const theme in topics) {
-        const topicList = topics[theme];
-
-        if (!Array.isArray(topicList)) {
-            const error = `Topics for theme "${theme}" must be an array`;
-            logs.push(error);
-            emitLog(error, requestId);
-            continue;
-        }
-
-        for (const topic of topicList) {
-            const startMessage = `Starting content generation for theme: "${theme}", topic: "${topic}"`;
-            logs.push(startMessage);
-            emitLog(startMessage, requestId);
-
-            const channelMessage = `Using default channel name: ${config.defaultChannelName}`;
-            logs.push(channelMessage); // not emitted to client
-
-            try {
-                const pipelineOptions: PipelineOptions = {
-                    channelName: config.defaultChannelName,
-                    requestId,
-                    emitLog
-                };
-
-                const topicsObj = { [theme]: [topic] };
-                const result = await runContentPipeline(topicsObj, pipelineOptions);
-
-                if (!result || !result[theme] || !result[theme][topic]) {
-                    const error = `Pipeline failed for theme "${theme}", topic "${topic}".`;
-                    logs.push(error);
-                    emitLog(error, requestId);
-                    continue;
-                }
-
-                savedFiles.push(result[theme][topic]);
-            } catch (err) {
-                const error = `Error during content generation for topic "${topic}": ${err}`;
-                logs.push(error);
-                emitLog(error, requestId);
-            }
-        }
-    }
-}
-
 // Song with animals generation processor
 async function processSongWithAnimalsGeneration(
     input: any,
@@ -362,31 +257,6 @@ async function processSongWithAnimalsGeneration(
         emitLog(`Song with animals generation complete with ${style} style${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during song with animals generation: ${err}`;
-        logs.push(error);
-        emitLog(error, requestId);
-    }
-}
-
-// Short study generation processor
-async function processShortStudyGeneration(
-    input: any,
-    requestId: string
-): Promise<void> {
-    const logs: string[] = [];
-
-    // Wait for SSE client to connect
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log(`[SHORT STUDY] Checking for active connection for requestId: ${requestId}`);
-    console.log(`[SHORT STUDY] Active connections: ${activeConnections.size}`);
-
-    try {
-        const result = await import('./pipeline/shortStudyPipeline.js').then(m => m.runShortStudyPipeline(input, { requestId, emitLog: (log: string, reqId?: string) => emitLog(log, reqId) }));
-        
-        // Emit completion message with results
-        emitLog(`Short study topics generation complete. Generated ${result.length} topic(s).`, requestId);
-    } catch (err) {
-        const error = `Error during short study generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }
@@ -516,16 +386,6 @@ async function processPoemsGeneration(
         logs.push(error);
         emitLog(error, requestId);
     }
-}
-
-// Utility to resolve the generations directory
-export function getGenerationsDir() {
-    if (config.generationsDirPath) {
-        return config.generationsDirPath;
-    } else if (config.generationsDirRelativePath) {
-        return path.resolve(process.cwd(), config.generationsDirRelativePath);
-    }
-    return null;
 }
 
 // Endpoint to list unprocessed/saved generations

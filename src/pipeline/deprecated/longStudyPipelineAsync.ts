@@ -3,8 +3,8 @@
  * Async Content Pipeline
  * Implements the main content generation pipeline using FAL.AI queue for async processing
  */
-import { createChain } from '../chains/index.js';
-import { safeJsonParse, extractSystemPrompt } from '../utils/index.js';
+import { createChain } from '../../chains/index.js';
+import { safeJsonParse, extractSystemPrompt } from '../../utils/index.js';
 import {
     scriptPrompt,
     mediaPrompt,
@@ -13,23 +13,22 @@ import {
     titleDescPrompt,
     hashtagsPrompt,
     narrationPrompt,
-} from '../promts/index.js';
-import config from '../config/index.js';
-import { ContentPackage, PipelineOptions, LLMRequest } from '../types/pipeline.js';
+} from '../../promts/index.js';
+import config from '../../config/index.js';
+import { ContentPackage, PipelineOptions, LLMRequest } from '../../types/pipeline.js';
 import { Runnable } from '@langchain/core/runnables';
 import { ChainValues } from '@langchain/core/utils/types';
 import fs from 'fs/promises';
 import path from 'path';
-import { getGenerationsDir } from '../server.js';
-import { getNextFileNumber } from '../utils/fileUtils.js';
+import { getGenerationsDir } from '../../config/index.js';
+import { getNextFileNumber } from '../../utils/index.js';
 import { 
     submitToQueueWithTracking, 
     batchCheckStatus, 
     getQueueResult, 
     updateRequestStatus,
-    removeRequest,
-    getRequest
-} from '../services/falQueueService.js';
+    removeRequest
+} from '../../services/index.js';
 
 // Interface for pipeline step
 interface PipelineStep {
