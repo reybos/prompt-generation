@@ -10,10 +10,10 @@ import { EventEmitter } from 'events';
 import fs from 'fs';
 import crypto from 'crypto';
 
-import { runContentPipeline, runHalloweenTransformPipeline, runHalloweenTransformTwoFramePipeline } from './pipeline/index.js';
+import { runContentPipeline, runHalloweenTransformPipeline, runHalloweenTransformTwoFramePipeline, runPoemsPipeline } from './pipeline/index.js';
 // Utility functions removed: not implemented
 import config from './config/index.js';
-import { ContentPackage, PipelineOptions, HalloweenInput } from './types/pipeline.js';
+import { ContentPackage, PipelineOptions, HalloweenInput, PoemsInput } from './types/pipeline.js';
 
 // Get the directory name using ES modules approach
 const __filename: string = fileURLToPath(import.meta.url);
@@ -197,6 +197,29 @@ app.post('/api/generate-halloween-transform-two-frame', async (req, res) => {
         return res.json({ success: true, requestId });
     } catch (err) {
         console.error('Error in /api/generate-halloween-transform-two-frame:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API endpoint for Poems generation
+app.post('/api/generate-poems', async (req, res) => {
+    try {
+        const { input, generateAdditionalFrames, linesPerVideo } = req.body;
+        if (!input) {
+            return res.status(400).json({ error: 'Missing input' });
+        }
+        // Generate a unique requestId for this generation
+        const requestId = crypto.randomUUID();
+        // Start Poems generation in the background (do not await)
+        processPoemsGeneration(input, requestId, generateAdditionalFrames, linesPerVideo)
+            .catch(err => {
+                console.error('Error in background Poems generation:', err);
+                emitLog('Error during Poems generation: ' + (err?.message || err), requestId);
+            });
+        // Respond immediately so frontend can connect to SSE
+        return res.json({ success: true, requestId });
+    } catch (err) {
+        console.error('Error in /api/generate-poems:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -457,6 +480,39 @@ async function processHalloweenTransformTwoFrameGeneration(
         emitLog(`Halloween Transform Two Frame generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during Halloween Transform Two Frame generation: ${err}`;
+        logs.push(error);
+        emitLog(error, requestId);
+    }
+}
+
+// Poems generation processor
+async function processPoemsGeneration(
+    input: PoemsInput,
+    requestId: string,
+    generateAdditionalFrames?: boolean,
+    linesPerVideo?: number
+): Promise<void> {
+    const logs: string[] = [];
+
+    // Wait for SSE client to connect
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log(`[POEMS] Checking for active connection for requestId: ${requestId}`);
+    console.log(`[POEMS] Active connections: ${activeConnections.size}`);
+
+    try {
+        const result = await runPoemsPipeline(input, {
+            requestId, 
+            emitLog: (log: string, reqId?: string) => emitLog(log, reqId),
+            generateAdditionalFrames: generateAdditionalFrames || false,
+            linesPerVideo: linesPerVideo || 1
+        });
+        
+        // Emit completion message with results
+        const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
+        emitLog(`Poems generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+    } catch (err) {
+        const error = `Error during Poems generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }

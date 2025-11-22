@@ -16,6 +16,7 @@ import { imagePrompt, songWithAnimalsTitlePrompt, songWithAnimalsVideoPrompt, lo
 import { imagePrompt as halloweenImagePrompt, halloweenTitlePrompt, halloweenVideoPrompt, logVideoPrompt as halloweenLogVideoPrompt, logTitlePrompt as halloweenLogTitlePrompt, halloweenGroupImagePrompt, halloweenGroupVideoPrompt, logHalloweenGroupImagePrompt, logHalloweenGroupVideoPrompt } from './halloween_dance/index.js';
 import { imagePrompt as halloweenTransformImagePrompt, halloweenTransformTitlePrompt, halloweenTransformVideoPrompt, logVideoPrompt as halloweenTransformLogVideoPrompt, logTitlePrompt as halloweenTransformLogTitlePrompt, halloweenTransformGroupImagePrompt, halloweenTransformGroupVideoPrompt, logHalloweenTransformGroupImagePrompt, logHalloweenTransformGroupVideoPrompt } from './halloween_transform/index.js';
 import { imagePrompt as halloweenTransformTwoFrameImagePrompt, halloweenTransformTwoFrameTitlePrompt, halloweenTransformTwoFrameVideoPrompt, logVideoPrompt as halloweenTransformTwoFrameLogVideoPrompt, logTitlePrompt as halloweenTransformTwoFrameLogTitlePrompt, halloweenTransformTwoFrameGroupImagePrompt, halloweenTransformTwoFrameGroupVideoPrompt, logHalloweenTransformTwoFrameGroupImagePrompt, logHalloweenTransformTwoFrameGroupVideoPrompt } from './halloween_transform_two_frame/index.js';
+import { imagePrompt as poemsImagePrompt, poemsTitlePrompt, poemsVideoPrompt, logPoemsVideoPrompt, logPoemsTitlePrompt, poemsGroupImagePrompt, poemsGroupVideoPrompt, logPoemsGroupImagePrompt, logPoemsGroupVideoPrompt } from './poems/index.js';
 import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logTitleDescPrompt as shortStudyLogTitleDescPrompt } from './short_study/index.js';
 
 export {
@@ -64,6 +65,15 @@ export {
     halloweenTransformTwoFrameGroupVideoPrompt,
     logHalloweenTransformTwoFrameGroupImagePrompt,
     logHalloweenTransformTwoFrameGroupVideoPrompt,
+    poemsImagePrompt,
+    poemsTitlePrompt,
+    poemsVideoPrompt,
+    logPoemsVideoPrompt,
+    logPoemsTitlePrompt,
+    poemsGroupImagePrompt,
+    poemsGroupVideoPrompt,
+    logPoemsGroupImagePrompt,
+    logPoemsGroupVideoPrompt,
     shortStudyVideoPrompt,
     shortStudyTitleDescPrompt,
     shortStudyHashtagsPrompt,

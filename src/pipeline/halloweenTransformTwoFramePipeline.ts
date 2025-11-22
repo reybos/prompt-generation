@@ -48,6 +48,11 @@ export async function runHalloweenTransformTwoFramePipeline(
     const titleModel = 'anthropic/claude-sonnet-4.5';
     const titleTemperature = 0.7;
 
+    const groupImageModel = 'anthropic/claude-sonnet-4.5';
+    const groupImageTemperature = 0.3;
+    const groupVideoModel = 'anthropic/claude-sonnet-4.5';
+    const groupVideoTemperature = 0.5;
+
     let attempt = 0;
     const maxAttempts = 3;
     let finished = false;
@@ -177,10 +182,6 @@ export async function runHalloweenTransformTwoFramePipeline(
         if (options.generateAdditionalFrames) {
           if (options.emitLog && options.requestId) options.emitLog(`🎬 Generating group frames (every 3 characters)...`, options.requestId);
           try {
-            const groupImageModel = 'anthropic/claude-3.7-sonnet';
-            const groupImageTemperature = 0.3;
-            const groupVideoModel = 'anthropic/claude-3.7-sonnet';
-            const groupVideoTemperature = 0.5;
             const groups: HalloweenImagePrompt[][] = [];
             for (let i = 0; i < prompts.length; i += 3) {
               const group = prompts.slice(i, i + 3);

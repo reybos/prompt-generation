@@ -4,9 +4,7 @@
  */
 
 // DOM Elements - Navigation
-const generateLink = document.getElementById('generate-link');
 const savedLink = document.getElementById('saved-link');
-const generateContent = document.getElementById('generate-content');
 const savedContent = document.getElementById('saved-content');
 
 // DOM Elements - Logs (Generation Logs)
@@ -42,7 +40,6 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 
 // DOM Elements - Results Section
 const resultsSection = document.getElementById('resultsSection');
-const generationForm = document.getElementById('generationForm');
 const copyToast = document.getElementById('copyToast');
 
 // DOM Elements for Song with Animals Generation
@@ -90,15 +87,18 @@ const halloweenTransformTwoFrameErrorAlert = document.getElementById('halloweenT
 const halloweenTransformTwoFrameErrorMessage = document.getElementById('halloweenTransformTwoFrameErrorMessage');
 const halloweenTransformTwoFrameLoadingSpinner = document.getElementById('halloweenTransformTwoFrameLoadingSpinner');
 
-// DOM Elements for Short Study Generation
-const shortStudyLink = document.getElementById('short-study-link');
-const shortStudyContent = document.getElementById('short-study-content');
-const shortStudyForm = document.getElementById('shortStudyForm');
-const shortStudyResultsSection = document.getElementById('shortStudyResultsSection');
-const shortStudyResultsContainer = document.getElementById('shortStudyResultsContainer');
-const shortStudyErrorAlert = document.getElementById('shortStudyErrorAlert');
-const shortStudyErrorMessage = document.getElementById('shortStudyErrorMessage');
-const shortStudyLoadingSpinner = document.getElementById('shortStudyLoadingSpinner');
+// DOM Elements for Poems Generation
+const poemsLink = document.getElementById('poems-link');
+const poemsContent = document.getElementById('poems-content');
+const poemsForm = document.getElementById('poemsForm');
+const poemsLyrics = document.getElementById('poemsLyrics');
+const poemsLinesPerVideo = document.getElementById('poemsLinesPerVideo');
+const poemsAdditionalFrames = document.getElementById('poemsAdditionalFrames');
+const poemsResultsSection = document.getElementById('poemsResultsSection');
+const poemsResultsContainer = document.getElementById('poemsResultsContainer');
+const poemsErrorAlert = document.getElementById('poemsErrorAlert');
+const poemsErrorMessage = document.getElementById('poemsErrorMessage');
+const poemsLoadingSpinner = document.getElementById('poemsLoadingSpinner');
 
 
 
@@ -114,7 +114,7 @@ let songWithAnimalsLogEventSource = null;
 let halloweenLogEventSource = null;
 let halloweenTransformLogEventSource = null;
 let halloweenTransformTwoFrameLogEventSource = null;
-let shortStudyLogEventSource = null;
+let poemsLogEventSource = null;
 
 /**
  * Load available styles from the server and populate the style select
@@ -658,6 +658,133 @@ function appendHalloweenTransformTwoFrameLogEntry(log, timestamp) {
 }
 
 /**
+ * Connect to the SSE log stream for Poems generation
+ * @param {string} requestId - The request ID to filter logs by
+ */
+function connectToPoemsLogStream(requestId) {
+    // Close any existing connection
+    if (poemsLogEventSource) {
+        console.log('Closing existing Poems log stream connection');
+        poemsLogEventSource.close();
+    }
+
+    console.log(`Connecting to Poems log stream with requestId: ${requestId}`);
+
+    // Create a new EventSource connection
+    poemsLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
+
+    // Handle connection open
+    poemsLogEventSource.onopen = () => {
+        console.log('Poems log stream connection established');
+        if (poemsResultsContainer && poemsResultsContainer.querySelector('.list-group')) {
+            poemsResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
+        }
+    };
+
+    // Handle incoming messages
+    poemsLogEventSource.onmessage = (event) => {
+        console.log('Received Poems SSE message:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'connected') {
+                console.log('Connected to Poems log stream');
+            } else if (data.type === 'log') {
+                console.log('Received Poems log:', data.log, 'timestamp:', data.timestamp);
+                if (poemsResultsContainer && poemsResultsContainer.querySelector('.alert-info')) {
+                    poemsResultsContainer.innerHTML = '';
+                }
+                appendPoemsLogEntry(data.log, data.timestamp);
+            } else if (data.type === 'complete') {
+                console.log('Poems generation complete:', data.message);
+                appendPoemsLogEntry(data.message, data.timestamp);
+                if (poemsLoadingSpinner) poemsLoadingSpinner.classList.add('d-none');
+                setTimeout(() => {
+                    if (poemsLogEventSource) {
+                        console.log('Closing Poems log stream connection after completion');
+                        poemsLogEventSource.close();
+                        poemsLogEventSource = null;
+                    }
+                }, 1000);
+            } else {
+                console.warn('Unknown Poems message type:', data.type);
+            }
+        } catch (error) {
+            console.error('Error parsing Poems SSE message:', error, event.data);
+        }
+    };
+
+    // Handle errors
+    poemsLogEventSource.onerror = (error) => {
+        console.error('Poems log stream error:', error);
+        if (poemsResultsContainer && poemsResultsContainer.querySelector('.alert-info')) {
+            poemsResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
+        }
+        if (poemsLoadingSpinner) poemsLoadingSpinner.classList.add('d-none');
+        poemsLogEventSource.close();
+        poemsLogEventSource = null;
+    };
+}
+
+/**
+ * Append a single log entry to the Poems display
+ * @param {string} log - The log message to append
+ * @param {string} timestamp - The timestamp for the log entry
+ */
+function appendPoemsLogEntry(log, timestamp) {
+    // Skip logs containing "Using default channel name"
+    if (log && log.includes("Using default channel name")) {
+        console.log('Skipping channel name log:', log);
+        return;
+    }
+
+    console.log('Appending Poems log entry:', log, 'timestamp:', timestamp);
+
+    // Make sure the results section is visible
+    if (poemsResultsSection) {
+        poemsResultsSection.classList.remove('d-none');
+    }
+
+    // Create or get the log list
+    let logList = poemsResultsContainer.querySelector('.list-group');
+    if (!logList) {
+        logList = document.createElement('div');
+        logList.className = 'list-group';
+        poemsResultsContainer.appendChild(logList);
+    }
+
+    // Create log entry
+    const logItem = document.createElement('div');
+    logItem.className = 'list-group-item list-group-item-action';
+    
+    let formattedTime = '';
+    if (timestamp) {
+        try {
+            const date = new Date(timestamp);
+            if (!isNaN(date.getTime())) {
+                formattedTime = date.toLocaleTimeString();
+            } else {
+                formattedTime = timestamp;
+            }
+        } catch (e) {
+            formattedTime = timestamp;
+        }
+    }
+    
+    logItem.innerHTML = `
+        <div class="d-flex w-100 justify-content-between">
+            <h6 class="mb-1">${log}</h6>
+            <small class="text-muted">${formattedTime}</small>
+        </div>
+    `;
+
+    logList.appendChild(logItem);
+
+    // Scroll to the bottom
+    poemsResultsContainer.scrollTop = poemsResultsContainer.scrollHeight;
+}
+
+/**
  * Connect to the SSE log stream for short study generation
  * @param {string} requestId - The request ID to filter logs by
  */
@@ -920,84 +1047,6 @@ function appendLogEntry(log, timestamp) {
 /**
  * Handle form submission
  */
-if (generationForm) {
-    generationForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const topicsJsonElem = document.getElementById('topicsJson');
-        const topicsJsonText = topicsJsonElem && topicsJsonElem.value ? topicsJsonElem.value.trim() : '';
-        if (!topicsJsonText) {
-            showError('Please enter topics JSON');
-            return;
-        }
-
-        // Parse and validate JSON input
-        let topics;
-        try {
-            topics = JSON.parse(topicsJsonText);
-
-            if (typeof topics !== 'object' || Array.isArray(topics)) {
-                throw new Error('Topics must be an object with theme keys and topic arrays');
-            }
-
-            for (const theme in topics) {
-                if (!Array.isArray(topics[theme])) {
-                    throw new Error(`Topics for theme "${theme}" must be an array`);
-                }
-            }
-        } catch (error) {
-            showError(`Invalid JSON format: ${error.message}`);
-            return;
-        }
-
-        // Prepare UI
-        setLoadingState(true);
-        hideError();
-        hideResults();
-        logsContainer.innerHTML = '';
-        resultsSection.classList.remove('d-none');
-        logsContainer.innerHTML = `<div class="alert alert-info">Waiting for logs...</div>`;
-
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topics })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || 'An error occurred during content generation');
-            }
-
-            if (data.requestId) {
-                console.log('Received requestId:', data.requestId);
-
-                logsContainer.innerHTML = '';
-                connectToLogStream(data.requestId);
-
-                appendLogEntry('Content generation started: You will see logs in real-time as they are generated.');
-
-                // Fallback message if logs are delayed
-                setTimeout(() => {
-                    const logGroup = logsContainer.querySelector('.list-group');
-                    if (!logGroup || logGroup.children.length <= 1) {
-                        console.log('No logs received via SSE yet, adding a status message');
-                        appendLogEntry('Waiting for logs. This may take a moment.');
-                    }
-                }, 3000);
-            }
-
-        } catch (error) {
-            console.error('Error:', error);
-            showError(error.message || 'An error occurred during content generation');
-            logsContainer.innerHTML = '';
-        } finally {
-            // setLoadingState(false); // <-- Remove this line so button is only re-enabled on log stream completion
-        }
-    });
-}
 
 /**
  * Fetch existing themes from the server
@@ -1132,13 +1181,13 @@ if (savedLink) {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
         savedLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
+        if (poemsLink) poemsLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (shortStudyLink) shortStudyLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
+        if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
@@ -1151,10 +1200,10 @@ if (savedLink) {
         if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
         if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
         if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
-        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
-        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
+        if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
+        if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
         if (savedContent) savedContent.classList.remove('d-none');
         if (typeof loadSavedGenerations === 'function') {
             loadSavedGenerations();
@@ -1162,50 +1211,19 @@ if (savedLink) {
     });
 }
 
-if (generateLink) {
-    generateLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        hideError(); // Hide main error alert when navigating
-        generateLink.classList.add('active');
-        if (savedLink) savedLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
-        if (halloweenLink) halloweenLink.classList.remove('active');
-        if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
-        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (shortStudyLink) shortStudyLink.classList.remove('active');
-        if (generateContent) generateContent.classList.remove('d-none');
-        if (savedContent) savedContent.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
-        if (halloweenContent) halloweenContent.classList.add('d-none');
-        if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
-        if (halloweenErrorAlert) halloweenErrorAlert.classList.add('d-none');
-        if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
-        if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
-        if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
-        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
-        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
-        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.add('d-none');
-        if (resultsSection) resultsSection.classList.add('d-none');
-        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
-        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
-    });
-}
 
 if (songWithAnimalsLink) {
     songWithAnimalsLink.addEventListener('click', (e) => {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
         songWithAnimalsLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
+        if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (shortStudyLink) shortStudyLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
+        if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
@@ -1216,13 +1234,13 @@ if (songWithAnimalsLink) {
         if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
         if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
         if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.remove('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
-        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
-        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
+        if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
+        if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
     });
 }
 
@@ -1231,16 +1249,16 @@ if (halloweenLink) {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
         halloweenLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
+        if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
-        if (shortStudyLink) shortStudyLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
+        if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.remove('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
@@ -1259,19 +1277,19 @@ if (halloweenTransformLink) {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
         halloweenTransformLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
+        if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (shortStudyLink) shortStudyLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
+        if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
         if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (halloweenTransformContent) halloweenTransformContent.classList.remove('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
@@ -1287,13 +1305,13 @@ if (halloweenTransformTwoFrameLink) {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
         halloweenTransformTwoFrameLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
+        if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
-        if (shortStudyLink) shortStudyLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
+        if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
@@ -1304,27 +1322,26 @@ if (halloweenTransformTwoFrameLink) {
         if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
         if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
         if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.remove('d-none');
         if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
         if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
-        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
-        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
+        if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
+        if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
     });
 }
 
-if (shortStudyLink) {
-    shortStudyLink.addEventListener('click', (e) => {
+if (poemsLink) {
+    poemsLink.addEventListener('click', (e) => {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
-        shortStudyLink.classList.add('active');
-        if (generateLink) generateLink.classList.remove('active');
+        poemsLink.classList.add('active');
         if (savedLink) savedLink.classList.remove('active');
         if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
-        if (generateContent) generateContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (savedContent) savedContent.classList.add('d-none');
         if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
         if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
@@ -1338,10 +1355,9 @@ if (shortStudyLink) {
         if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
         if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
         if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
-        if (resultsSection) resultsSection.classList.add('d-none');
-        if (shortStudyContent) shortStudyContent.classList.remove('d-none');
-        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
-        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.remove('d-none');
+        if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
+        if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
     });
 }
 
@@ -1606,77 +1622,58 @@ if (halloweenTransformTwoFrameForm) {
     });
 }
 
-if (shortStudyForm) {
-    shortStudyForm.addEventListener('submit', async (e) => {
+if (poemsForm) {
+    poemsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (shortStudyErrorAlert) shortStudyErrorAlert.classList.add('d-none');
-        if (shortStudyResultsSection) shortStudyResultsSection.classList.add('d-none');
-        if (shortStudyResultsContainer) shortStudyResultsContainer.innerHTML = '';
-        if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.remove('d-none');
+        if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
+        if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
+        if (poemsResultsContainer) poemsResultsContainer.innerHTML = '';
+        if (poemsLoadingSpinner) poemsLoadingSpinner.classList.remove('d-none');
         
-        const topicsElem = document.getElementById('shortStudyTopics');
-        const topicsText = topicsElem && topicsElem.value ? topicsElem.value.trim() : '';
+        const lyricsText = poemsLyrics && poemsLyrics.value ? poemsLyrics.value.trim() : '';
+        const generateAdditionalFrames = poemsAdditionalFrames && poemsAdditionalFrames.checked;
+        const linesPerVideo = poemsLinesPerVideo && poemsLinesPerVideo.value ? parseInt(poemsLinesPerVideo.value, 10) : 1;
         
-        if (!topicsText) {
-            if (shortStudyErrorAlert && shortStudyErrorMessage) {
-                shortStudyErrorMessage.textContent = 'Please enter study topics';
-                shortStudyErrorAlert.classList.remove('d-none');
+        if (!lyricsText) {
+            if (poemsErrorAlert && poemsErrorMessage) {
+                poemsErrorMessage.textContent = 'Please enter song lyrics';
+                poemsErrorAlert.classList.remove('d-none');
             }
-            if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.add('d-none');
+            if (poemsLoadingSpinner) poemsLoadingSpinner.classList.add('d-none');
             return;
         }
         
         // Create the input format expected by the pipeline
-        // Each line becomes a separate topic object
-        const topics = topicsText.split('\n')
-            .filter(line => line.trim().length > 0)
-            .map(topic => ({ topic: topic.trim() }));
+        const songs = [{ lyrics: lyricsText }];
         
         try {
-            const response = await fetch('/api/generate-short-study', {
+            const response = await fetch('/api/generate-poems', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    input: topics
+                    input: songs,
+                    generateAdditionalFrames: generateAdditionalFrames,
+                    linesPerVideo: linesPerVideo
                 })
             });
 
             const data = await response.json();
 
             if (!response.ok || !data.success) {
-                throw new Error(data.error || 'An error occurred during short study generation');
+                throw new Error(data.error || 'An error occurred during Poems generation');
             }
 
+            // Start listening for logs via SSE
             if (data.requestId) {
-                console.log('Received requestId for short study generation:', data.requestId);
-
-                // Clear previous results and show results section
-                if (shortStudyResultsContainer) shortStudyResultsContainer.innerHTML = '';
-                if (shortStudyResultsSection) shortStudyResultsSection.classList.remove('d-none');
-                
-                // Connect to log stream for short study generation
-                connectToShortStudyLogStream(data.requestId);
-
-                // Add initial message
-                appendShortStudyLogEntry(`Short study topics generation started: You will see logs in real-time as they are generated.`);
-
-                // Fallback message if logs are delayed
-                setTimeout(() => {
-                    const logGroup = shortStudyResultsContainer.querySelector('.list-group');
-                    if (!logGroup || logGroup.children.length <= 1) {
-                        console.log('No logs received via SSE yet for short study, adding a status message');
-                        appendShortStudyLogEntry('Waiting for logs. This may take a moment.');
-                    }
-                }, 3000);
-            } else {
-                throw new Error('No requestId received from server');
+                connectToPoemsLogStream(data.requestId);
             }
         } catch (error) {
-            if (shortStudyErrorAlert && shortStudyErrorMessage) {
-                shortStudyErrorMessage.textContent = error.message || 'An error occurred during short study generation';
-                shortStudyErrorAlert.classList.remove('d-none');
+            console.error('Error generating Poems content:', error);
+            if (poemsErrorAlert && poemsErrorMessage) {
+                poemsErrorMessage.textContent = error.message || 'An error occurred during Poems generation';
+                poemsErrorAlert.classList.remove('d-none');
             }
-            if (shortStudyLoadingSpinner) shortStudyLoadingSpinner.classList.add('d-none');
+            if (poemsLoadingSpinner) poemsLoadingSpinner.classList.add('d-none');
         }
     });
 }

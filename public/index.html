@@ -36,13 +36,8 @@
                         </h6>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" id="generate-link" href="#">
-                            <i class="fas fa-magic"></i> Long Video by theme
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="short-study-link" href="#">
-                            <i class="fas fa-graduation-cap"></i> Short Study Topics
+                        <a class="nav-link" id="poems-link" href="#">
+                            <i class="fas fa-book"></i> Poems
                         </a>
                     </li>
                     
@@ -99,52 +94,6 @@
             </header>
 
             <!-- Content sections -->
-            <div id="generate-content" class="content-section">
-                <div class="row">
-                    <div class="col-md-8 mx-auto">
-                        <div class="card shadow">
-                            <div class="card-header bg-primary text-white">
-                                <h2 class="h4 mb-0">Long videos for the Mini Marvels channel</h2>
-                            </div>
-                            <div class="card-body">
-                                <form id="generationForm">
-                                    <div class="mb-3">
-                                        <label for="topicsJson" class="form-label">
-                                            Topics JSON <span class="text-danger">*</span>
-                                        </label>
-                                        <textarea
-                                                class="form-control"
-                                                id="topicsJson"
-                                                rows="8"
-                                                required
-                                        >{
-  "Learning Colors": [
-    "All Red!",
-    "Light and Dark Colors"
-  ]
-}</textarea>
-                                        <div class="form-text">
-                                            Enter topics organized by themes in JSON format
-                                        </div>
-                                    </div>
-
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary" id="generateBtn">
-                        <span
-                                class="spinner-border spinner-border-sm d-none"
-                                id="loadingSpinner"
-                                role="status"
-                                aria-hidden="true"
-                        ></span>
-                                            Generate Content
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="row mt-5 d-none" id="resultsSection">
                 <div class="col-12">
@@ -522,42 +471,68 @@ The vampire bat says, "Squeak, squeak, squeak!"</textarea>
                 </div>
             </div>
 
-            <!-- Short Study Generation Content -->
-            <div id="short-study-content" class="content-section d-none">
+            <!-- Poems Generation Content -->
+            <div id="poems-content" class="content-section d-none">
                 <div class="row">
                     <div class="col-md-8 mx-auto">
                         <div class="card shadow">
-                            <div class="card-header bg-info text-white">
-                                <h2 class="h4 mb-0">Mini Marvels - Short Study Topics Generator</h2>
+                            <div class="card-header bg-success text-white">
+                                <h2 class="h4 mb-0">Mini Marvels - Poems Shorts</h2>
                             </div>
                             <div class="card-body">
-                                <form id="shortStudyForm">
+                                <form id="poemsForm">
                                     <div class="mb-3">
-                                        <label for="shortStudyTopics" class="form-label">
-                                            Study Topics <span class="text-danger">*</span>
+                                        <label for="poemsLyrics" class="form-label">
+                                            Song Lyrics <span class="text-danger">*</span>
                                         </label>
                                         <textarea
                                                 class="form-control"
-                                                id="shortStudyTopics"
+                                                id="poemsLyrics"
                                                 rows="10"
                                                 required
-                                        >All Red!
-All Yellow!
-All Blue!
-All Green!</textarea>
+                                        >The cat says, "Meow, meow, meow!"
+The dog says, "Woof, woof, woof!"
+The bird says, "Tweet, tweet, tweet!"
+The fish says, "Blub, blub, blub!"</textarea>
                                         <div class="form-text">
-                                            Enter educational topics for children. Each line will become a separate topic to process.
+                                            Enter the lyrics of your poem song. Each line will become an image prompt.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="poemsLinesPerVideo" class="form-label">
+                                            Lines per video
+                                        </label>
+                                        <input
+                                                type="number"
+                                                class="form-control"
+                                                id="poemsLinesPerVideo"
+                                                min="1"
+                                                value="1"
+                                        />
+                                        <div class="form-text">
+                                            Number of song lines to combine into one video (will be used in future pipeline updates).
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="poemsAdditionalFrames">
+                                            <label class="form-check-label" for="poemsAdditionalFrames">
+                                                Generate additional frames
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            Generate extra visual frames for enhanced video variety and transitions.
                                         </div>
                                     </div>
                                     <div class="d-grid">
-                                        <button type="submit" class="btn btn-info" id="shortStudyGenerateBtn">
+                                        <button type="submit" class="btn btn-success" id="poemsGenerateBtn">
                                             <span
                                                 class="spinner-border spinner-border-sm d-none"
-                                                id="shortStudyLoadingSpinner"
+                                                id="poemsLoadingSpinner"
                                                 role="status"
                                                 aria-hidden="true"
                                             ></span>
-                                            Generate Short Study Topics
+                                            Generate Poems Shorts
                                         </button>
                                     </div>
                                 </form>
@@ -565,27 +540,26 @@ All Green!</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-5 d-none" id="shortStudyResultsSection">
+                <div class="row mt-5 d-none" id="poemsResultsSection">
                     <div class="col-12">
                         <div class="card shadow">
-                            <div class="card-header bg-success text-white d-flex justify-between align-items-center">
-                                <h2 class="h4 mb-0">Short Study Topics Generation Results</h2>
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <h2 class="h4 mb-0">Poems Generation Results</h2>
                             </div>
                             <div class="card-body">
-                                <div id="shortStudyResultsContainer" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
-                                    <!-- Short study results will be dynamically added here -->
+                                <div id="poemsResultsContainer" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Poems results will be dynamically added here -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="alert alert-danger mt-4 d-none" id="shortStudyErrorAlert" role="alert">
+                <div class="alert alert-danger mt-4 d-none" id="poemsErrorAlert" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <span id="shortStudyErrorMessage"></span>
+                    <span id="poemsErrorMessage"></span>
                 </div>
-                
-
             </div>
+
 
         </div>
     </div>

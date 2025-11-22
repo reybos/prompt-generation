@@ -125,6 +125,7 @@ export interface PipelineOptions {
     emitLog?: (log: string, requestId: string | undefined) => void;
     style?: string; // Visual style for song with animals pipeline
     generateAdditionalFrames?: boolean; // Flag to generate additional frames
+    linesPerVideo?: number; // Number of song lines to combine into one video
 }
 
 /**
@@ -304,6 +305,55 @@ export interface HalloweenTransformOutput {
     video_prompts: HalloweenTransformVideoPrompt[];
     titles: string[];
     additional_frames?: HalloweenAdditionalFramePrompt[]; // Optional additional frames
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
+}
+
+/**
+ * Poems input: array of song objects with lyrics
+ */
+export interface PoemsInputItem {
+    lyrics: string; // The song lyrics as a string
+}
+
+export type PoemsInput = PoemsInputItem[];
+
+/**
+ * Poems image prompt (output of image generation step)
+ */
+export interface PoemsImagePrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    prompt: string;
+}
+
+/**
+ * Poems video prompt (output of video generation step)
+ */
+export interface PoemsVideoPrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    video_prompt: string;
+}
+
+/**
+ * Poems additional frame prompt (group image)
+ */
+export interface PoemsAdditionalFramePrompt {
+    index: number; // Frame index starting from 0 for easier identification
+    lines: string[]; // Array of 3 lines that were grouped together
+    group_image_prompt: string; // Group image prompt for thumbnail
+    group_video_prompt: string; // Group video prompt for animation
+}
+
+/**
+ * Poems output (final result)
+ */
+export interface PoemsOutput {
+    global_style: string;
+    prompts: PoemsImagePrompt[];
+    video_prompts: PoemsVideoPrompt[];
+    titles: string[];
+    additional_frames?: PoemsAdditionalFramePrompt[]; // Optional additional frames
     requests?: LLMRequest[]; // Array of all LLM requests made during generation
 }
 
