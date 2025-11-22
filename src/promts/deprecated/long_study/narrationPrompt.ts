@@ -6,7 +6,7 @@
 import { PromptTemplate } from '@langchain/core/prompts';
 import fs from 'fs';
 import path from 'path';
-import { getDirname } from '../../utils/fileUtils.js';
+import { getDirname } from '../../../utils/fileUtils.js';
 
 // Get __dirname equivalent for ES modules
 const __dirname = getDirname(import.meta.url);

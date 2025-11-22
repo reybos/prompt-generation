@@ -1,5 +1,5 @@
 import {PromptTemplate} from '@langchain/core/prompts';
-import { getDirname } from '../../utils/fileUtils.js';
+import { getDirname } from '../../../utils/fileUtils.js';
 import fs from 'fs';
 import path from 'path';
 
