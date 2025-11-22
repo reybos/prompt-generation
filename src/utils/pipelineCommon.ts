@@ -57,12 +57,12 @@ export function groupVideoPromptsIntoSegments<T>(
 /**
  * Save pipeline result to file in unprocessed folder
  * @param result - The pipeline result to save
- * @param style - Style name for the filename
+ * @param pipelineIdentifier - Pipeline identifier for the filename
  * @param options - Pipeline options for logging
  */
 export async function savePipelineResult(
   result: any,
-  style: string,
+  pipelineIdentifier: string,
   options: PipelineOptions = {}
 ): Promise<void> {
   if (options.emitLog && options.requestId) {
@@ -74,7 +74,7 @@ export async function savePipelineResult(
     const unprocessedDir = path.join(generationsDir, 'unprocessed');
     await fs.mkdir(unprocessedDir, { recursive: true });
     const fileNumber = await getNextFileNumber(generationsDir);
-    const filename = `${fileNumber}-${style}.json`;
+    const filename = `${fileNumber}-${pipelineIdentifier}.json`;
     const filePath = path.join(unprocessedDir, filename);
     await fs.writeFile(filePath, JSON.stringify(result, null, 2), 'utf-8');
   }

@@ -4,7 +4,7 @@ A comprehensive Node.js/TypeScript pipeline for generating educational video con
 
 ## 🚀 Features
 
-- **Multiple Content Pipelines**: Halloween, Horror, Study (Short/Long), Song with Animals
+- **Multiple Content Pipelines**: Halloween, Horror, Study (Short/Long), Halloween Patchwork
 - **AI-Powered Generation**: Uses fal.ai API with Claude models for high-quality content
 - **Web Interface**: User-friendly interface for content generation and management
 - **Modular Architecture**: TypeScript-based with clean separation of concerns
@@ -84,10 +84,10 @@ The web interface provides:
 - **Long Study**: Comprehensive educational content with async processing
 - Includes character prompts, media enhancement, and narration
 
-#### 🎵 Song with Animals Pipeline
+#### 🎃 Halloween Patchwork Pipeline
 - **Automatic Segmentation**: Splits songs into 3-line segments
 - **Multi-format Output**: Generates images, videos, titles, descriptions, and hashtags
-- **Visual Styles**: Support for Classic, Steampunk, Futuristic, and Halloween styles
+- **Halloween Patchwork Style**: Hardcoded spooky-cute 3D cartoon style with patchwork characters
 - **Scalable Content**: One song generates multiple content pieces
 
 ### Development
@@ -154,7 +154,7 @@ Each pipeline is designed for specific content types:
 
 ## 📖 Documentation
 
-- [Song with Animals Pipeline](documentation/SONG_WITH_ANIMALS_PIPELINE.md)
+- [Halloween Patchwork Pipeline](documentation/HALLOWEEN_PATCHWORK_PIPELINE.md)
 - [Async Pipeline](documentation/ASYNC_PIPELINE_README.md)
 
 ## 🤝 Contributing

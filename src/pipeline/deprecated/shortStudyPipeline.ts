@@ -1,6 +1,6 @@
 import { ShortStudyInput, ShortStudyOutput, ShortStudyVideoPrompt, ShortStudySongPrompt, LLMRequest } from '../../types/pipeline.js';
 import { PipelineOptions } from '../../types/pipeline.js';
-import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, logVideoPrompt, shortStudyLogTitleDescPrompt } from '../../promts/index.js';
+import { shortStudyVideoPrompt, shortStudyTitleDescPrompt, shortStudyHashtagsPrompt, shortStudySongPrompt, shortStudyLogTitleDescPrompt } from '../../promts/index.js';
 import { executePipelineStepWithTracking, safeJsonParse } from '../../utils/index.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -101,7 +101,8 @@ export async function runShortStudyPipeline(
         let videoJson: string | Record<string, any> | null = null;
         try {
           // Логируем видео промт в консоль
-          logVideoPrompt(songPrompt.song_text, topicDescription);
+          // Log video prompt (removed logVideoPrompt function)
+          console.log('Video prompt:', songPrompt.song_text, 'Topic:', topicDescription);
           
           videoJson = await executePipelineStepWithTracking({
             stepName: 'SHORT STUDY VIDEO PROMPTS',

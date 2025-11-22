@@ -60,28 +60,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// API endpoint for song with animals generation
-app.post('/api/generate-song-with-animals', async (req, res) => {
+// API endpoint for Halloween Patchwork generation
+app.post('/api/generate-halloween-patchwork', async (req, res) => {
     try {
-        const { input, style, generateAdditionalFrames } = req.body;
+        const { input, generateAdditionalFrames } = req.body;
         if (!input) {
             return res.status(400).json({ error: 'Missing input' });
         }
-        if (!style) {
-            return res.status(400).json({ error: 'Missing style parameter' });
-        }
         // Generate a unique requestId for this generation
         const requestId = crypto.randomUUID();
-        // Start song with animals generation in the background (do not await)
-        processSongWithAnimalsGeneration(input, requestId, style, generateAdditionalFrames)
+        // Start Halloween Patchwork generation in the background (do not await)
+        processHalloweenPatchworkGeneration(input, requestId, generateAdditionalFrames)
             .catch(err => {
-                console.error('Error in background song with animals generation:', err);
-                emitLog('Error during song with animals generation: ' + (err?.message || err), requestId);
+                console.error('Error in background Halloween Patchwork generation:', err);
+                emitLog('Error during Halloween Patchwork generation: ' + (err?.message || err), requestId);
             });
         // Respond immediately so frontend can connect to SSE
         return res.json({ success: true, requestId });
     } catch (err) {
-        console.error('Error in /api/generate-song-with-animals:', err);
+        console.error('Error in /api/generate-halloween-patchwork:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -178,17 +175,6 @@ app.post('/api/generate-poems', async (req, res) => {
     }
 });
 
-// API endpoint for getting available styles
-app.get('/api/styles', async (req, res) => {
-    try {
-        const { getAvailableStyles } = await import('./promts/song_with_animals/styles/styleConfig.js');
-        const styles = getAvailableStyles();
-        res.json({ success: true, styles });
-    } catch (error) {
-        console.error('Error getting styles:', error);
-        res.status(500).json({ error: 'Failed to get styles' });
-    }
-});
 
 // SSE endpoint for streaming logs to the frontend
 app.get('/api/logs/stream', (req, res) => {
@@ -229,11 +215,10 @@ function emitLog(log: string, requestId?: string): void {
     logEmitter.emit('log', { log, requestId: safeRequestId, timestamp });
 }
 
-// Song with animals generation processor
-async function processSongWithAnimalsGeneration(
+// Halloween Patchwork generation processor
+async function processHalloweenPatchworkGeneration(
     input: any,
     requestId: string,
-    style: string,
     generateAdditionalFrames?: boolean
 ): Promise<void> {
     const logs: string[] = [];
@@ -241,22 +226,21 @@ async function processSongWithAnimalsGeneration(
     // Wait for SSE client to connect
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    console.log(`[SONG WITH ANIMALS] Checking for active connection for requestId: ${requestId}`);
-    console.log(`[SONG WITH ANIMALS] Active connections: ${activeConnections.size}`);
+    console.log(`[HALLOWEEN PATCHWORK] Checking for active connection for requestId: ${requestId}`);
+    console.log(`[HALLOWEEN PATCHWORK] Active connections: ${activeConnections.size}`);
 
     try {
-        const result = await import('./pipeline/songWithAnimalsPipeline.js').then(m => m.runSongWithAnimalsPipeline(input, { 
+        const result = await import('./pipeline/halloweenPatchworkPipeline.js').then(m => m.runHalloweenPatchworkPipeline(input, { 
             requestId, 
             emitLog: (log: string, reqId?: string) => emitLog(log, reqId), 
-            style,
             generateAdditionalFrames: generateAdditionalFrames || false
         }));
         
         // Emit completion message with results
         const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
-        emitLog(`Song with animals generation complete with ${style} style${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+        emitLog(`Halloween Patchwork generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
-        const error = `Error during song with animals generation: ${err}`;
+        const error = `Error during Halloween Patchwork generation: ${err}`;
         logs.push(error);
         emitLog(error, requestId);
     }

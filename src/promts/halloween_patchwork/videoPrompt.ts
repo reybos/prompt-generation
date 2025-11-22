@@ -16,10 +16,10 @@ if (fs.existsSync(actualPath)) {
     videoPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
 } else {
     videoPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
-    console.warn('⚠️  Using template prompt for songWithAnimalsVideoPrompt. Copy .template.txt to .txt for production use.');
+    console.warn('⚠️  Using template prompt for halloweenPatchworkVideoPrompt. Copy .template.txt to .txt for production use.');
 }
 
-export const songWithAnimalsVideoPrompt = new PromptTemplate({
+export const halloweenPatchworkVideoPrompt = new PromptTemplate({
     inputVariables: ["global_style", "image_prompts"],
     template: videoPromptTemplate
 });
@@ -34,4 +34,5 @@ export function logVideoPrompt(global_style: string, image_prompts: string): voi
     console.log('Full Video Prompt:');
     console.log(fullVideoPrompt);
     console.log('=== END VIDEO PROMPT ===');
-} 
+}
+

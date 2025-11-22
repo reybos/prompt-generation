@@ -45,7 +45,7 @@ export type LogVideoPromptFn = (...args: any[]) => void;
 export type LogTitlePromptFn = (...args: any[]) => void;
 
 /**
- * Function to get initial global style (optional, for special cases like songWithAnimals)
+ * Function to get initial global style (optional, for special cases)
  */
 export type GetGlobalStyleFn = (
   style: string,
@@ -64,8 +64,8 @@ export interface PipelineConfig<TImagePrompt, TVideoPrompt> {
   // Pipeline name for logging
   pipelineName: string;
   
-  // Style name (can be fixed or from options)
-  getStyleName: (options: PipelineOptions) => string;
+  // Pipeline identifier for filenames and logging (can be fixed or from options)
+  getPipelineIdentifier: (options: PipelineOptions) => string;
   
   // Model configurations
   models: {

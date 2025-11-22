@@ -140,3 +140,30 @@ export const SongWithAnimalsOutputSchema = z.object({
     descriptions: z.array(z.string()),
     hashtags: z.array(z.string()),
 });
+
+/**
+ * Halloween Patchwork schemas
+ */
+export const HalloweenPatchworkInputItemSchema = z.object({
+    lyrics: z.string(),
+});
+
+export const HalloweenPatchworkInputSchema = z.array(HalloweenPatchworkInputItemSchema);
+
+export const HalloweenPatchworkImagePromptSchema = z.object({
+    line: z.string(),
+    prompt: z.string(),
+});
+
+export const HalloweenPatchworkVideoPromptSchema = z.object({
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+export const HalloweenPatchworkOutputSchema = z.object({
+    global_style: z.string(),
+    prompts: z.array(HalloweenPatchworkImagePromptSchema),
+    video_prompts: z.array(HalloweenPatchworkVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(z.any()).optional(),
+});

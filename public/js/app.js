@@ -42,17 +42,16 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 const resultsSection = document.getElementById('resultsSection');
 const copyToast = document.getElementById('copyToast');
 
-// DOM Elements for Song with Animals Generation
-const songWithAnimalsLink = document.getElementById('song-with-animals-link');
-const songWithAnimalsContent = document.getElementById('song-with-animals-content');
-const songWithAnimalsForm = document.getElementById('songWithAnimalsForm');
-const songWithAnimalsStyle = document.getElementById('songWithAnimalsStyle');
-const songWithAnimalsAdditionalFrames = document.getElementById('songWithAnimalsAdditionalFrames');
-const songWithAnimalsResultsSection = document.getElementById('songWithAnimalsResultsSection');
-const songWithAnimalsResultsContainer = document.getElementById('songWithAnimalsResultsContainer');
-const songWithAnimalsErrorAlert = document.getElementById('songWithAnimalsErrorAlert');
-const songWithAnimalsErrorMessage = document.getElementById('songWithAnimalsErrorMessage');
-const songWithAnimalsLoadingSpinner = document.getElementById('songWithAnimalsLoadingSpinner');
+// DOM Elements for Halloween Patchwork Generation
+const halloweenPatchworkLink = document.getElementById('halloween-patchwork-link');
+const halloweenPatchworkContent = document.getElementById('halloween-patchwork-content');
+const halloweenPatchworkForm = document.getElementById('halloweenPatchworkForm');
+const halloweenPatchworkAdditionalFrames = document.getElementById('halloweenPatchworkAdditionalFrames');
+const halloweenPatchworkResultsSection = document.getElementById('halloweenPatchworkResultsSection');
+const halloweenPatchworkResultsContainer = document.getElementById('halloweenPatchworkResultsContainer');
+const halloweenPatchworkErrorAlert = document.getElementById('halloweenPatchworkErrorAlert');
+const halloweenPatchworkErrorMessage = document.getElementById('halloweenPatchworkErrorMessage');
+const halloweenPatchworkLoadingSpinner = document.getElementById('halloweenPatchworkLoadingSpinner');
 
 // DOM Elements for Halloween Generation
 const halloweenLink = document.getElementById('halloween-link');
@@ -110,139 +109,107 @@ const viewModal = new window.bootstrap.Modal(viewGenerationModal);
 // Store the generated content and active SSE connection
 let generatedContent = null;
 let logEventSource = null;
-let songWithAnimalsLogEventSource = null;
+let halloweenPatchworkLogEventSource = null;
 let halloweenLogEventSource = null;
 let halloweenTransformLogEventSource = null;
 let halloweenTransformTwoFrameLogEventSource = null;
 let poemsLogEventSource = null;
 
 /**
- * Load available styles from the server and populate the style select
- */
-async function loadStyles() {
-    try {
-        const response = await fetch('/api/styles');
-        const data = await response.json();
-        
-        if (data.success && data.styles) {
-            const styleSelect = document.getElementById('songWithAnimalsStyle');
-            if (styleSelect) {
-                // Clear existing options except the first placeholder
-                styleSelect.innerHTML = '<option value="">Choose a visual style...</option>';
-                
-                // Add new options from the server
-                data.styles.forEach(style => {
-                    const option = document.createElement('option');
-                    option.value = style.name;
-                    option.textContent = `${style.displayName} - ${style.description}`;
-                    styleSelect.appendChild(option);
-                });
-                
-                console.log('Styles loaded successfully:', data.styles);
-            }
-        }
-    } catch (error) {
-        console.error('Error loading styles:', error);
-        // Fallback to static styles if API fails
-    }
-}
-
-
-/**
- * Connect to the SSE log stream for song with animals generation
+ * Connect to the SSE log stream for Halloween Patchwork generation
  * @param {string} requestId - The request ID to filter logs by
  */
-function connectToSongWithAnimalsLogStream(requestId) {
+function connectToHalloweenPatchworkLogStream(requestId) {
     // Close any existing connection
-    if (songWithAnimalsLogEventSource) {
-        console.log('Closing existing song with animals log stream connection');
-        songWithAnimalsLogEventSource.close();
+    if (halloweenPatchworkLogEventSource) {
+        console.log('Closing existing Halloween Patchwork log stream connection');
+        halloweenPatchworkLogEventSource.close();
     }
 
     console.log(`Connecting to song with animals log stream with requestId: ${requestId}`);
 
     // Create a new EventSource connection
-    songWithAnimalsLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
+    halloweenPatchworkLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
 
     // Handle connection open
-    songWithAnimalsLogEventSource.onopen = () => {
-        console.log('Song with animals log stream connection established');
-        if (songWithAnimalsResultsContainer && songWithAnimalsResultsContainer.querySelector('.list-group')) {
-            songWithAnimalsResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
+    halloweenPatchworkLogEventSource.onopen = () => {
+        console.log('Halloween Patchwork log stream connection established');
+        if (halloweenPatchworkResultsContainer && halloweenPatchworkResultsContainer.querySelector('.list-group')) {
+            halloweenPatchworkResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
         }
     };
 
     // Handle incoming messages
-    songWithAnimalsLogEventSource.onmessage = (event) => {
-        console.log('Received song with animals SSE message:', event.data);
+    halloweenPatchworkLogEventSource.onmessage = (event) => {
+        console.log('Received Halloween Patchwork SSE message:', event.data);
         try {
             const data = JSON.parse(event.data);
 
             if (data.type === 'connected') {
-                console.log('Connected to song with animals log stream');
+                console.log('Connected to Halloween Patchwork log stream');
             } else if (data.type === 'log') {
-                console.log('Received song with animals log:', data.log, 'timestamp:', data.timestamp);
-                if (songWithAnimalsResultsContainer && songWithAnimalsResultsContainer.querySelector('.alert-info')) {
-                    songWithAnimalsResultsContainer.innerHTML = '';
+                console.log('Received Halloween Patchwork log:', data.log, 'timestamp:', data.timestamp);
+                if (halloweenPatchworkResultsContainer && halloweenPatchworkResultsContainer.querySelector('.alert-info')) {
+                    halloweenPatchworkResultsContainer.innerHTML = '';
                 }
-                appendSongWithAnimalsLogEntry(data.log, data.timestamp);
+                appendHalloweenPatchworkLogEntry(data.log, data.timestamp);
             } else if (data.type === 'complete') {
-                console.log('Song with animals generation complete:', data.message);
-                appendSongWithAnimalsLogEntry(data.message, data.timestamp);
-                if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+                console.log('Halloween Patchwork generation complete:', data.message);
+                appendHalloweenPatchworkLogEntry(data.message, data.timestamp);
+                if (halloweenPatchworkLoadingSpinner) halloweenPatchworkLoadingSpinner.classList.add('d-none');
                 setTimeout(() => {
-                    if (songWithAnimalsLogEventSource) {
-                        console.log('Closing song with animals log stream connection after completion');
-                        songWithAnimalsLogEventSource.close();
-                        songWithAnimalsLogEventSource = null;
+                    if (halloweenPatchworkLogEventSource) {
+                        console.log('Closing Halloween Patchwork log stream connection after completion');
+                        halloweenPatchworkLogEventSource.close();
+                        halloweenPatchworkLogEventSource = null;
                     }
                 }, 1000);
             } else {
-                console.warn('Unknown song with animals message type:', data.type);
+                console.warn('Unknown Halloween Patchwork message type:', data.type);
             }
         } catch (error) {
-            console.error('Error parsing song with animals SSE message:', error, event.data);
+            console.error('Error parsing Halloween Patchwork SSE message:', error, event.data);
         }
     };
 
     // Handle errors
-    songWithAnimalsLogEventSource.onerror = (error) => {
-        console.error('Song with animals log stream error:', error);
-        if (songWithAnimalsResultsContainer && songWithAnimalsResultsContainer.querySelector('.alert-info')) {
-            songWithAnimalsResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
+    halloweenPatchworkLogEventSource.onerror = (error) => {
+        console.error('Halloween Patchwork log stream error:', error);
+        if (halloweenPatchworkResultsContainer && halloweenPatchworkResultsContainer.querySelector('.alert-info')) {
+            halloweenPatchworkResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
         }
-        if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
-        songWithAnimalsLogEventSource.close();
-        songWithAnimalsLogEventSource = null;
+        if (halloweenPatchworkLoadingSpinner) halloweenPatchworkLoadingSpinner.classList.add('d-none');
+        halloweenPatchworkLogEventSource.close();
+        halloweenPatchworkLogEventSource = null;
     };
 }
 
 /**
- * Append a single log entry to the song with animals display
+ * Append a single log entry to the Halloween Patchwork display
  * @param {string} log - The log message to append
  * @param {string} timestamp - The timestamp for the log entry
  */
-function appendSongWithAnimalsLogEntry(log, timestamp) {
+function appendHalloweenPatchworkLogEntry(log, timestamp) {
     // Skip logs containing "Using default channel name"
     if (log && log.includes("Using default channel name")) {
         console.log('Skipping channel name log:', log);
         return;
     }
 
-    console.log('Appending song with animals log entry:', log, 'timestamp:', timestamp);
+    console.log('Appending Halloween Patchwork log entry:', log, 'timestamp:', timestamp);
 
     // Make sure the results section is visible
-    if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.remove('d-none');
+    if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.remove('d-none');
 
     // Create the log item list if it doesn't exist yet
-    if (!songWithAnimalsResultsContainer.querySelector('.list-group')) {
-        console.log('Creating new song with animals log list');
+    if (!halloweenPatchworkResultsContainer.querySelector('.list-group')) {
+        console.log('Creating new Halloween Patchwork log list');
         const logList = document.createElement('div');
         logList.className = 'list-group';
-        songWithAnimalsResultsContainer.appendChild(logList);
+        halloweenPatchworkResultsContainer.appendChild(logList);
     }
 
-    const logList = songWithAnimalsResultsContainer.querySelector('.list-group');
+    const logList = halloweenPatchworkResultsContainer.querySelector('.list-group');
 
     // Create and append the new log entry
     const logItem = document.createElement('div');
@@ -273,7 +240,7 @@ function appendSongWithAnimalsLogEntry(log, timestamp) {
     logList.appendChild(logItem);
 
     // Scroll to the bottom
-    songWithAnimalsResultsContainer.scrollTop = songWithAnimalsResultsContainer.scrollHeight;
+    halloweenPatchworkResultsContainer.scrollTop = halloweenPatchworkResultsContainer.scrollHeight;
 }
 
 /**
@@ -1182,15 +1149,15 @@ if (savedLink) {
         hideError(); // Hide main error alert when navigating
         savedLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
         if (halloweenErrorAlert) halloweenErrorAlert.classList.add('d-none');
@@ -1212,11 +1179,11 @@ if (savedLink) {
 }
 
 
-if (songWithAnimalsLink) {
-    songWithAnimalsLink.addEventListener('click', (e) => {
+if (halloweenPatchworkLink) {
+    halloweenPatchworkLink.addEventListener('click', (e) => {
         e.preventDefault();
         hideError(); // Hide main error alert when navigating
-        songWithAnimalsLink.classList.add('active');
+        halloweenPatchworkLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
@@ -1236,9 +1203,9 @@ if (songWithAnimalsLink) {
         if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
         if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.remove('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.remove('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
         if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
         if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
     });
@@ -1251,13 +1218,13 @@ if (halloweenLink) {
         halloweenLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
         if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.remove('d-none');
@@ -1279,15 +1246,15 @@ if (halloweenTransformLink) {
         halloweenTransformLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
         if (poemsContent) poemsContent.classList.add('d-none');
         if (resultsSection) resultsSection.classList.add('d-none');
@@ -1307,15 +1274,15 @@ if (halloweenTransformTwoFrameLink) {
         halloweenTransformTwoFrameLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
         if (halloweenErrorAlert) halloweenErrorAlert.classList.add('d-none');
@@ -1338,14 +1305,14 @@ if (poemsLink) {
         hideError(); // Hide main error alert when navigating
         poemsLink.classList.add('active');
         if (savedLink) savedLink.classList.remove('active');
-        if (songWithAnimalsLink) songWithAnimalsLink.classList.remove('active');
+        if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
         if (savedContent) savedContent.classList.add('d-none');
-        if (songWithAnimalsContent) songWithAnimalsContent.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
         if (halloweenErrorAlert) halloweenErrorAlert.classList.add('d-none');
@@ -1361,36 +1328,25 @@ if (poemsLink) {
     });
 }
 
-if (songWithAnimalsForm) {
-    songWithAnimalsForm.addEventListener('submit', async (e) => {
+if (halloweenPatchworkForm) {
+    halloweenPatchworkForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (songWithAnimalsErrorAlert) songWithAnimalsErrorAlert.classList.add('d-none');
-        if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.add('d-none');
-        if (songWithAnimalsResultsContainer) songWithAnimalsResultsContainer.innerHTML = '';
-        if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.remove('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkResultsContainer) halloweenPatchworkResultsContainer.innerHTML = '';
+        if (halloweenPatchworkLoadingSpinner) halloweenPatchworkLoadingSpinner.classList.remove('d-none');
         
-        const lyricsElem = document.getElementById('songWithAnimalsLyrics');
-        const styleElem = document.getElementById('songWithAnimalsStyle');
-        const additionalFramesElem = document.getElementById('songWithAnimalsAdditionalFrames');
+        const lyricsElem = document.getElementById('halloweenPatchworkLyrics');
+        const additionalFramesElem = document.getElementById('halloweenPatchworkAdditionalFrames');
         const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
-        const selectedStyle = styleElem && styleElem.value ? styleElem.value : '';
         const generateAdditionalFrames = additionalFramesElem && additionalFramesElem.checked;
         
         if (!lyricsText) {
-            if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
-                songWithAnimalsErrorMessage.textContent = 'Please enter song lyrics';
-                songWithAnimalsErrorAlert.classList.remove('d-none');
+            if (halloweenPatchworkErrorAlert && halloweenPatchworkErrorMessage) {
+                halloweenPatchworkErrorMessage.textContent = 'Please enter song lyrics';
+                halloweenPatchworkErrorAlert.classList.remove('d-none');
             }
-            if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
-            return;
-        }
-        
-        if (!selectedStyle) {
-            if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
-                songWithAnimalsErrorMessage.textContent = 'Please select a visual style';
-                songWithAnimalsErrorAlert.classList.remove('d-none');
-            }
-            if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+            if (halloweenPatchworkLoadingSpinner) halloweenPatchworkLoadingSpinner.classList.add('d-none');
             return;
         }
         
@@ -1398,12 +1354,11 @@ if (songWithAnimalsForm) {
         const songs = [{ lyrics: lyricsText }];
         
         try {
-            const response = await fetch('/api/generate-song-with-animals', {
+            const response = await fetch('/api/generate-halloween-patchwork', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     input: songs,
-                    style: selectedStyle,
                     generateAdditionalFrames: generateAdditionalFrames
                 })
             });
@@ -1411,39 +1366,39 @@ if (songWithAnimalsForm) {
             const data = await response.json();
 
             if (!response.ok || !data.success) {
-                throw new Error(data.error || 'An error occurred during song with animals generation');
+                throw new Error(data.error || 'An error occurred during Halloween Patchwork generation');
             }
 
             if (data.requestId) {
-                console.log('Received requestId for song with animals generation:', data.requestId);
+                console.log('Received requestId for Halloween Patchwork generation:', data.requestId);
 
                 // Clear previous results and show results section
-                if (songWithAnimalsResultsContainer) songWithAnimalsResultsContainer.innerHTML = '';
-                if (songWithAnimalsResultsSection) songWithAnimalsResultsSection.classList.remove('d-none');
+                if (halloweenPatchworkResultsContainer) halloweenPatchworkResultsContainer.innerHTML = '';
+                if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.remove('d-none');
                 
-                // Connect to log stream for song with animals generation
-                connectToSongWithAnimalsLogStream(data.requestId);
+                // Connect to log stream for Halloween Patchwork generation
+                connectToHalloweenPatchworkLogStream(data.requestId);
 
                 // Add initial message
-                appendSongWithAnimalsLogEntry(`Song with animals generation started with ${selectedStyle} style: You will see logs in real-time as they are generated.`);
+                appendHalloweenPatchworkLogEntry('Halloween Patchwork generation started: You will see logs in real-time as they are generated.');
 
                 // Fallback message if logs are delayed
                 setTimeout(() => {
-                    const logGroup = songWithAnimalsResultsContainer.querySelector('.list-group');
+                    const logGroup = halloweenPatchworkResultsContainer.querySelector('.list-group');
                     if (!logGroup || logGroup.children.length <= 1) {
-                        console.log('No logs received via SSE yet for song with animals, adding a status message');
-                        appendSongWithAnimalsLogEntry('Waiting for logs. This may take a moment.');
+                        console.log('No logs received via SSE yet for Halloween Patchwork, adding a status message');
+                        appendHalloweenPatchworkLogEntry('Waiting for logs. This may take a moment.');
                     }
                 }, 3000);
             } else {
                 throw new Error('No requestId received from server');
                     }
     } catch (error) {
-        if (songWithAnimalsErrorAlert && songWithAnimalsErrorMessage) {
-            songWithAnimalsErrorMessage.textContent = error.message || 'An error occurred during song with animals generation';
-            songWithAnimalsErrorAlert.classList.remove('d-none');
+        if (halloweenPatchworkErrorAlert && halloweenPatchworkErrorMessage) {
+            halloweenPatchworkErrorMessage.textContent = error.message || 'An error occurred during Halloween Patchwork generation';
+            halloweenPatchworkErrorAlert.classList.remove('d-none');
         }
-        if (songWithAnimalsLoadingSpinner) songWithAnimalsLoadingSpinner.classList.add('d-none');
+        if (halloweenPatchworkLoadingSpinner) halloweenPatchworkLoadingSpinner.classList.add('d-none');
     }
     });
 }
@@ -2083,6 +2038,5 @@ async function checkServerStatus(retryCount = 0, maxRetries = 5, retryDelay = 20
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Load styles from the server
-    loadStyles();
+    // Initialization complete
 });

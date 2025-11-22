@@ -11,7 +11,7 @@ import { runBasePipeline } from './basePipeline.js';
 function createHalloweenDanceConfig(): PipelineConfig<HalloweenImagePrompt, HalloweenVideoPrompt> {
   return {
     pipelineName: '🎃 Generating Halloween song',
-    getStyleName: () => 'halloweenNew', // Fixed style for Halloween pipeline
+    getPipelineIdentifier: () => 'halloweenDance', // Pipeline identifier for filenames and logging
     
     models: {
       image: { model: 'anthropic/claude-sonnet-4.5', temperature: 0.3 },

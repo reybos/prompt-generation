@@ -16,23 +16,23 @@ if (fs.existsSync(actualPath)) {
     additionalFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
 } else {
     additionalFramesPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
-    console.warn('⚠️  Using template prompt for songWithAnimalsGroupImagePrompt. Copy .template.txt to .txt for production use.');
+    console.warn('⚠️  Using template prompt for halloweenPatchworkGroupImagePrompt. Copy .template.txt to .txt for production use.');
 }
 
 /**
- * Song with animals group image prompt template
+ * Halloween Patchwork group image prompt template
  * Creates group thumbnails for every 3 characters
  */
-export const songWithAnimalsGroupImagePrompt = new PromptTemplate({ 
+export const halloweenPatchworkGroupImagePrompt = new PromptTemplate({ 
     inputVariables: ["globalStyle", "prompts"],
     template: additionalFramesPromptTemplate 
 });
 
 /**
- * Song with animals group video prompt template
+ * Halloween Patchwork group video prompt template
  * Creates animated video prompts for group thumbnails
  */
-export const songWithAnimalsGroupVideoPrompt = PromptTemplate.fromTemplate(`
+export const halloweenPatchworkGroupVideoPrompt = PromptTemplate.fromTemplate(`
 You are an expert in creating short animated video prompts for YouTube. You will receive a description of a static illustration showing three characters and their environment. Your task is to transform it into a video description with subtle, natural motions.
 
 Rules:
@@ -72,24 +72,25 @@ Return your response as a JSON object with the following structure:
  * @param globalStyle - The global style
  * @param prompts - The three character prompts
  */
-export function logSongWithAnimalsGroupImagePrompt(
+export function logHalloweenPatchworkGroupImagePrompt(
   globalStyle: string,
   prompts: string
 ): void {
-  console.log('=== SONG WITH ANIMALS GROUP IMAGE PROMPT ===');
+  console.log('=== HALLOWEEN PATCHWORK GROUP IMAGE PROMPT ===');
   console.log('Global Style:', globalStyle);
   console.log('Three Character Prompts:', prompts);
-  console.log('============================================');
+  console.log('=============================================');
 }
 
 /**
  * Log the group video prompt for debugging
  * @param groupImagePrompt - The group image prompt
  */
-export function logSongWithAnimalsGroupVideoPrompt(
+export function logHalloweenPatchworkGroupVideoPrompt(
   groupImagePrompt: string
 ): void {
-  console.log('=== SONG WITH ANIMALS GROUP VIDEO PROMPT ===');
+  console.log('=== HALLOWEEN PATCHWORK GROUP VIDEO PROMPT ===');
   console.log('Group Image Prompt:', groupImagePrompt);
-  console.log('============================================');
+  console.log('=============================================');
 }
+

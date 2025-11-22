@@ -1,6 +1,6 @@
 /**
- * Optimized Title Prompt for Animal Song Shorts
- * Generates TITLE for kids' song videos with animal characters, optimized for Shorts growth, SEO, and engagement
+ * Optimized Title Prompt for Halloween Patchwork Shorts
+ * Generates TITLE for kids' song videos with Halloween patchwork characters, optimized for Shorts growth, SEO, and engagement
  */
 
 import {PromptTemplate} from '@langchain/core/prompts';
@@ -24,19 +24,20 @@ if (fs.existsSync(actualPath)) {
     console.warn('⚠️  Using template prompt for titleDescPrompt. Copy .template.txt to .txt for production use.');
 }
 
-const songWithAnimalsTitlePrompt: PromptTemplate = new PromptTemplate({
+const halloweenPatchworkTitlePrompt: PromptTemplate = new PromptTemplate({
     inputVariables: ["songLyrics", "videoPrompt", "globalStyle"],
     template: titleDescPromptTemplate
 });
 
 export function logTitlePrompt(songLyrics: string, videoPrompt: string, globalStyle: string): void {
-    console.log('\n=== SONG WITH ANIMALS TITLE PROMPT ===');
+    console.log('\n=== HALLOWEEN PATCHWORK TITLE PROMPT ===');
     console.log('Song Lyrics:', songLyrics);
     console.log('Video Prompt:', videoPrompt);
     console.log('Global Style:', globalStyle);
-    console.log('=====================================\n');
+    console.log('========================================\n');
 }
 
 export {
-    songWithAnimalsTitlePrompt,
+    halloweenPatchworkTitlePrompt,
 };
+

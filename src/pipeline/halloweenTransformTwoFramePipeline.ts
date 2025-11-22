@@ -11,7 +11,7 @@ import { runBasePipeline } from './basePipeline.js';
 function createHalloweenTransformTwoFrameConfig(): PipelineConfig<HalloweenImagePrompt, HalloweenTransformVideoPrompt> {
   return {
     pipelineName: '🎃 Generating Halloween Transform Two Frame song',
-    getStyleName: () => 'halloweenTransformTwoFrame',
+    getPipelineIdentifier: () => 'halloweenTransformTwoFrame', // Pipeline identifier for filenames and logging
     
     models: {
       image: { model: 'anthropic/claude-sonnet-4.5', temperature: 0.3 },

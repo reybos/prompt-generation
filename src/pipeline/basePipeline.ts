@@ -48,7 +48,7 @@ export async function runBasePipeline<
   options: PipelineOptions = {}
 ): Promise<TOutput[]> {
   const results: TOutput[] = [];
-  const selectedStyle = pipelineConfig.getStyleName(options);
+  const pipelineIdentifier = pipelineConfig.getPipelineIdentifier(options);
   const maxAttempts = 3;
 
   for (const song of input) {
@@ -64,22 +64,22 @@ export async function runBasePipeline<
       
       try {
         if (options.emitLog && options.requestId) {
-          options.emitLog(`${pipelineConfig.pipelineName} with ${selectedStyle} style... (Attempt ${attempt})`, options.requestId);
+          options.emitLog(`${pipelineConfig.pipelineName} (${pipelineIdentifier})... (Attempt ${attempt})`, options.requestId);
         }
 
         // Step 1: Generate image prompts
         if (options.emitLog && options.requestId) {
-          options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments using ${selectedStyle} style...`, options.requestId);
+          options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments...`, options.requestId);
         }
         
         // Get initial global style if configured
         let globalStyle = '';
         if (pipelineConfig.globalStyle?.getInitial) {
-          globalStyle = await pipelineConfig.globalStyle.getInitial(selectedStyle, options);
+          globalStyle = await pipelineConfig.globalStyle.getInitial(pipelineIdentifier, options);
         }
 
         // Create image prompt with style
-        const imagePromptWithStyle = pipelineConfig.prompts.createImagePrompt(selectedStyle);
+        const imagePromptWithStyle = pipelineConfig.prompts.createImagePrompt(pipelineIdentifier);
         const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
           stepName: pipelineConfig.stepNames.image,
           promptTemplate: imagePromptWithStyle,
@@ -306,10 +306,10 @@ export async function runBasePipeline<
         results.push(songResult);
 
         // Save to file
-        await savePipelineResult(songResult, selectedStyle, options);
+        await savePipelineResult(songResult, pipelineIdentifier, options);
         
         if (options.emitLog && options.requestId) {
-          options.emitLog(`✅ Generation finished with ${selectedStyle} style`, options.requestId);
+          options.emitLog(`✅ Generation finished (${pipelineIdentifier})`, options.requestId);
         }
         
         finished = true;

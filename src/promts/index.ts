@@ -12,7 +12,7 @@ import { musicPrompt } from './deprecated/long_study/musicPrompt.js';
 import { hashtagsPrompt } from './deprecated/long_study/hashtagsPrompt.js';
 import { characterPrompt } from './deprecated/long_study/characterPrompt.js';
 import { shortenVideoPrompt } from './deprecated/long_study/shortenVideoPrompt.js';
-import { imagePrompt, songWithAnimalsTitlePrompt, songWithAnimalsVideoPrompt, logVideoPrompt, logTitlePrompt, songWithAnimalsGroupImagePrompt, songWithAnimalsGroupVideoPrompt, logSongWithAnimalsGroupImagePrompt, logSongWithAnimalsGroupVideoPrompt } from './song_with_animals/index.js';
+import { imagePrompt as halloweenPatchworkImagePrompt, halloweenPatchworkTitlePrompt, halloweenPatchworkVideoPrompt, logVideoPrompt as halloweenPatchworkLogVideoPrompt, logTitlePrompt as halloweenPatchworkLogTitlePrompt, halloweenPatchworkGroupImagePrompt, halloweenPatchworkGroupVideoPrompt, logHalloweenPatchworkGroupImagePrompt, logHalloweenPatchworkGroupVideoPrompt } from './halloween_patchwork/index.js';
 import { imagePrompt as halloweenImagePrompt, halloweenTitlePrompt, halloweenVideoPrompt, logVideoPrompt as halloweenLogVideoPrompt, logTitlePrompt as halloweenLogTitlePrompt, halloweenGroupImagePrompt, halloweenGroupVideoPrompt, logHalloweenGroupImagePrompt, logHalloweenGroupVideoPrompt } from './halloween_dance/index.js';
 import { imagePrompt as halloweenTransformImagePrompt, halloweenTransformTitlePrompt, halloweenTransformVideoPrompt, logVideoPrompt as halloweenTransformLogVideoPrompt, logTitlePrompt as halloweenTransformLogTitlePrompt, halloweenTransformGroupImagePrompt, halloweenTransformGroupVideoPrompt, logHalloweenTransformGroupImagePrompt, logHalloweenTransformGroupVideoPrompt } from './halloween_transform/index.js';
 import { imagePrompt as halloweenTransformTwoFrameImagePrompt, halloweenTransformTwoFrameTitlePrompt, halloweenTransformTwoFrameVideoPrompt, logVideoPrompt as halloweenTransformTwoFrameLogVideoPrompt, logTitlePrompt as halloweenTransformTwoFrameLogTitlePrompt, halloweenTransformTwoFrameGroupImagePrompt, halloweenTransformTwoFrameGroupVideoPrompt, logHalloweenTransformTwoFrameGroupImagePrompt, logHalloweenTransformTwoFrameGroupVideoPrompt } from './halloween_transform_two_frame/index.js';
@@ -29,15 +29,15 @@ export {
     hashtagsPrompt,
     characterPrompt,
     shortenVideoPrompt,
-    imagePrompt,
-    songWithAnimalsTitlePrompt,
-    songWithAnimalsVideoPrompt,
-    logVideoPrompt,
-    logTitlePrompt,
-    songWithAnimalsGroupImagePrompt,
-    songWithAnimalsGroupVideoPrompt,
-    logSongWithAnimalsGroupImagePrompt,
-    logSongWithAnimalsGroupVideoPrompt,
+    halloweenPatchworkImagePrompt,
+    halloweenPatchworkTitlePrompt,
+    halloweenPatchworkVideoPrompt,
+    halloweenPatchworkLogVideoPrompt,
+    halloweenPatchworkLogTitlePrompt,
+    halloweenPatchworkGroupImagePrompt,
+    halloweenPatchworkGroupVideoPrompt,
+    logHalloweenPatchworkGroupImagePrompt,
+    logHalloweenPatchworkGroupVideoPrompt,
     halloweenImagePrompt,
     halloweenTitlePrompt,
     halloweenVideoPrompt,

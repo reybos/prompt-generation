@@ -191,6 +191,55 @@ export interface SongWithAnimalsOutput {
 }
 
 /**
+ * Halloween Patchwork input: array of song objects with lyrics
+ */
+export interface HalloweenPatchworkInputItem {
+    lyrics: string; // The song lyrics as a string
+}
+
+export type HalloweenPatchworkInput = HalloweenPatchworkInputItem[];
+
+/**
+ * Halloween Patchwork image prompt (output of image generation step)
+ */
+export interface HalloweenPatchworkImagePrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    prompt: string;
+}
+
+/**
+ * Halloween Patchwork video prompt (output of video generation step)
+ */
+export interface HalloweenPatchworkVideoPrompt {
+    index: number; // Scene index starting from 0 for easier identification
+    line: string;
+    video_prompt: string;
+}
+
+/**
+ * Halloween Patchwork additional frame prompt (group image)
+ */
+export interface HalloweenPatchworkAdditionalFramePrompt {
+    index: number; // Frame index starting from 0 for easier identification
+    lines: string[]; // Array of 3 lines that were grouped together
+    group_image_prompt: string; // Group image prompt for thumbnail
+    group_video_prompt: string; // Group video prompt for animation
+}
+
+/**
+ * Halloween Patchwork output (final result)
+ */
+export interface HalloweenPatchworkOutput {
+    global_style: string;
+    prompts: HalloweenPatchworkImagePrompt[];
+    video_prompts: HalloweenPatchworkVideoPrompt[];
+    titles: string[];
+    additional_frames?: HalloweenPatchworkAdditionalFramePrompt[]; // Optional additional frames
+    requests?: LLMRequest[]; // Array of all LLM requests made during generation
+}
+
+/**
  * Short study input: array of topic objects with description
  */
 export interface ShortStudyInputItem {
