@@ -5,7 +5,7 @@
  */
 import { z } from 'zod';
 import type { EnvironmentConfig } from '../types/config.js';
-import { EnvironmentConfigSchema } from '../schemas/config.js';
+import { EnvironmentConfigSchema } from '../types/config.js';
 
 // Required environment variables
 const requiredEnvVars: string[] = ['FAL_KEY'];

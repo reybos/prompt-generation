@@ -1,123 +1,436 @@
 /* START GENAI */
 /**
- * Pipeline type definitions
+ * Pipeline schemas and type definitions
  */
 
-/**
- * Script component structure
- */
-export interface Script {
-    introduction: {
-        title: string;
-        description: string;
-        narration: string;
-    };
-    scenes: Array<{
-        title: string;
-        description: string;
-        narration: string;
-        visuals: string;
-        interaction?: string;
-    }>;
-    finale: {
-        summary: string;
-        narration: string;
-        callToAction?: string;
-    };
-}
+import { z } from 'zod';
 
 /**
- * Character component structure
+ * LLM request tracking information schema
  */
-export interface Character {
-    name: string;
-    appearance: string;
-    personality: string;
-    gestures: string[];
-    voiceDescription: string;
-}
+export const LLMRequestSchema = z.object({
+    prompt: z.string(), // The formatted prompt that was sent to LLM (template with inserted params)
+    systemPrompt: z.string(), // The prompt template (instructions/rules before data insertion)
+    params: z.record(z.string(), z.any()), // Parameters that were inserted into placeholders
+    model: z.string(), // The model version used
+    requestId: z.string().optional(), // Request ID if available
+});
 
 /**
- * Media prompt component structure
+ * Script component schema
  */
-export interface MediaPrompt {
-    introduction: {
-        description: string;
-        prompt: string;
-    };
-    scenes: Array<{
-        description: string;
-        prompt: string;
-    }>;
-    finale: {
-        description: string;
-        prompt: string;
-    };
-}
+export const ScriptSchema = z.object({
+    introduction: z.object({
+        title: z.string(),
+        description: z.string(),
+        narration: z.string(),
+    }),
+    scenes: z.array(z.object({
+        title: z.string(),
+        description: z.string(),
+        narration: z.string(),
+        visuals: z.string(),
+        interaction: z.string().optional(),
+    })),
+    finale: z.object({
+        summary: z.string(),
+        narration: z.string(),
+        callToAction: z.string().optional(),
+    }),
+});
 
 /**
- * Enhanced media prompt component structure
+ * Character component schema
  */
-export interface EnhancedMediaPrompt {
-    introduction: {
-        description: string;
-        prompt: string;
-    };
-    scenes: Array<{
-        description: string;
-        prompt: string;
-    }>;
-    finale: {
-        description: string;
-        prompt: string;
-    };
-    styleGuide: {
-        visualStyle: string;
-        colorPalette: string;
-        characterConsistency: string;
-    };
-}
+export const CharacterSchema = z.object({
+    name: z.string(),
+    appearance: z.string(),
+    personality: z.string(),
+    gestures: z.array(z.string()),
+    voiceDescription: z.string(),
+});
 
 /**
- * Music suggestion component structure
+ * Media prompt component schema
  */
-export interface MusicSuggestion {
-    overallMood: string;
-    recommendedTracks: Array<{
-        title: string;
-        description: string;
-        mood: string;
-        tempo: string;
-        section?: string;
-    }>;
-}
+export const MediaPromptSchema = z.object({
+    introduction: z.object({
+        description: z.string(),
+        prompt: z.string(),
+    }),
+    scenes: z.array(z.object({
+        description: z.string(),
+        prompt: z.string(),
+    })),
+    finale: z.object({
+        description: z.string(),
+        prompt: z.string(),
+    }),
+});
 
 /**
- * Title and description component structure
+ * Enhanced media prompt component schema
  */
-export interface TitleDescription {
-    title: string;
-    shortDescription: string;
-    longDescription: string;
-    keywords: string[];
-}
+export const EnhancedMediaPromptSchema = z.object({
+    introduction: z.object({
+        description: z.string(),
+        prompt: z.string(),
+    }),
+    scenes: z.array(z.object({
+        description: z.string(),
+        prompt: z.string(),
+    })),
+    finale: z.object({
+        description: z.string(),
+        prompt: z.string(),
+    }),
+    styleGuide: z.object({
+        visualStyle: z.string(),
+        colorPalette: z.string(),
+        characterConsistency: z.string(),
+    }),
+});
 
 /**
- * Complete content package structure
+ * Music suggestion component schema
  */
-export interface ContentPackage {
-    script: Script;
-    media: MediaPrompt;
-    enhancedMedia: EnhancedMediaPrompt;
-    narration?: any;
-    music: MusicSuggestion;
-    titleDesc: TitleDescription;
-    hashtags: string;
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export const MusicSuggestionSchema = z.object({
+    overallMood: z.string(),
+    recommendedTracks: z.array(z.object({
+        title: z.string(),
+        description: z.string(),
+        mood: z.string(),
+        tempo: z.string(),
+        section: z.string().optional(),
+    })),
+});
+
+/**
+ * Title and description component schema
+ */
+export const TitleDescriptionSchema = z.object({
+    title: z.string(),
+    shortDescription: z.string(),
+    longDescription: z.string(),
+    keywords: z.array(z.string()),
+});
+
+/**
+ * Complete content package schema
+ */
+export const ContentPackageSchema = z.object({
+    script: ScriptSchema,
+    media: MediaPromptSchema,
+    enhancedMedia: EnhancedMediaPromptSchema,
+    narration: z.any().optional(),
+    music: MusicSuggestionSchema,
+    titleDesc: TitleDescriptionSchema,
+    hashtags: z.string(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+/**
+ * Song with animals input item schema
+ */
+export const SongWithAnimalsInputItemSchema = z.object({
+    lyrics: z.string(),
+});
+
+/**
+ * Song with animals image prompt schema
+ */
+export const SongWithAnimalsImagePromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    prompt: z.string(),
+});
+
+/**
+ * Song with animals video prompt schema
+ */
+export const SongWithAnimalsVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+/**
+ * Song with animals additional frame prompt schema
+ */
+export const SongWithAnimalsAdditionalFramePromptSchema = z.object({
+    index: z.number(),
+    lines: z.array(z.string()),
+    group_image_prompt: z.string(),
+    group_video_prompt: z.string(),
+});
+
+/**
+ * Song with animals output schema
+ */
+export const SongWithAnimalsOutputSchema = z.object({
+    global_style: z.string(),
+    prompts: z.array(SongWithAnimalsImagePromptSchema),
+    video_prompts: z.array(SongWithAnimalsVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(SongWithAnimalsAdditionalFramePromptSchema).optional(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+/**
+ * Halloween Patchwork input item schema
+ */
+export const HalloweenPatchworkInputItemSchema = z.object({
+    lyrics: z.string(),
+});
+
+/**
+ * Halloween Patchwork image prompt schema
+ */
+export const HalloweenPatchworkImagePromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    prompt: z.string(),
+});
+
+/**
+ * Halloween Patchwork video prompt schema
+ */
+export const HalloweenPatchworkVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+/**
+ * Halloween Patchwork additional frame prompt schema
+ */
+export const HalloweenPatchworkAdditionalFramePromptSchema = z.object({
+    index: z.number(),
+    lines: z.array(z.string()),
+    group_image_prompt: z.string(),
+    group_video_prompt: z.string(),
+});
+
+/**
+ * Halloween Patchwork output schema
+ */
+export const HalloweenPatchworkOutputSchema = z.object({
+    global_style: z.string(),
+    prompts: z.array(HalloweenPatchworkImagePromptSchema),
+    video_prompts: z.array(HalloweenPatchworkVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(HalloweenPatchworkAdditionalFramePromptSchema).optional(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+/**
+ * Short study input item schema (deprecated)
+ */
+export const ShortStudyInputItemSchema = z.object({
+    topic: z.string(),
+});
+
+/**
+ * Short study image prompt schema (deprecated)
+ */
+export const ShortStudyImagePromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    prompt: z.string(),
+});
+
+/**
+ * Short study video prompt schema (deprecated)
+ */
+export const ShortStudyVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+/**
+ * Short study song prompt schema (deprecated)
+ */
+export const ShortStudySongPromptSchema = z.object({
+    song_text: z.string(),
+    music_prompt: z.string(),
+});
+
+/**
+ * Short study output schema (deprecated)
+ */
+export const ShortStudyOutputSchema = z.object({
+    song: ShortStudySongPromptSchema.nullable(),
+    video_prompt: ShortStudyVideoPromptSchema,
+    title: z.string(),
+    description: z.string(),
+    hashtags: z.string(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+/**
+ * Halloween input item schema
+ */
+export const HalloweenInputItemSchema = z.object({
+    lyrics: z.string(),
+});
+
+/**
+ * Halloween image prompt schema
+ */
+export const HalloweenImagePromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    prompt: z.string(),
+});
+
+/**
+ * Halloween video prompt schema
+ */
+export const HalloweenVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+/**
+ * Halloween additional frame prompt schema
+ */
+export const HalloweenAdditionalFramePromptSchema = z.object({
+    index: z.number(),
+    lines: z.array(z.string()),
+    group_image_prompt: z.string(),
+    group_video_prompt: z.string(),
+});
+
+/**
+ * Halloween output schema
+ */
+export const HalloweenOutputSchema = z.object({
+    global_style: z.string(),
+    prompts: z.array(HalloweenImagePromptSchema),
+    video_prompts: z.array(HalloweenVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(HalloweenAdditionalFramePromptSchema).optional(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+/**
+ * Halloween Transform video prompt schema
+ */
+export const HalloweenTransformVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    prompt: z.string(), // Starting image prompt (friendly, neutral form)
+    video_prompt: z.string(), // Transformation video prompt (6-second creative transformation)
+});
+
+/**
+ * Halloween Transform output schema
+ */
+export const HalloweenTransformOutputSchema = z.object({
+    global_style: z.string(),
+    prompts: z.array(HalloweenImagePromptSchema),
+    video_prompts: z.array(HalloweenTransformVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(HalloweenAdditionalFramePromptSchema).optional(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+/**
+ * Poems input item schema
+ */
+export const PoemsInputItemSchema = z.object({
+    lyrics: z.string(),
+});
+
+/**
+ * Poems image prompt schema
+ */
+export const PoemsImagePromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    prompt: z.string(),
+});
+
+/**
+ * Poems video prompt schema
+ */
+export const PoemsVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+/**
+ * Poems additional frame prompt schema
+ */
+export const PoemsAdditionalFramePromptSchema = z.object({
+    index: z.number(),
+    lines: z.array(z.string()),
+    group_image_prompt: z.string(),
+    group_video_prompt: z.string(),
+});
+
+/**
+ * Poems output schema
+ */
+export const PoemsOutputSchema = z.object({
+    global_style: z.string(),
+    prompts: z.array(PoemsImagePromptSchema),
+    video_prompts: z.array(PoemsVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(PoemsAdditionalFramePromptSchema).optional(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
+// ============================================================================
+// Type exports (inferred from schemas)
+// ============================================================================
+
+/**
+ * LLM request tracking information type (inferred from schema)
+ */
+export type LLMRequest = z.infer<typeof LLMRequestSchema>;
+
+/**
+ * Script component type (inferred from schema)
+ */
+export type Script = z.infer<typeof ScriptSchema>;
+
+/**
+ * Character component type (inferred from schema)
+ */
+export type Character = z.infer<typeof CharacterSchema>;
+
+/**
+ * Media prompt component type (inferred from schema)
+ */
+export type MediaPrompt = z.infer<typeof MediaPromptSchema>;
+
+/**
+ * Enhanced media prompt component type (inferred from schema)
+ */
+export type EnhancedMediaPrompt = z.infer<typeof EnhancedMediaPromptSchema>;
+
+/**
+ * Music suggestion component type (inferred from schema)
+ */
+export type MusicSuggestion = z.infer<typeof MusicSuggestionSchema>;
+
+/**
+ * Title and description component type (inferred from schema)
+ */
+export type TitleDescription = z.infer<typeof TitleDescriptionSchema>;
+
+/**
+ * Complete content package type (inferred from schema)
+ */
+export type ContentPackage = z.infer<typeof ContentPackageSchema>;
 
 /**
  * Pipeline options
+ * Note: This remains an interface because it contains function types that cannot be expressed in Zod
  */
 export interface PipelineOptions {
     channelName?: string;
@@ -129,280 +442,163 @@ export interface PipelineOptions {
 }
 
 /**
- * LLM request tracking information
+ * Song with animals input item type (inferred from schema)
  */
-export interface LLMRequest {
-    prompt: string; // The formatted prompt that was sent to LLM (template with inserted params)
-    systemPrompt: string; // The prompt template (instructions/rules before data insertion)
-    params: Record<string, any>; // Parameters that were inserted into placeholders
-    model: string; // The model version used
-    requestId?: string; // Request ID if available
-}
-
-/* END GENAI */
+export type SongWithAnimalsInputItem = z.infer<typeof SongWithAnimalsInputItemSchema>;
 
 /**
- * Song with animals input: array of song objects with lyrics
+ * Song with animals input type
  */
-export interface SongWithAnimalsInputItem {
-    lyrics: string; // The song lyrics as a string
-}
-
 export type SongWithAnimalsInput = SongWithAnimalsInputItem[];
 
 /**
- * Song with animals image prompt (output of image generation step)
+ * Song with animals image prompt type (inferred from schema)
  */
-export interface SongWithAnimalsImagePrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    prompt: string;
-}
+export type SongWithAnimalsImagePrompt = z.infer<typeof SongWithAnimalsImagePromptSchema>;
 
 /**
- * Song with animals video prompt (output of video generation step)
+ * Song with animals video prompt type (inferred from schema)
  */
-export interface SongWithAnimalsVideoPrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    video_prompt: string;
-}
+export type SongWithAnimalsVideoPrompt = z.infer<typeof SongWithAnimalsVideoPromptSchema>;
 
 /**
- * Song with animals additional frame prompt (group image)
+ * Song with animals additional frame prompt type (inferred from schema)
  */
-export interface SongWithAnimalsAdditionalFramePrompt {
-    index: number; // Frame index starting from 0 for easier identification
-    lines: string[]; // Array of 3 lines that were grouped together
-    group_image_prompt: string; // Group image prompt for thumbnail
-    group_video_prompt: string; // Group video prompt for animation
-}
+export type SongWithAnimalsAdditionalFramePrompt = z.infer<typeof SongWithAnimalsAdditionalFramePromptSchema>;
 
 /**
- * Song with animals output (final result)
+ * Song with animals output type (inferred from schema)
  */
-export interface SongWithAnimalsOutput {
-    global_style: string;
-    prompts: SongWithAnimalsImagePrompt[];
-    video_prompts: SongWithAnimalsVideoPrompt[];
-    titles: string[];
-    additional_frames?: SongWithAnimalsAdditionalFramePrompt[]; // Optional additional frames
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export type SongWithAnimalsOutput = z.infer<typeof SongWithAnimalsOutputSchema>;
 
 /**
- * Halloween Patchwork input: array of song objects with lyrics
+ * Halloween Patchwork input item type (inferred from schema)
  */
-export interface HalloweenPatchworkInputItem {
-    lyrics: string; // The song lyrics as a string
-}
+export type HalloweenPatchworkInputItem = z.infer<typeof HalloweenPatchworkInputItemSchema>;
 
+/**
+ * Halloween Patchwork input type
+ */
 export type HalloweenPatchworkInput = HalloweenPatchworkInputItem[];
 
 /**
- * Halloween Patchwork image prompt (output of image generation step)
+ * Halloween Patchwork image prompt type (inferred from schema)
  */
-export interface HalloweenPatchworkImagePrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    prompt: string;
-}
+export type HalloweenPatchworkImagePrompt = z.infer<typeof HalloweenPatchworkImagePromptSchema>;
 
 /**
- * Halloween Patchwork video prompt (output of video generation step)
+ * Halloween Patchwork video prompt type (inferred from schema)
  */
-export interface HalloweenPatchworkVideoPrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    video_prompt: string;
-}
+export type HalloweenPatchworkVideoPrompt = z.infer<typeof HalloweenPatchworkVideoPromptSchema>;
 
 /**
- * Halloween Patchwork additional frame prompt (group image)
+ * Halloween Patchwork additional frame prompt type (inferred from schema)
  */
-export interface HalloweenPatchworkAdditionalFramePrompt {
-    index: number; // Frame index starting from 0 for easier identification
-    lines: string[]; // Array of 3 lines that were grouped together
-    group_image_prompt: string; // Group image prompt for thumbnail
-    group_video_prompt: string; // Group video prompt for animation
-}
+export type HalloweenPatchworkAdditionalFramePrompt = z.infer<typeof HalloweenPatchworkAdditionalFramePromptSchema>;
 
 /**
- * Halloween Patchwork output (final result)
+ * Halloween Patchwork output type (inferred from schema)
  */
-export interface HalloweenPatchworkOutput {
-    global_style: string;
-    prompts: HalloweenPatchworkImagePrompt[];
-    video_prompts: HalloweenPatchworkVideoPrompt[];
-    titles: string[];
-    additional_frames?: HalloweenPatchworkAdditionalFramePrompt[]; // Optional additional frames
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export type HalloweenPatchworkOutput = z.infer<typeof HalloweenPatchworkOutputSchema>;
 
 /**
- * Short study input: array of topic objects with description
+ * Short study input item type (inferred from schema, deprecated)
  */
-export interface ShortStudyInputItem {
-    topic: string; // The study topic description as a string
-}
+export type ShortStudyInputItem = z.infer<typeof ShortStudyInputItemSchema>;
 
+/**
+ * Short study input type (deprecated)
+ */
 export type ShortStudyInput = ShortStudyInputItem[];
 
 /**
- * Short study image prompt (output of image generation step)
+ * Short study image prompt type (inferred from schema, deprecated)
  */
-export interface ShortStudyImagePrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    prompt: string;
-}
+export type ShortStudyImagePrompt = z.infer<typeof ShortStudyImagePromptSchema>;
 
 /**
- * Short study video prompt (output of video generation step)
+ * Short study video prompt type (inferred from schema, deprecated)
  */
-export interface ShortStudyVideoPrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    video_prompt: string;
-}
+export type ShortStudyVideoPrompt = z.infer<typeof ShortStudyVideoPromptSchema>;
 
 /**
- * Short study song prompt (output of song generation step)
+ * Short study song prompt type (inferred from schema, deprecated)
  */
-export interface ShortStudySongPrompt {
-    song_text: string;
-    music_prompt: string;
-}
+export type ShortStudySongPrompt = z.infer<typeof ShortStudySongPromptSchema>;
 
 /**
- * Short study output (final result)
+ * Short study output type (inferred from schema, deprecated)
  */
-export interface ShortStudyOutput {
-    song: ShortStudySongPrompt | null;
-    video_prompt: ShortStudyVideoPrompt;
-    title: string;
-    description: string;
-    hashtags: string;
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export type ShortStudyOutput = z.infer<typeof ShortStudyOutputSchema>;
 
 /**
- * Halloween input: array of song objects with lyrics
+ * Halloween input item type (inferred from schema)
  */
-export interface HalloweenInputItem {
-    lyrics: string; // The song lyrics as a string
-}
+export type HalloweenInputItem = z.infer<typeof HalloweenInputItemSchema>;
 
+/**
+ * Halloween input type
+ */
 export type HalloweenInput = HalloweenInputItem[];
 
 /**
- * Halloween image prompt (output of image generation step)
+ * Halloween image prompt type (inferred from schema)
  */
-export interface HalloweenImagePrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    prompt: string;
-}
+export type HalloweenImagePrompt = z.infer<typeof HalloweenImagePromptSchema>;
 
 /**
- * Halloween video prompt (output of video generation step)
+ * Halloween video prompt type (inferred from schema)
  */
-export interface HalloweenVideoPrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    video_prompt: string;
-}
+export type HalloweenVideoPrompt = z.infer<typeof HalloweenVideoPromptSchema>;
 
 /**
- * Halloween additional frame prompt (group image)
+ * Halloween additional frame prompt type (inferred from schema)
  */
-export interface HalloweenAdditionalFramePrompt {
-    index: number; // Frame index starting from 0 for easier identification
-    lines: string[]; // Array of 3 lines that were grouped together
-    group_image_prompt: string; // Group image prompt for thumbnail
-    group_video_prompt: string; // Group video prompt for animation
-}
+export type HalloweenAdditionalFramePrompt = z.infer<typeof HalloweenAdditionalFramePromptSchema>;
 
 /**
- * Halloween output (final result)
+ * Halloween output type (inferred from schema)
  */
-export interface HalloweenOutput {
-    global_style: string;
-    prompts: HalloweenImagePrompt[];
-    video_prompts: HalloweenVideoPrompt[];
-    titles: string[];
-    additional_frames?: HalloweenAdditionalFramePrompt[]; // Optional additional frames
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export type HalloweenOutput = z.infer<typeof HalloweenOutputSchema>;
 
 /**
- * Halloween Transform video prompt (output of video generation step with transformation)
+ * Halloween Transform video prompt type (inferred from schema)
  */
-export interface HalloweenTransformVideoPrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    prompt: string; // Starting image prompt (friendly, neutral form)
-    video_prompt: string; // Transformation video prompt (6-second creative transformation)
-}
+export type HalloweenTransformVideoPrompt = z.infer<typeof HalloweenTransformVideoPromptSchema>;
 
 /**
- * Halloween Transform output (final result with transformation videos)
+ * Halloween Transform output type (inferred from schema)
  */
-export interface HalloweenTransformOutput {
-    global_style: string;
-    prompts: HalloweenImagePrompt[];
-    video_prompts: HalloweenTransformVideoPrompt[];
-    titles: string[];
-    additional_frames?: HalloweenAdditionalFramePrompt[]; // Optional additional frames
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export type HalloweenTransformOutput = z.infer<typeof HalloweenTransformOutputSchema>;
 
 /**
- * Poems input: array of song objects with lyrics
+ * Poems input item type (inferred from schema)
  */
-export interface PoemsInputItem {
-    lyrics: string; // The song lyrics as a string
-}
+export type PoemsInputItem = z.infer<typeof PoemsInputItemSchema>;
 
+/**
+ * Poems input type
+ */
 export type PoemsInput = PoemsInputItem[];
 
 /**
- * Poems image prompt (output of image generation step)
+ * Poems image prompt type (inferred from schema)
  */
-export interface PoemsImagePrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    prompt: string;
-}
+export type PoemsImagePrompt = z.infer<typeof PoemsImagePromptSchema>;
 
 /**
- * Poems video prompt (output of video generation step)
+ * Poems video prompt type (inferred from schema)
  */
-export interface PoemsVideoPrompt {
-    index: number; // Scene index starting from 0 for easier identification
-    line: string;
-    video_prompt: string;
-}
+export type PoemsVideoPrompt = z.infer<typeof PoemsVideoPromptSchema>;
 
 /**
- * Poems additional frame prompt (group image)
+ * Poems additional frame prompt type (inferred from schema)
  */
-export interface PoemsAdditionalFramePrompt {
-    index: number; // Frame index starting from 0 for easier identification
-    lines: string[]; // Array of 3 lines that were grouped together
-    group_image_prompt: string; // Group image prompt for thumbnail
-    group_video_prompt: string; // Group video prompt for animation
-}
+export type PoemsAdditionalFramePrompt = z.infer<typeof PoemsAdditionalFramePromptSchema>;
 
 /**
- * Poems output (final result)
+ * Poems output type (inferred from schema)
  */
-export interface PoemsOutput {
-    global_style: string;
-    prompts: PoemsImagePrompt[];
-    video_prompts: PoemsVideoPrompt[];
-    titles: string[];
-    additional_frames?: PoemsAdditionalFramePrompt[]; // Optional additional frames
-    requests?: LLMRequest[]; // Array of all LLM requests made during generation
-}
+export type PoemsOutput = z.infer<typeof PoemsOutputSchema>;
 
+/* END GENAI */

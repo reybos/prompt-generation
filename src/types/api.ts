@@ -1,16 +1,82 @@
 /* START GENAI */
 /**
- * API type definitions
+ * API schemas and type definitions
  */
 
-import { ContentPackage } from '../types/pipeline.js';
+import { z } from 'zod';
+import { ContentPackage, ContentPackageSchema } from './pipeline.js';
+import { GenerationMetadataSchema, GenerationMetadata } from './file.js';
 
 /**
- * Generate content request body
+ * Generate content request schema
  */
-export interface GenerateContentRequest {
-    topics: Record<string, string[]>;
-}
+export const GenerateContentRequestSchema = z.object({
+    topics: z.record(z.string(), z.array(z.string())),
+});
+
+/**
+ * Save generation request schema
+ */
+export const SaveGenerationRequestSchema = z.object({
+    theme: z.string(),
+    topic: z.string(),
+    content: z.union([ContentPackageSchema, z.string()]), // ContentPackage or string
+});
+
+/**
+ * Save generation response schema
+ */
+export const SaveGenerationResponseSchema = z.object({
+    success: z.boolean(),
+    savedFile: GenerationMetadataSchema,
+});
+
+/**
+ * Generation info schema (used in listings)
+ */
+export const GenerationInfoSchema = z.object({
+    filename: z.string(),
+    topic: z.string(),
+    path: z.string(),
+    size: z.number(),
+    created: z.string(),
+});
+
+/**
+ * List generations response schema
+ */
+export const ListGenerationsResponseSchema = z.object({
+    success: z.boolean(),
+    generations: z.record(z.string(), z.array(GenerationInfoSchema)),
+});
+
+/**
+ * Get generation content response schema
+ */
+export const GetGenerationContentResponseSchema = z.object({
+    success: z.boolean(),
+    content: z.string(),
+});
+
+/**
+ * List themes response schema
+ */
+export const ListThemesResponseSchema = z.object({
+    success: z.boolean(),
+    themes: z.array(z.string()),
+});
+
+/**
+ * Status response schema
+ */
+export const StatusResponseSchema = z.object({
+    status: z.enum(['ok', 'error']),
+});
+
+/**
+ * Generate content request type (inferred from schema)
+ */
+export type GenerateContentRequest = z.infer<typeof GenerateContentRequestSchema>;
 
 /**
  * Generate content response
@@ -22,76 +88,38 @@ export interface GenerateContentResponse {
 }
 
 /**
- * Save generation request body
+ * Save generation request type (inferred from schema)
  */
-export interface SaveGenerationRequest {
-    theme: string;
-    topic: string;
-    content: ContentPackage | string;
-}
+export type SaveGenerationRequest = z.infer<typeof SaveGenerationRequestSchema>;
 
 /**
- * Save generation response
+ * Save generation response type (inferred from schema)
  */
-export interface SaveGenerationResponse {
-    success: boolean;
-    savedFile: GenerationMetadata;
-}
+export type SaveGenerationResponse = z.infer<typeof SaveGenerationResponseSchema>;
 
 /**
- * Generation metadata
+ * Generation info type (inferred from schema)
  */
-export interface GenerationMetadata {
-    theme: string;
-    originalTheme: string;
-    topic: string;
-    originalTopic: string;
-    filename: string;
-    path: string;
-    number: number;
-    timestamp: string;
-}
+export type GenerationInfo = z.infer<typeof GenerationInfoSchema>;
 
 /**
- * Generation info (used in listings)
+ * List generations response type (inferred from schema)
  */
-export interface GenerationInfo {
-    filename: string;
-    topic: string;
-    path: string;
-    size: number;
-    created: string;
-}
+export type ListGenerationsResponse = z.infer<typeof ListGenerationsResponseSchema>;
 
 /**
- * List generations response
+ * Get generation content response type (inferred from schema)
  */
-export interface ListGenerationsResponse {
-    success: boolean;
-    generations: Record<string, GenerationInfo[]>;
-}
+export type GetGenerationContentResponse = z.infer<typeof GetGenerationContentResponseSchema>;
 
 /**
- * Get generation content response
+ * List themes response type (inferred from schema)
  */
-export interface GetGenerationContentResponse {
-    success: boolean;
-    content: string;
-}
+export type ListThemesResponse = z.infer<typeof ListThemesResponseSchema>;
 
 /**
- * List themes response
+ * Status response type (inferred from schema)
  */
-export interface ListThemesResponse {
-    success: boolean;
-    themes: string[];
-}
-
-/**
- * Status response
- */
-export interface StatusResponse {
-    status: 'ok' | 'error';
-}
+export type StatusResponse = z.infer<typeof StatusResponseSchema>;
 
 /* END GENAI */

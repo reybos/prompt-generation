@@ -1,7 +1,9 @@
 /* START GENAI */
 /**
- * Configuration type definitions
+ * Configuration schemas and type definitions
  */
+
+import { z } from 'zod';
 
 /**
  * Output format options
@@ -21,23 +23,26 @@ export interface LLMOptions {
 }
 
 /**
- * Environment configuration
+ * Environment configuration schema
  */
-export interface EnvironmentConfig {
-    defaultTemperature: number;
-    defaultChannelName: string;
-    defaultTopic: string;
-    generationsDirPath?: string;
-    generationsDirRelativePath?: string;
-    
+export const EnvironmentConfigSchema = z.object({
+    defaultTemperature: z.number().min(0).max(2),
+    defaultChannelName: z.string(),
+    defaultTopic: z.string(),
+    generationsDirPath: z.string().optional(),
+    generationsDirRelativePath: z.string().optional(),
     // Song segmentation configuration
-    songSegmentLines: number;
-
+    songSegmentLines: z.number().int().min(1).max(10),
     // fal.ai configuration
-    falApiKey: string | undefined;
-    falDefaultModel: string;
-    useFalApi: boolean;
-}
+    falApiKey: z.string().optional(),
+    falDefaultModel: z.string(),
+    useFalApi: z.boolean(),
+});
+
+/**
+ * Environment configuration type (inferred from schema)
+ */
+export type EnvironmentConfig = z.infer<typeof EnvironmentConfigSchema>;
 
 /**
  * Application configuration

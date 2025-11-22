@@ -1,53 +1,72 @@
 /* START GENAI */
 /**
- * File system utility type definitions
+ * File system utility schemas and type definitions
  * Using string type instead of BufferEncoding to avoid Node.js type issues
  */
 
-/**
- * Number tracker state
- */
-export interface NumberTrackerState {
-    lastNumber: number;
-}
+import { z } from 'zod';
 
 /**
- * File content with original topic
+ * Number tracker state schema
  */
-export interface FileContent {
-    content?: string;
-    originalTopic: string;
-    theme: string;
-    [key: string]: any;
-}
+export const NumberTrackerStateSchema = z.object({
+    lastNumber: z.number().int().nonnegative(),
+});
 
 /**
- * Generation file info
+ * File content schema
  */
-export interface GenerationFileInfo {
-    filename: string;
-    number: number;
-    theme: string;
-    topic: string;
-    path: string;
-    size: number;
-    created: string;
-}
+export const FileContentSchema = z.object({
+    content: z.string().optional(),
+    originalTopic: z.string(),
+    theme: z.string(),
+}).catchall(z.unknown());
 
 /**
- * Theme folder structure
+ * Generation file info schema
  */
-export interface ThemeFolderStructure {
-    [theme: string]: GenerationFileInfo[];
-}
+export const GenerationFileInfoSchema = z.object({
+    filename: z.string(),
+    number: z.number().int().nonnegative(),
+    theme: z.string(),
+    topic: z.string(),
+    path: z.string(),
+    size: z.number().nonnegative(),
+    created: z.string().datetime(),
+});
 
 /**
- * File save options
+ * Generation metadata schema
  */
-export interface FileSaveOptions {
-    // Добавь здесь поля по необходимости, например:
-    encoding?: string;
-    overwrite?: boolean;
-}
+export const GenerationMetadataSchema = z.object({
+    theme: z.string(),
+    originalTheme: z.string(),
+    topic: z.string(),
+    originalTopic: z.string(),
+    filename: z.string(),
+    path: z.string(),
+    number: z.number().int().nonnegative(),
+    timestamp: z.string().datetime(),
+});
+
+/**
+ * Number tracker state type (inferred from schema)
+ */
+export type NumberTrackerState = z.infer<typeof NumberTrackerStateSchema>;
+
+/**
+ * File content type (inferred from schema)
+ */
+export type FileContent = z.infer<typeof FileContentSchema>;
+
+/**
+ * Generation file info type (inferred from schema)
+ */
+export type GenerationFileInfo = z.infer<typeof GenerationFileInfoSchema>;
+
+/**
+ * Generation metadata type (inferred from schema)
+ */
+export type GenerationMetadata = z.infer<typeof GenerationMetadataSchema>;
 
 /* END GENAI */

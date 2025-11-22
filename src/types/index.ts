@@ -1,6 +1,6 @@
 /**
- * Type definitions index file
- * Exports all type definitions for the application
+ * Type definitions and schemas index file
+ * Exports all type definitions and Zod schemas for the application
  */
 
 export * from './config.js';
