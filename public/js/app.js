@@ -1577,7 +1577,149 @@ if (halloweenTransformTwoFrameForm) {
     });
 }
 
+// Store original lyrics for Poems form
+let poemsOriginalLyrics = null;
+
+/**
+ * Format lyrics based on lines per video setting
+ * @param {string} lyrics - Original lyrics text
+ * @param {number} linesPerVideo - Number of lines to group together
+ * @returns {string} Formatted lyrics
+ */
+function formatLyricsByLinesPerVideo(lyrics, linesPerVideo) {
+    if (!lyrics || linesPerVideo < 1) {
+        return lyrics || '';
+    }
+    
+    // Check if input is already in JSON array format
+    const trimmedLyrics = lyrics.trim();
+    if (trimmedLyrics.startsWith('[')) {
+        try {
+            const parsed = JSON.parse(lyrics);
+            if (Array.isArray(parsed)) {
+                // Each element in array is a string that may contain multiple lines joined by space
+                // Split each string by space to get individual lines
+                const allLines = [];
+                for (const chunk of parsed) {
+                    if (typeof chunk === 'string') {
+                        // Split by space - but this might not be perfect if lines contain spaces
+                        // For now, treat each array element as one line
+                        allLines.push(chunk);
+                    }
+                }
+                // If linesPerVideo is 1, return as JSON array with one line per element
+                if (linesPerVideo === 1) {
+                    return JSON.stringify(allLines, null, 2);
+                }
+                // Re-group and format again
+                const chunks = [];
+                for (let i = 0; i < allLines.length; i += linesPerVideo) {
+                    const chunk = allLines.slice(i, i + linesPerVideo);
+                    chunks.push(chunk.join(' '));
+                }
+                return JSON.stringify(chunks, null, 2);
+            }
+        } catch (e) {
+            // Not valid JSON, treat as regular text
+        }
+    }
+    
+    // Split by newlines and filter empty lines
+    const allLines = [];
+    const inputLines = lyrics.split('\n');
+    
+    for (const line of inputLines) {
+        const trimmedLine = line.trim();
+        // Skip empty lines
+        if (trimmedLine.length === 0) {
+            continue;
+        }
+        // It's an original line - keep it as is (but trimmed)
+        allLines.push(trimmedLine);
+    }
+    
+    // If linesPerVideo is 1, return as JSON array with one line per element
+    if (linesPerVideo === 1) {
+        return JSON.stringify(allLines, null, 2);
+    }
+    
+    // Group lines into chunks and format as JSON array of strings
+    const chunks = [];
+    for (let i = 0; i < allLines.length; i += linesPerVideo) {
+        const chunk = allLines.slice(i, i + linesPerVideo);
+        // Join lines within chunk with space separator
+        const chunkText = chunk.join(' ');
+        chunks.push(chunkText);
+    }
+    
+    // Format as JSON array of strings
+    return JSON.stringify(chunks, null, 2);
+}
+
 if (poemsForm) {
+    // Handle select change to format lyrics
+    if (poemsLinesPerVideo && poemsLyrics) {
+        // Store original lyrics when user first changes the select or when textarea is edited
+        const updateOriginalIfNeeded = () => {
+            const currentValue = poemsLyrics.value;
+            // If text doesn't start with "[", it's in original format - update original
+            if (!currentValue.trim().startsWith('[')) {
+                poemsOriginalLyrics = currentValue;
+            }
+        };
+        
+        // Store original lyrics on page load
+        if (poemsLyrics.value && !poemsLyrics.value.trim().startsWith('[')) {
+            poemsOriginalLyrics = poemsLyrics.value;
+        }
+        
+        // Update original when textarea is edited (if it's in original format)
+        poemsLyrics.addEventListener('input', updateOriginalIfNeeded);
+        
+        // Format lyrics as JSON array when textarea loses focus
+        poemsLyrics.addEventListener('blur', () => {
+            const currentValue = poemsLyrics.value.trim();
+            
+            // Only format if it's not already in JSON format
+            if (!currentValue.startsWith('[')) {
+                // Split by newlines and filter empty lines
+                const lines = currentValue.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                
+                // Format as JSON array of strings
+                if (lines.length > 0) {
+                    const formatted = JSON.stringify(lines, null, 2);
+                    poemsLyrics.value = formatted;
+                    // Update original to the formatted version
+                    poemsOriginalLyrics = formatted;
+                }
+            }
+        });
+        
+        // Handle select change to format lyrics
+        poemsLinesPerVideo.addEventListener('change', (e) => {
+            const linesPerVideo = parseInt(poemsLinesPerVideo.value, 10) || 1;
+            
+            // Update original if current text is in original format
+            updateOriginalIfNeeded();
+            
+            // If no original stored yet, use current value (restore from formatted if needed)
+            if (poemsOriginalLyrics === null) {
+                // If current text is JSON array format, restore original format first
+                if (poemsLyrics.value.trim().startsWith('[')) {
+                    poemsOriginalLyrics = formatLyricsByLinesPerVideo(poemsLyrics.value, 1);
+                } else {
+                    poemsOriginalLyrics = poemsLyrics.value;
+                }
+            }
+            
+            // Format lyrics based on linesPerVideo
+            const formatted = formatLyricsByLinesPerVideo(poemsOriginalLyrics, linesPerVideo);
+            poemsLyrics.value = formatted;
+        });
+    }
+    
     poemsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');

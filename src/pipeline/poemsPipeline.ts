@@ -11,7 +11,7 @@ import { runBasePipeline } from './basePipeline.js';
 function createPoemsConfig(): PipelineConfig<PoemsImagePrompt, PoemsVideoPrompt> {
   return {
     pipelineName: '📝 Generating Poems song',
-    getPipelineIdentifier: () => 'halloweenNew', // Pipeline identifier for filenames and logging
+    getPipelineIdentifier: () => 'poems', // Pipeline identifier for filenames and logging
     
     models: {
       image: { model: 'anthropic/claude-sonnet-4.5', temperature: 0.3 },

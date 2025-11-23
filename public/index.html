@@ -490,13 +490,16 @@ The fish says, "Blub, blub, blub!"</textarea>
                                         <label for="poemsLinesPerVideo" class="form-label">
                                             Lines per video
                                         </label>
-                                        <input
-                                                type="number"
+                                        <select
                                                 class="form-control"
                                                 id="poemsLinesPerVideo"
-                                                min="1"
-                                                value="1"
-                                        />
+                                        >
+                                            <option value="1" selected>1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
                                         <div class="form-text">
                                             Number of song lines to combine into one video (will be used in future pipeline updates).
                                         </div>
