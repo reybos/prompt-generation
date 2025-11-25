@@ -15,7 +15,7 @@ import config from '../config/index.js';
  * Base pipeline result structure
  */
 export interface BasePipelineResult<TImagePrompt, TVideoPrompt, TAdditionalFrame> {
-  prompts: TImagePrompt[];
+  prompts?: TImagePrompt[]; // Optional when skipImageStep is true
   video_prompts: TVideoPrompt[];
   titles: string[];
   additional_frames?: TAdditionalFrame[];
@@ -66,71 +66,104 @@ export async function runBasePipeline<
           options.emitLog(`${pipelineConfig.pipelineName} (${pipelineIdentifier})... (Attempt ${attempt})`, options.requestId);
         }
 
-        // Step 1: Generate image prompts
-        if (options.emitLog && options.requestId) {
-          options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments...`, options.requestId);
-        }
-
-        // Create image prompt with style
-        const imagePromptWithStyle = pipelineConfig.prompts.createImagePrompt(pipelineIdentifier);
-        const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
-          stepName: pipelineConfig.stepNames.image,
-          promptTemplate: imagePromptWithStyle,
-          options: { 
-            model: pipelineConfig.models.image.model, 
-            temperature: pipelineConfig.models.image.temperature 
-          },
-          params: { songLyrics: lyrics },
-          requests
-        });
-
+        // Step 1: Generate image prompts (skip if skipImageStep is true)
         let prompts: TImagePrompt[] = [];
-        if (imageJson) {
-          const parsed = typeof imageJson === 'string' 
-            ? safeJsonParse(imageJson, pipelineConfig.stepNames.image) 
-            : imageJson;
+        
+        if (!pipelineConfig.skipImageStep) {
+          if (options.emitLog && options.requestId) {
+            options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments...`, options.requestId);
+          }
+
+          // Create image prompt with style
+          if (!pipelineConfig.prompts.createImagePrompt) {
+            throw new Error('createImagePrompt is required when skipImageStep is false');
+          }
           
-          if (parsed && typeof parsed === 'object') {
-            const rawPrompts = Array.isArray(parsed.prompts) ? parsed.prompts : [];
-            // Add indices to image prompts (starting from 0)
-            prompts = rawPrompts.map((prompt: any, index: number) => ({
-              ...prompt,
-              index: index
-            })) as TImagePrompt[];
+          const imagePromptWithStyle = pipelineConfig.prompts.createImagePrompt(pipelineIdentifier);
+          const imageJson: string | Record<string, any> | null = await executePipelineStepWithTracking({
+            stepName: pipelineConfig.stepNames.image,
+            promptTemplate: imagePromptWithStyle,
+            options: { 
+              model: pipelineConfig.models.image.model, 
+              temperature: pipelineConfig.models.image.temperature 
+            },
+            params: { songLyrics: lyrics },
+            requests
+          });
+
+          if (imageJson) {
+            const parsed = typeof imageJson === 'string' 
+              ? safeJsonParse(imageJson, pipelineConfig.stepNames.image) 
+              : imageJson;
             
-            // Apply post-processing if configured
-            if (pipelineConfig.postProcessImagePrompts) {
-              prompts = pipelineConfig.postProcessImagePrompts(prompts);
+            if (parsed && typeof parsed === 'object') {
+              const rawPrompts = Array.isArray(parsed.prompts) ? parsed.prompts : [];
+              // Add indices to image prompts (starting from 0)
+              prompts = rawPrompts.map((prompt: any, index: number) => ({
+                ...prompt,
+                index: index
+              })) as TImagePrompt[];
+              
+              // Apply post-processing if configured
+              if (pipelineConfig.postProcessImagePrompts) {
+                prompts = pipelineConfig.postProcessImagePrompts(prompts);
+              }
             }
+          } else {
+            if (options.emitLog && options.requestId) {
+              options.emitLog(`❌ Failed to generate image prompts. Retrying...`, options.requestId);
+            }
+            break;
           }
         } else {
           if (options.emitLog && options.requestId) {
-            options.emitLog(`❌ Failed to generate image prompts. Retrying...`, options.requestId);
+            options.emitLog(`⏭️ Skipping image prompts generation (direct video mode)...`, options.requestId);
           }
-          break;
         }
 
         // Step 2: Generate video prompts
         if (options.emitLog && options.requestId) {
-          options.emitLog(`🎬 Generating video prompts for ${prompts.length} image prompts...`, options.requestId);
+          if (pipelineConfig.skipImageStep) {
+            options.emitLog(`🎬 Generating video prompts directly from poem lyrics...`, options.requestId);
+          } else {
+            options.emitLog(`🎬 Generating video prompts for ${prompts.length} image prompts...`, options.requestId);
+          }
         }
         
         let videoPrompts: TVideoPrompt[] = [];
         let videoJson: string | Record<string, any> | null = null;
         
         try {
-          // Format image prompts for video step
-          const imagePromptsFormatted = pipelineConfig.formatters.formatImagePromptsForVideo(prompts);
+          let videoParams: Record<string, any>;
           
-          // Log video prompt
-          pipelineConfig.loggers.logVideoPrompt(imagePromptsFormatted);
-          
-          // Build params for video step (use custom builder if provided, otherwise default)
-          const videoParams = pipelineConfig.formatters.buildVideoParams
-            ? pipelineConfig.formatters.buildVideoParams(imagePromptsFormatted)
-            : { 
-                image_prompts: imagePromptsFormatted
-              };
+          if (pipelineConfig.skipImageStep) {
+            // Generate video prompts directly from lyrics
+            if (pipelineConfig.formatters.buildVideoParamsFromLyrics) {
+              videoParams = pipelineConfig.formatters.buildVideoParamsFromLyrics(lyrics);
+            } else {
+              videoParams = { songLyrics: lyrics };
+            }
+            
+            // Log video prompt
+            pipelineConfig.loggers.logVideoPrompt(lyrics);
+          } else {
+            // Format image prompts for video step
+            if (!pipelineConfig.formatters.formatImagePromptsForVideo) {
+              throw new Error('formatImagePromptsForVideo is required when skipImageStep is false');
+            }
+            
+            const imagePromptsFormatted = pipelineConfig.formatters.formatImagePromptsForVideo(prompts);
+            
+            // Log video prompt
+            pipelineConfig.loggers.logVideoPrompt(imagePromptsFormatted);
+            
+            // Build params for video step (use custom builder if provided, otherwise default)
+            videoParams = pipelineConfig.formatters.buildVideoParams
+              ? pipelineConfig.formatters.buildVideoParams(imagePromptsFormatted)
+              : { 
+                  image_prompts: imagePromptsFormatted
+                };
+          }
           
           videoJson = await executePipelineStepWithTracking({
             stepName: pipelineConfig.stepNames.video,
@@ -155,6 +188,12 @@ export async function runBasePipeline<
             const parsedPrompts = pipelineConfig.parsers.parseVideoPrompts(parsed, options);
             if (parsedPrompts) {
               videoPrompts = parsedPrompts;
+              
+              // Apply post-processing if configured
+              if (pipelineConfig.postProcessVideoPrompts) {
+                videoPrompts = pipelineConfig.postProcessVideoPrompts(videoPrompts);
+              }
+              
               if (options.emitLog && options.requestId) {
                 options.emitLog(`✅ Successfully parsed ${videoPrompts.length} video prompts`, options.requestId);
               }
@@ -274,8 +313,10 @@ export async function runBasePipeline<
         }
 
         // Step 4: Generate additional group frames (if requested)
+        // Note: generateGroupFrames may need prompts, but if skipImageStep is true, we pass empty array
+        // The function should handle this case or we need to modify it
         let additionalFrames = await generateGroupFrames(
-          prompts,
+          prompts.length > 0 ? prompts : [] as any,
           pipelineConfig,
           options,
           requests
@@ -287,13 +328,20 @@ export async function runBasePipeline<
         }
 
         // Create result object
-        const songResult = {
-          prompts,
+        // If skipImageStep is true, don't include prompts field (undefined)
+        const songResult: any = {
           video_prompts: videoPrompts,
           titles,
           additional_frames: additionalFrames.length > 0 ? additionalFrames : undefined,
           requests: requests.length > 0 ? requests : undefined
-        } as TOutput;
+        };
+        
+        // Only include prompts if we generated them
+        if (!pipelineConfig.skipImageStep && prompts.length > 0) {
+          songResult.prompts = prompts;
+        }
+        
+        const finalResult = songResult as TOutput;
         
         results.push(songResult);
 

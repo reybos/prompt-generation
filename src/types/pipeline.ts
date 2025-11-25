@@ -379,6 +379,42 @@ export const PoemsOutputSchema = z.object({
     requests: z.array(LLMRequestSchema).optional(),
 });
 
+/**
+ * Poems Direct Video input item schema
+ */
+export const PoemsDirectVideoInputItemSchema = z.object({
+    lyrics: z.string(),
+});
+
+/**
+ * Poems Direct Video video prompt schema
+ */
+export const PoemsDirectVideoVideoPromptSchema = z.object({
+    index: z.number(),
+    line: z.string(),
+    video_prompt: z.string(),
+});
+
+/**
+ * Poems Direct Video additional frame prompt schema
+ */
+export const PoemsDirectVideoAdditionalFramePromptSchema = z.object({
+    index: z.number(),
+    lines: z.array(z.string()),
+    group_image_prompt: z.string(),
+    group_video_prompt: z.string(),
+});
+
+/**
+ * Poems Direct Video output schema
+ */
+export const PoemsDirectVideoOutputSchema = z.object({
+    video_prompts: z.array(PoemsDirectVideoVideoPromptSchema),
+    titles: z.array(z.string()),
+    additional_frames: z.array(PoemsDirectVideoAdditionalFramePromptSchema).optional(),
+    requests: z.array(LLMRequestSchema).optional(),
+});
+
 // ============================================================================
 // Type exports (inferred from schemas)
 // ============================================================================
@@ -595,5 +631,30 @@ export type PoemsAdditionalFramePrompt = z.infer<typeof PoemsAdditionalFrameProm
  * Poems output type (inferred from schema)
  */
 export type PoemsOutput = z.infer<typeof PoemsOutputSchema>;
+
+/**
+ * Poems Direct Video input item type (inferred from schema)
+ */
+export type PoemsDirectVideoInputItem = z.infer<typeof PoemsDirectVideoInputItemSchema>;
+
+/**
+ * Poems Direct Video input type
+ */
+export type PoemsDirectVideoInput = PoemsDirectVideoInputItem[];
+
+/**
+ * Poems Direct Video video prompt type (inferred from schema)
+ */
+export type PoemsDirectVideoVideoPrompt = z.infer<typeof PoemsDirectVideoVideoPromptSchema>;
+
+/**
+ * Poems Direct Video additional frame prompt type (inferred from schema)
+ */
+export type PoemsDirectVideoAdditionalFramePrompt = z.infer<typeof PoemsDirectVideoAdditionalFramePromptSchema>;
+
+/**
+ * Poems Direct Video output type (inferred from schema)
+ */
+export type PoemsDirectVideoOutput = z.infer<typeof PoemsDirectVideoOutputSchema>;
 
 /* END GENAI */

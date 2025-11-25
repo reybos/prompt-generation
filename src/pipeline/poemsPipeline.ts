@@ -1,11 +1,10 @@
-import { PoemsInput, PoemsOutput, PoemsImagePrompt, PoemsVideoPrompt, PoemsAdditionalFramePrompt } from '../types/pipeline.js';
+import { PoemsInput, PoemsOutput, PoemsImagePrompt, PoemsVideoPrompt } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { createImagePromptWithStyle } from '../promts/poems/imagePrompt.js';
-import { poemsVideoPrompt, poemsTitlePrompt, logPoemsVideoPrompt, logPoemsTitlePrompt, poemsGroupImagePrompt, poemsGroupVideoPrompt, logPoemsGroupImagePrompt, logPoemsGroupVideoPrompt } from '../promts/poems/index.js';
+import { poemsVideoPrompt, poemsTitlePrompt, logPoemsVideoPrompt, logPoemsTitlePrompt } from '../promts/poems/index.js';
 import { getImagePromptStyleSuffix } from '../promts/poems/imagePromptStyle.js';
 import { PipelineConfig } from './pipelineConfig.js';
 import { runBasePipeline } from './basePipeline.js';
-import { AdditionalFrameResult } from './generateGroupFrames.js';
 
 /**
  * Create pipeline configuration for Poems
@@ -27,15 +26,15 @@ function createPoemsConfig(): PipelineConfig<PoemsImagePrompt, PoemsVideoPrompt>
       createImagePrompt: createImagePromptWithStyle,
       videoPrompt: poemsVideoPrompt,
       titlePrompt: poemsTitlePrompt,
-      groupImagePrompt: poemsGroupImagePrompt,
-      groupVideoPrompt: poemsGroupVideoPrompt
+      groupImagePrompt: poemsVideoPrompt, // Placeholder, won't be used
+      groupVideoPrompt: poemsVideoPrompt // Placeholder, won't be used
     },
     
     loggers: {
       logVideoPrompt: logPoemsVideoPrompt,
       logTitlePrompt: logPoemsTitlePrompt,
-      logGroupImagePrompt: logPoemsGroupImagePrompt,
-      logGroupVideoPrompt: logPoemsGroupVideoPrompt
+      logGroupImagePrompt: () => {}, // Not used
+      logGroupVideoPrompt: () => {} // Not used
     },
     
     formatters: {
@@ -66,14 +65,7 @@ function createPoemsConfig(): PipelineConfig<PoemsImagePrompt, PoemsVideoPrompt>
       }));
     },
     
-    // Post-processing: append style suffix to group image prompts in additional frames
-    postProcessAdditionalFrames: (frames: AdditionalFrameResult[]) => {
-      const styleSuffix = getImagePromptStyleSuffix();
-      return frames.map(frame => ({
-        ...frame,
-        group_image_prompt: frame.group_image_prompt + "; " + styleSuffix
-      }));
-    },
+    // Note: Additional frames are not supported for poems pipeline
     
     stepNames: {
       image: 'POEMS IMAGE PROMPTS',

@@ -92,12 +92,23 @@ const poemsContent = document.getElementById('poems-content');
 const poemsForm = document.getElementById('poemsForm');
 const poemsLyrics = document.getElementById('poemsLyrics');
 const poemsLinesPerVideo = document.getElementById('poemsLinesPerVideo');
-const poemsAdditionalFrames = document.getElementById('poemsAdditionalFrames');
 const poemsResultsSection = document.getElementById('poemsResultsSection');
 const poemsResultsContainer = document.getElementById('poemsResultsContainer');
 const poemsErrorAlert = document.getElementById('poemsErrorAlert');
 const poemsErrorMessage = document.getElementById('poemsErrorMessage');
 const poemsLoadingSpinner = document.getElementById('poemsLoadingSpinner');
+
+// DOM Elements for Poems Direct Video Generation
+const poemsDirectVideoLink = document.getElementById('poems-direct-video-link');
+const poemsDirectVideoContent = document.getElementById('poems-direct-video-content');
+const poemsDirectVideoForm = document.getElementById('poemsDirectVideoForm');
+const poemsDirectVideoLyrics = document.getElementById('poemsDirectVideoLyrics');
+const poemsDirectVideoLinesPerVideo = document.getElementById('poemsDirectVideoLinesPerVideo');
+const poemsDirectVideoResultsSection = document.getElementById('poemsDirectVideoResultsSection');
+const poemsDirectVideoResultsContainer = document.getElementById('poemsDirectVideoResultsContainer');
+const poemsDirectVideoErrorAlert = document.getElementById('poemsDirectVideoErrorAlert');
+const poemsDirectVideoErrorMessage = document.getElementById('poemsDirectVideoErrorMessage');
+const poemsDirectVideoLoadingSpinner = document.getElementById('poemsDirectVideoLoadingSpinner');
 
 
 
@@ -114,6 +125,7 @@ let halloweenLogEventSource = null;
 let halloweenTransformLogEventSource = null;
 let halloweenTransformTwoFrameLogEventSource = null;
 let poemsLogEventSource = null;
+let poemsDirectVideoLogEventSource = null;
 
 /**
  * Connect to the SSE log stream for Halloween Patchwork generation
@@ -752,6 +764,133 @@ function appendPoemsLogEntry(log, timestamp) {
 }
 
 /**
+ * Connect to the SSE log stream for Poems Direct Video generation
+ * @param {string} requestId - The request ID to filter logs by
+ */
+function connectToPoemsDirectVideoLogStream(requestId) {
+    // Close any existing connection
+    if (poemsDirectVideoLogEventSource) {
+        console.log('Closing existing Poems Direct Video log stream connection');
+        poemsDirectVideoLogEventSource.close();
+    }
+
+    console.log(`Connecting to Poems Direct Video log stream with requestId: ${requestId}`);
+
+    // Create a new EventSource connection
+    poemsDirectVideoLogEventSource = new EventSource(`/api/logs/stream?requestId=${requestId}`);
+
+    // Handle connection open
+    poemsDirectVideoLogEventSource.onopen = () => {
+        console.log('Poems Direct Video log stream connection established');
+        if (poemsDirectVideoResultsContainer && poemsDirectVideoResultsContainer.querySelector('.list-group')) {
+            poemsDirectVideoResultsContainer.innerHTML = '<div class="alert alert-info">Connected to log stream. Waiting for logs...</div>';
+        }
+    };
+
+    // Handle incoming messages
+    poemsDirectVideoLogEventSource.onmessage = (event) => {
+        console.log('Received Poems Direct Video SSE message:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'connected') {
+                console.log('Connected to Poems Direct Video log stream');
+            } else if (data.type === 'log') {
+                console.log('Received Poems Direct Video log:', data.log, 'timestamp:', data.timestamp);
+                if (poemsDirectVideoResultsContainer && poemsDirectVideoResultsContainer.querySelector('.alert-info')) {
+                    poemsDirectVideoResultsContainer.innerHTML = '';
+                }
+                appendPoemsDirectVideoLogEntry(data.log, data.timestamp);
+            } else if (data.type === 'complete') {
+                console.log('Poems Direct Video generation complete:', data.message);
+                appendPoemsDirectVideoLogEntry(data.message, data.timestamp);
+                if (poemsDirectVideoLoadingSpinner) poemsDirectVideoLoadingSpinner.classList.add('d-none');
+                setTimeout(() => {
+                    if (poemsDirectVideoLogEventSource) {
+                        console.log('Closing Poems Direct Video log stream connection after completion');
+                        poemsDirectVideoLogEventSource.close();
+                        poemsDirectVideoLogEventSource = null;
+                    }
+                }, 1000);
+            } else {
+                console.warn('Unknown Poems Direct Video message type:', data.type);
+            }
+        } catch (error) {
+            console.error('Error parsing Poems Direct Video SSE message:', error, event.data);
+        }
+    };
+
+    // Handle errors
+    poemsDirectVideoLogEventSource.onerror = (error) => {
+        console.error('Poems Direct Video log stream error:', error);
+        if (poemsDirectVideoResultsContainer && poemsDirectVideoResultsContainer.querySelector('.alert-info')) {
+            poemsDirectVideoResultsContainer.innerHTML = '<div class="alert alert-danger">Error connecting to log stream. Logs may be unavailable.</div>';
+        }
+        if (poemsDirectVideoLoadingSpinner) poemsDirectVideoLoadingSpinner.classList.add('d-none');
+        poemsDirectVideoLogEventSource.close();
+        poemsDirectVideoLogEventSource = null;
+    };
+}
+
+/**
+ * Append a single log entry to the Poems Direct Video display
+ * @param {string} log - The log message to append
+ * @param {string} timestamp - The timestamp for the log entry
+ */
+function appendPoemsDirectVideoLogEntry(log, timestamp) {
+    // Skip logs containing "Using default channel name"
+    if (log && log.includes("Using default channel name")) {
+        console.log('Skipping channel name log:', log);
+        return;
+    }
+
+    console.log('Appending Poems Direct Video log entry:', log, 'timestamp:', timestamp);
+
+    // Make sure the results section is visible
+    if (poemsDirectVideoResultsSection) {
+        poemsDirectVideoResultsSection.classList.remove('d-none');
+    }
+
+    // Create or get the log list
+    let logList = poemsDirectVideoResultsContainer.querySelector('.list-group');
+    if (!logList) {
+        logList = document.createElement('div');
+        logList.className = 'list-group';
+        poemsDirectVideoResultsContainer.appendChild(logList);
+    }
+
+    // Create log entry
+    const logItem = document.createElement('div');
+    logItem.className = 'list-group-item list-group-item-action';
+    
+    let formattedTime = '';
+    if (timestamp) {
+        try {
+            const date = new Date(timestamp);
+            if (!isNaN(date.getTime())) {
+                formattedTime = date.toLocaleTimeString();
+            } else {
+                formattedTime = timestamp;
+            }
+        } catch (e) {
+            formattedTime = timestamp;
+        }
+    }
+    
+    logItem.innerHTML = `
+        <div class="d-flex w-100 justify-content-between">
+            <h6 class="mb-1">${log}</h6>
+            <small class="text-muted">${formattedTime}</small>
+        </div>
+    `;
+
+    logList.appendChild(logItem);
+
+    // Scroll to the bottom
+    poemsDirectVideoResultsContainer.scrollTop = poemsDirectVideoResultsContainer.scrollHeight;
+}
+
+/**
  * Connect to the SSE log stream for short study generation
  * @param {string} requestId - The request ID to filter logs by
  */
@@ -1149,12 +1288,13 @@ if (savedLink) {
         hideError(); // Hide main error alert when navigating
         savedLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsDirectVideoLink) poemsDirectVideoLink.classList.remove('active');
         if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.add('d-none');
         if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
         if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
         if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
@@ -1171,6 +1311,8 @@ if (savedLink) {
         if (resultsSection) resultsSection.classList.add('d-none');
         if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
         if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
+        if (poemsDirectVideoResultsSection) poemsDirectVideoResultsSection.classList.add('d-none');
+        if (poemsDirectVideoErrorAlert) poemsDirectVideoErrorAlert.classList.add('d-none');
         if (savedContent) savedContent.classList.remove('d-none');
         if (typeof loadSavedGenerations === 'function') {
             loadSavedGenerations();
@@ -1185,12 +1327,13 @@ if (halloweenPatchworkLink) {
         hideError(); // Hide main error alert when navigating
         halloweenPatchworkLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsDirectVideoLink) poemsDirectVideoLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (halloweenContent) halloweenContent.classList.add('d-none');
         if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
@@ -1217,10 +1360,11 @@ if (halloweenLink) {
         hideError(); // Hide main error alert when navigating
         halloweenLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsDirectVideoLink) poemsDirectVideoLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
-        if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
         if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
@@ -1245,12 +1389,13 @@ if (halloweenTransformLink) {
         hideError(); // Hide main error alert when navigating
         halloweenTransformLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsDirectVideoLink) poemsDirectVideoLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
-        if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
         if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
@@ -1273,12 +1418,13 @@ if (halloweenTransformTwoFrameLink) {
         hideError(); // Hide main error alert when navigating
         halloweenTransformTwoFrameLink.classList.add('active');
         if (poemsLink) poemsLink.classList.remove('active');
+        if (poemsDirectVideoLink) poemsDirectVideoLink.classList.remove('active');
         if (savedLink) savedLink.classList.remove('active');
         if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
         if (halloweenLink) halloweenLink.classList.remove('active');
         if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
-        if (poemsLink) poemsLink.classList.remove('active');
         if (poemsContent) poemsContent.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.add('d-none');
         if (savedContent) savedContent.classList.add('d-none');
         if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
         if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
@@ -1322,9 +1468,45 @@ if (poemsLink) {
         if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
         if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
         if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.add('d-none');
+        if (poemsDirectVideoResultsSection) poemsDirectVideoResultsSection.classList.add('d-none');
+        if (poemsDirectVideoErrorAlert) poemsDirectVideoErrorAlert.classList.add('d-none');
         if (poemsContent) poemsContent.classList.remove('d-none');
         if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
         if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
+    });
+}
+
+if (poemsDirectVideoLink) {
+    poemsDirectVideoLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideError(); // Hide main error alert when navigating
+        poemsDirectVideoLink.classList.add('active');
+        if (savedLink) savedLink.classList.remove('active');
+        if (poemsLink) poemsLink.classList.remove('active');
+        if (halloweenPatchworkLink) halloweenPatchworkLink.classList.remove('active');
+        if (halloweenLink) halloweenLink.classList.remove('active');
+        if (halloweenTransformLink) halloweenTransformLink.classList.remove('active');
+        if (halloweenTransformTwoFrameLink) halloweenTransformTwoFrameLink.classList.remove('active');
+        if (savedContent) savedContent.classList.add('d-none');
+        if (poemsContent) poemsContent.classList.add('d-none');
+        if (halloweenPatchworkContent) halloweenPatchworkContent.classList.add('d-none');
+        if (halloweenPatchworkResultsSection) halloweenPatchworkResultsSection.classList.add('d-none');
+        if (halloweenPatchworkErrorAlert) halloweenPatchworkErrorAlert.classList.add('d-none');
+        if (halloweenContent) halloweenContent.classList.add('d-none');
+        if (halloweenResultsSection) halloweenResultsSection.classList.add('d-none');
+        if (halloweenErrorAlert) halloweenErrorAlert.classList.add('d-none');
+        if (halloweenTransformContent) halloweenTransformContent.classList.add('d-none');
+        if (halloweenTransformResultsSection) halloweenTransformResultsSection.classList.add('d-none');
+        if (halloweenTransformErrorAlert) halloweenTransformErrorAlert.classList.add('d-none');
+        if (halloweenTransformTwoFrameContent) halloweenTransformTwoFrameContent.classList.add('d-none');
+        if (halloweenTransformTwoFrameResultsSection) halloweenTransformTwoFrameResultsSection.classList.add('d-none');
+        if (halloweenTransformTwoFrameErrorAlert) halloweenTransformTwoFrameErrorAlert.classList.add('d-none');
+        if (poemsResultsSection) poemsResultsSection.classList.add('d-none');
+        if (poemsErrorAlert) poemsErrorAlert.classList.add('d-none');
+        if (poemsDirectVideoContent) poemsDirectVideoContent.classList.remove('d-none');
+        if (poemsDirectVideoResultsSection) poemsDirectVideoResultsSection.classList.add('d-none');
+        if (poemsDirectVideoErrorAlert) poemsDirectVideoErrorAlert.classList.add('d-none');
     });
 }
 
@@ -1580,6 +1762,9 @@ if (halloweenTransformTwoFrameForm) {
 // Store original lyrics for Poems form
 let poemsOriginalLyrics = null;
 
+// Store original lyrics for Poems Direct Video form
+let poemsDirectVideoOriginalLyrics = null;
+
 /**
  * Format lyrics based on lines per video setting
  * @param {string} lyrics - Original lyrics text
@@ -1728,7 +1913,6 @@ if (poemsForm) {
         if (poemsLoadingSpinner) poemsLoadingSpinner.classList.remove('d-none');
         
         const lyricsText = poemsLyrics && poemsLyrics.value ? poemsLyrics.value.trim() : '';
-        const generateAdditionalFrames = poemsAdditionalFrames && poemsAdditionalFrames.checked;
         const linesPerVideo = poemsLinesPerVideo && poemsLinesPerVideo.value ? parseInt(poemsLinesPerVideo.value, 10) : 1;
         
         if (!lyricsText) {
@@ -1749,7 +1933,6 @@ if (poemsForm) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     input: songs,
-                    generateAdditionalFrames: generateAdditionalFrames,
                     linesPerVideo: linesPerVideo
                 })
             });
@@ -1771,6 +1954,123 @@ if (poemsForm) {
                 poemsErrorAlert.classList.remove('d-none');
             }
             if (poemsLoadingSpinner) poemsLoadingSpinner.classList.add('d-none');
+        }
+    });
+}
+
+if (poemsDirectVideoForm) {
+    // Handle select change to format lyrics
+    if (poemsDirectVideoLinesPerVideo && poemsDirectVideoLyrics) {
+        // Store original lyrics when user first changes the select or when textarea is edited
+        const updateOriginalIfNeeded = () => {
+            const currentValue = poemsDirectVideoLyrics.value;
+            // If text doesn't start with "[", it's in original format - update original
+            if (!currentValue.trim().startsWith('[')) {
+                poemsDirectVideoOriginalLyrics = currentValue;
+            }
+        };
+        
+        // Store original lyrics on page load
+        if (poemsDirectVideoLyrics.value && !poemsDirectVideoLyrics.value.trim().startsWith('[')) {
+            poemsDirectVideoOriginalLyrics = poemsDirectVideoLyrics.value;
+        }
+        
+        // Update original when textarea is edited (if it's in original format)
+        poemsDirectVideoLyrics.addEventListener('input', updateOriginalIfNeeded);
+        
+        // Format lyrics as JSON array when textarea loses focus
+        poemsDirectVideoLyrics.addEventListener('blur', () => {
+            const currentValue = poemsDirectVideoLyrics.value.trim();
+            
+            // Only format if it's not already in JSON format
+            if (!currentValue.startsWith('[')) {
+                // Split by newlines and filter empty lines
+                const lines = currentValue.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                
+                // Format as JSON array of strings
+                if (lines.length > 0) {
+                    const formatted = JSON.stringify(lines, null, 2);
+                    poemsDirectVideoLyrics.value = formatted;
+                    // Update original to the formatted version
+                    poemsDirectVideoOriginalLyrics = formatted;
+                }
+            }
+        });
+        
+        // Handle select change to format lyrics
+        poemsDirectVideoLinesPerVideo.addEventListener('change', (e) => {
+            const linesPerVideo = parseInt(poemsDirectVideoLinesPerVideo.value, 10) || 1;
+            
+            // Update original if current text is in original format
+            updateOriginalIfNeeded();
+            
+            // If no original stored yet, use current value (restore from formatted if needed)
+            if (poemsDirectVideoOriginalLyrics === null) {
+                // If current text is JSON array format, restore original format first
+                if (poemsDirectVideoLyrics.value.trim().startsWith('[')) {
+                    poemsDirectVideoOriginalLyrics = formatLyricsByLinesPerVideo(poemsDirectVideoLyrics.value, 1);
+                } else {
+                    poemsDirectVideoOriginalLyrics = poemsDirectVideoLyrics.value;
+                }
+            }
+            
+            // Format lyrics based on linesPerVideo
+            const formatted = formatLyricsByLinesPerVideo(poemsDirectVideoOriginalLyrics, linesPerVideo);
+            poemsDirectVideoLyrics.value = formatted;
+        });
+    }
+    
+    poemsDirectVideoForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (poemsDirectVideoErrorAlert) poemsDirectVideoErrorAlert.classList.add('d-none');
+        if (poemsDirectVideoResultsSection) poemsDirectVideoResultsSection.classList.add('d-none');
+        if (poemsDirectVideoResultsContainer) poemsDirectVideoResultsContainer.innerHTML = '';
+        if (poemsDirectVideoLoadingSpinner) poemsDirectVideoLoadingSpinner.classList.remove('d-none');
+        
+        const lyricsText = poemsDirectVideoLyrics && poemsDirectVideoLyrics.value ? poemsDirectVideoLyrics.value.trim() : '';
+        const linesPerVideo = poemsDirectVideoLinesPerVideo && poemsDirectVideoLinesPerVideo.value ? parseInt(poemsDirectVideoLinesPerVideo.value, 10) : 1;
+        
+        if (!lyricsText) {
+            if (poemsDirectVideoErrorAlert && poemsDirectVideoErrorMessage) {
+                poemsDirectVideoErrorMessage.textContent = 'Please enter song lyrics';
+                poemsDirectVideoErrorAlert.classList.remove('d-none');
+            }
+            if (poemsDirectVideoLoadingSpinner) poemsDirectVideoLoadingSpinner.classList.add('d-none');
+            return;
+        }
+        
+        // Create the input format expected by the pipeline
+        const songs = [{ lyrics: lyricsText }];
+        
+        try {
+            const response = await fetch('/api/generate-poems-direct-video', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    input: songs,
+                    linesPerVideo: linesPerVideo
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'An error occurred during Poems Direct Video generation');
+            }
+
+            // Start listening for logs via SSE
+            if (data.requestId) {
+                connectToPoemsDirectVideoLogStream(data.requestId);
+            }
+        } catch (error) {
+            console.error('Error generating Poems Direct Video content:', error);
+            if (poemsDirectVideoErrorAlert && poemsDirectVideoErrorMessage) {
+                poemsDirectVideoErrorMessage.textContent = error.message || 'An error occurred during Poems Direct Video generation';
+                poemsDirectVideoErrorAlert.classList.remove('d-none');
+            }
+            if (poemsDirectVideoLoadingSpinner) poemsDirectVideoLoadingSpinner.classList.add('d-none');
         }
     });
 }

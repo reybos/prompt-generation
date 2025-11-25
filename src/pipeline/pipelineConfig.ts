@@ -66,7 +66,7 @@ export interface PipelineConfig<TImagePrompt, TVideoPrompt> {
   
   // Prompt templates
   prompts: {
-    createImagePrompt: (style: string) => PromptTemplate;
+    createImagePrompt?: (style: string) => PromptTemplate; // Optional if skipImageStep is true
     videoPrompt: PromptTemplate;
     titlePrompt: PromptTemplate;
     groupImagePrompt: PromptTemplate;
@@ -83,8 +83,9 @@ export interface PipelineConfig<TImagePrompt, TVideoPrompt> {
   
   // Data formatting and parsing
   formatters: {
-    formatImagePromptsForVideo: ImagePromptsFormatter;
+    formatImagePromptsForVideo?: ImagePromptsFormatter; // Optional if skipImageStep is true
     buildVideoParams?: VideoParamsBuilder; // Optional, defaults to { image_prompts }
+    buildVideoParamsFromLyrics?: (songLyrics: string) => Record<string, any>; // For when skipImageStep is true
   };
   
   parsers: {
@@ -93,7 +94,12 @@ export interface PipelineConfig<TImagePrompt, TVideoPrompt> {
   
   // Post-processing hooks
   postProcessImagePrompts?: (prompts: TImagePrompt[]) => TImagePrompt[];
+  postProcessVideoPrompts?: (prompts: TVideoPrompt[]) => TVideoPrompt[];
   postProcessAdditionalFrames?: (frames: AdditionalFrameResult[]) => AdditionalFrameResult[];
+  
+  // Step skipping options
+  skipImageStep?: boolean; // If true, skip image prompt generation
+  skipTitleStep?: boolean; // If true, skip title generation (for future flexibility)
   
   // Step names for tracking
   stepNames: {

@@ -40,6 +40,11 @@
                             <i class="fas fa-book"></i> Poems
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="poems-direct-video-link" href="#">
+                            <i class="fas fa-video"></i> Poems Direct Video
+                        </a>
+                    </li>
                     
                     <!-- MINI DISCOVERIES Group -->
                     <li class="nav-item">
@@ -504,17 +509,6 @@ The fish says, "Blub, blub, blub!"</textarea>
                                             Number of song lines to combine into one video (will be used in future pipeline updates).
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="poemsAdditionalFrames">
-                                            <label class="form-check-label" for="poemsAdditionalFrames">
-                                                Generate additional frames
-                                            </label>
-                                        </div>
-                                        <div class="form-text">
-                                            Generate extra visual frames for enhanced video variety and transitions.
-                                        </div>
-                                    </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-success" id="poemsGenerateBtn">
                                             <span
@@ -548,6 +542,87 @@ The fish says, "Blub, blub, blub!"</textarea>
                 <div class="alert alert-danger mt-4 d-none" id="poemsErrorAlert" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <span id="poemsErrorMessage"></span>
+                </div>
+            </div>
+
+            <!-- Poems Direct Video Generation Content -->
+            <div id="poems-direct-video-content" class="content-section d-none">
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="h4 mb-0">Mini Marvels - Poems Direct Video</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="poemsDirectVideoForm">
+                                    <div class="mb-3">
+                                        <label for="poemsDirectVideoLyrics" class="form-label">
+                                            Song Lyrics <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea
+                                                class="form-control"
+                                                id="poemsDirectVideoLyrics"
+                                                rows="10"
+                                                required
+                                        >The cat says, "Meow, meow, meow!"
+The dog says, "Woof, woof, woof!"
+The bird says, "Tweet, tweet, tweet!"
+The fish says, "Blub, blub, blub!"</textarea>
+                                        <div class="form-text">
+                                            Enter the lyrics of your poem song. Video prompts will be generated directly from the lyrics without generating image prompts first.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="poemsDirectVideoLinesPerVideo" class="form-label">
+                                            Lines per video
+                                        </label>
+                                        <select
+                                                class="form-control"
+                                                id="poemsDirectVideoLinesPerVideo"
+                                        >
+                                            <option value="1" selected>1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                        <div class="form-text">
+                                            Number of song lines to combine into one video (will be used in future pipeline updates).
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary" id="poemsDirectVideoGenerateBtn">
+                                            <span
+                                                class="spinner-border spinner-border-sm d-none"
+                                                id="poemsDirectVideoLoadingSpinner"
+                                                role="status"
+                                                aria-hidden="true"
+                                            ></span>
+                                            Generate Poems Direct Video
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5 d-none" id="poemsDirectVideoResultsSection">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <h2 class="h4 mb-0">Poems Direct Video Generation Results</h2>
+                            </div>
+                            <div class="card-body">
+                                <div id="poemsDirectVideoResultsContainer" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Poems Direct Video results will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-4 d-none" id="poemsDirectVideoErrorAlert" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="poemsDirectVideoErrorMessage"></span>
                 </div>
             </div>
 

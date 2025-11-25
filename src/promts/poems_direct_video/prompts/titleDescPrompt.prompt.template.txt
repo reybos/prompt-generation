@@ -1,0 +1,26 @@
+Generate a YouTube TITLE for a kids' poem song video featuring characters based on these inputs:
+- Song Lyrics: {songLyrics}
+- Video Prompt: {videoPrompt}
+
+GOALS:
+
+---
+
+📌 **TITLE STRATEGY**:
+
+💡 TITLE EXAMPLES:
+
+---
+
+OUTPUT (STRICT JSON ONLY, NO EXTRA TEXT):
+{{
+  "title": "Catchy, SEO-optimized title with 2–4 emojis, 10–18 words"
+}}
+
+INPUT:
+Song Lyrics: {songLyrics}
+Video Prompt: {videoPrompt}
+
+OUTPUT:
+(Return only valid JSON as shown above)
+
