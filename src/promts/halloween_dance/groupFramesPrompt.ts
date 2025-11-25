@@ -8,31 +8,31 @@ import path from 'path';
 const __dirname = getDirname(import.meta.url);
 
 // Read prompt text with fallback to template
-let additionalFramesPromptTemplate: string;
-const actualPath = path.join(__dirname, 'prompts', 'additionalFramesPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'prompts', 'additionalFramesPrompt.prompt.template.txt');
+let groupFramesPromptTemplate: string;
+const actualPath = path.join(__dirname, 'prompts', 'groupFramesPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'groupFramesPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
-    additionalFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
+    groupFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
 } else {
-    additionalFramesPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
-    console.warn('⚠️  Using template prompt for poemsGroupImagePrompt. Copy .template.txt to .txt for production use.');
+    groupFramesPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
+    console.warn('⚠️  Using template prompt for halloweenGroupImagePrompt. Copy .template.txt to .txt for production use.');
 }
 
 /**
- * Poems group image prompt template
+ * Halloween group image prompt template
  * Creates group thumbnails for every 3 characters
  */
-export const poemsGroupImagePrompt = new PromptTemplate({ 
+export const halloweenGroupImagePrompt = new PromptTemplate({ 
     inputVariables: ["prompts"],
-    template: additionalFramesPromptTemplate 
+    template: groupFramesPromptTemplate 
 });
 
 /**
- * Poems group video prompt template
+ * Halloween group video prompt template
  * Creates animated video prompts for group thumbnails
  */
-export const poemsGroupVideoPrompt = PromptTemplate.fromTemplate(`
+export const halloweenGroupVideoPrompt = PromptTemplate.fromTemplate(`
 You are an expert in creating short animated video prompts for YouTube. You will receive a description of a static illustration showing three characters and their environment. Your task is to transform it into a video description with subtle, natural motions.
 
 Rules:
@@ -71,10 +71,10 @@ Return your response as a JSON object with the following structure:
  * Log the group image prompt for debugging
  * @param prompts - The three character prompts
  */
-export function logPoemsGroupImagePrompt(
+export function logHalloweenGroupImagePrompt(
   prompts: string
 ): void {
-  console.log('=== POEMS GROUP IMAGE PROMPT ===');
+  console.log('=== HALLOWEEN GROUP IMAGE PROMPT ===');
   console.log('Three Character Prompts:', prompts);
   console.log('====================================');
 }
@@ -83,10 +83,10 @@ export function logPoemsGroupImagePrompt(
  * Log the group video prompt for debugging
  * @param groupImagePrompt - The group image prompt
  */
-export function logPoemsGroupVideoPrompt(
+export function logHalloweenGroupVideoPrompt(
   groupImagePrompt: string
 ): void {
-  console.log('=== POEMS GROUP VIDEO PROMPT ===');
+  console.log('=== HALLOWEEN GROUP VIDEO PROMPT ===');
   console.log('Group Image Prompt:', groupImagePrompt);
   console.log('====================================');
 }

@@ -65,7 +65,7 @@ function createPoemsConfig(): PipelineConfig<PoemsImagePrompt, PoemsVideoPrompt>
       }));
     },
     
-    // Note: Additional frames are not supported for poems pipeline
+    // Note: Group frames are not supported for poems pipeline
     
     stepNames: {
       image: 'POEMS IMAGE PROMPTS',

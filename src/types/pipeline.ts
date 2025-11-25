@@ -155,9 +155,9 @@ export const SongWithAnimalsVideoPromptSchema = z.object({
 });
 
 /**
- * Song with animals additional frame prompt schema
+ * Song with animals group frame prompt schema
  */
-export const SongWithAnimalsAdditionalFramePromptSchema = z.object({
+export const SongWithAnimalsGroupFramePromptSchema = z.object({
     index: z.number(),
     lines: z.array(z.string()),
     group_image_prompt: z.string(),
@@ -171,7 +171,7 @@ export const SongWithAnimalsOutputSchema = z.object({
     prompts: z.array(SongWithAnimalsImagePromptSchema),
     video_prompts: z.array(SongWithAnimalsVideoPromptSchema),
     titles: z.array(z.string()),
-    additional_frames: z.array(SongWithAnimalsAdditionalFramePromptSchema).optional(),
+    group_frames: z.array(SongWithAnimalsGroupFramePromptSchema).optional(),
     requests: z.array(LLMRequestSchema).optional(),
 });
 
@@ -201,9 +201,9 @@ export const HalloweenPatchworkVideoPromptSchema = z.object({
 });
 
 /**
- * Halloween Patchwork additional frame prompt schema
+ * Halloween Patchwork group frame prompt schema
  */
-export const HalloweenPatchworkAdditionalFramePromptSchema = z.object({
+export const HalloweenPatchworkGroupFramePromptSchema = z.object({
     index: z.number(),
     lines: z.array(z.string()),
     group_image_prompt: z.string(),
@@ -217,7 +217,7 @@ export const HalloweenPatchworkOutputSchema = z.object({
     prompts: z.array(HalloweenPatchworkImagePromptSchema),
     video_prompts: z.array(HalloweenPatchworkVideoPromptSchema),
     titles: z.array(z.string()),
-    additional_frames: z.array(HalloweenPatchworkAdditionalFramePromptSchema).optional(),
+    group_frames: z.array(HalloweenPatchworkGroupFramePromptSchema).optional(),
     requests: z.array(LLMRequestSchema).optional(),
 });
 
@@ -292,9 +292,9 @@ export const HalloweenVideoPromptSchema = z.object({
 });
 
 /**
- * Halloween additional frame prompt schema
+ * Halloween group frame prompt schema
  */
-export const HalloweenAdditionalFramePromptSchema = z.object({
+export const HalloweenGroupFramePromptSchema = z.object({
     index: z.number(),
     lines: z.array(z.string()),
     group_image_prompt: z.string(),
@@ -308,7 +308,7 @@ export const HalloweenOutputSchema = z.object({
     prompts: z.array(HalloweenImagePromptSchema),
     video_prompts: z.array(HalloweenVideoPromptSchema),
     titles: z.array(z.string()),
-    additional_frames: z.array(HalloweenAdditionalFramePromptSchema).optional(),
+    group_frames: z.array(HalloweenGroupFramePromptSchema).optional(),
     requests: z.array(LLMRequestSchema).optional(),
 });
 
@@ -329,7 +329,7 @@ export const HalloweenTransformOutputSchema = z.object({
     prompts: z.array(HalloweenImagePromptSchema),
     video_prompts: z.array(HalloweenTransformVideoPromptSchema),
     titles: z.array(z.string()),
-    additional_frames: z.array(HalloweenAdditionalFramePromptSchema).optional(),
+    group_frames: z.array(HalloweenGroupFramePromptSchema).optional(),
     requests: z.array(LLMRequestSchema).optional(),
 });
 
@@ -359,9 +359,9 @@ export const PoemsVideoPromptSchema = z.object({
 });
 
 /**
- * Poems additional frame prompt schema
+ * Poems group frame prompt schema
  */
-export const PoemsAdditionalFramePromptSchema = z.object({
+export const PoemsGroupFramePromptSchema = z.object({
     index: z.number(),
     lines: z.array(z.string()),
     group_image_prompt: z.string(),
@@ -375,7 +375,7 @@ export const PoemsOutputSchema = z.object({
     prompts: z.array(PoemsImagePromptSchema),
     video_prompts: z.array(PoemsVideoPromptSchema),
     titles: z.array(z.string()),
-    additional_frames: z.array(PoemsAdditionalFramePromptSchema).optional(),
+    group_frames: z.array(PoemsGroupFramePromptSchema).optional(),
     requests: z.array(LLMRequestSchema).optional(),
 });
 
@@ -396,9 +396,9 @@ export const PoemsDirectVideoVideoPromptSchema = z.object({
 });
 
 /**
- * Poems Direct Video additional frame prompt schema
+ * Poems Direct Video group frame prompt schema
  */
-export const PoemsDirectVideoAdditionalFramePromptSchema = z.object({
+export const PoemsDirectVideoGroupFramePromptSchema = z.object({
     index: z.number(),
     lines: z.array(z.string()),
     group_image_prompt: z.string(),
@@ -411,7 +411,7 @@ export const PoemsDirectVideoAdditionalFramePromptSchema = z.object({
 export const PoemsDirectVideoOutputSchema = z.object({
     video_prompts: z.array(PoemsDirectVideoVideoPromptSchema),
     titles: z.array(z.string()),
-    additional_frames: z.array(PoemsDirectVideoAdditionalFramePromptSchema).optional(),
+    group_frames: z.array(PoemsDirectVideoGroupFramePromptSchema).optional(),
     requests: z.array(LLMRequestSchema).optional(),
 });
 
@@ -468,7 +468,7 @@ export interface PipelineOptions {
     requestId?: string;
     emitLog?: (log: string, requestId: string | undefined) => void;
     style?: string; // Visual style for song with animals pipeline
-    generateAdditionalFrames?: boolean; // Flag to generate additional frames
+    generateGroupFrames?: boolean; // Flag to generate group frames
     linesPerVideo?: number; // Number of song lines to combine into one video
 }
 
@@ -493,9 +493,9 @@ export type SongWithAnimalsImagePrompt = z.infer<typeof SongWithAnimalsImageProm
 export type SongWithAnimalsVideoPrompt = z.infer<typeof SongWithAnimalsVideoPromptSchema>;
 
 /**
- * Song with animals additional frame prompt type (inferred from schema)
+ * Song with animals group frame prompt type (inferred from schema)
  */
-export type SongWithAnimalsAdditionalFramePrompt = z.infer<typeof SongWithAnimalsAdditionalFramePromptSchema>;
+export type SongWithAnimalsGroupFramePrompt = z.infer<typeof SongWithAnimalsGroupFramePromptSchema>;
 
 /**
  * Song with animals output type (inferred from schema)
@@ -523,9 +523,9 @@ export type HalloweenPatchworkImagePrompt = z.infer<typeof HalloweenPatchworkIma
 export type HalloweenPatchworkVideoPrompt = z.infer<typeof HalloweenPatchworkVideoPromptSchema>;
 
 /**
- * Halloween Patchwork additional frame prompt type (inferred from schema)
+ * Halloween Patchwork group frame prompt type (inferred from schema)
  */
-export type HalloweenPatchworkAdditionalFramePrompt = z.infer<typeof HalloweenPatchworkAdditionalFramePromptSchema>;
+export type HalloweenPatchworkGroupFramePrompt = z.infer<typeof HalloweenPatchworkGroupFramePromptSchema>;
 
 /**
  * Halloween Patchwork output type (inferred from schema)
@@ -583,9 +583,9 @@ export type HalloweenImagePrompt = z.infer<typeof HalloweenImagePromptSchema>;
 export type HalloweenVideoPrompt = z.infer<typeof HalloweenVideoPromptSchema>;
 
 /**
- * Halloween additional frame prompt type (inferred from schema)
+ * Halloween group frame prompt type (inferred from schema)
  */
-export type HalloweenAdditionalFramePrompt = z.infer<typeof HalloweenAdditionalFramePromptSchema>;
+export type HalloweenGroupFramePrompt = z.infer<typeof HalloweenGroupFramePromptSchema>;
 
 /**
  * Halloween output type (inferred from schema)
@@ -623,9 +623,9 @@ export type PoemsImagePrompt = z.infer<typeof PoemsImagePromptSchema>;
 export type PoemsVideoPrompt = z.infer<typeof PoemsVideoPromptSchema>;
 
 /**
- * Poems additional frame prompt type (inferred from schema)
+ * Poems group frame prompt type (inferred from schema)
  */
-export type PoemsAdditionalFramePrompt = z.infer<typeof PoemsAdditionalFramePromptSchema>;
+export type PoemsGroupFramePrompt = z.infer<typeof PoemsGroupFramePromptSchema>;
 
 /**
  * Poems output type (inferred from schema)
@@ -648,9 +648,9 @@ export type PoemsDirectVideoInput = PoemsDirectVideoInputItem[];
 export type PoemsDirectVideoVideoPrompt = z.infer<typeof PoemsDirectVideoVideoPromptSchema>;
 
 /**
- * Poems Direct Video additional frame prompt type (inferred from schema)
+ * Poems Direct Video group frame prompt type (inferred from schema)
  */
-export type PoemsDirectVideoAdditionalFramePrompt = z.infer<typeof PoemsDirectVideoAdditionalFramePromptSchema>;
+export type PoemsDirectVideoGroupFramePrompt = z.infer<typeof PoemsDirectVideoGroupFramePromptSchema>;
 
 /**
  * Poems Direct Video output type (inferred from schema)

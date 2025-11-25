@@ -20,9 +20,9 @@ export interface ImagePromptWithLine {
 }
 
 /**
- * Interface for additional frame result
+ * Interface for group frame result
  */
-export interface AdditionalFrameResult {
+export interface GroupFrameResult {
   index: number;
   lines: string[];
   group_image_prompt: string;
@@ -30,23 +30,23 @@ export interface AdditionalFrameResult {
 }
 
 /**
- * Generate additional group frames (every 3 characters)
+ * Generate group frames (every 3 characters)
  * @param prompts - Array of image prompts to group
  * @param config - Pipeline configuration
  * @param options - Pipeline options
  * @param requests - Array to track LLM requests
- * @returns Array of additional frame results
+ * @returns Array of group frame results
  */
 export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLine>(
   prompts: TImagePrompt[],
   config: PipelineConfig<TImagePrompt, any>,
   options: PipelineOptions,
   requests: LLMRequest[]
-): Promise<AdditionalFrameResult[]> {
-  const additionalFrames: AdditionalFrameResult[] = [];
+): Promise<GroupFrameResult[]> {
+  const groupFrames: GroupFrameResult[] = [];
   
-  if (!options.generateAdditionalFrames) {
-    return additionalFrames;
+  if (!options.generateGroupFrames) {
+    return groupFrames;
   }
 
   if (options.emitLog && options.requestId) {
@@ -80,11 +80,14 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
       const threePrompts = group.map(p => `Line: "${p.line}"\nPrompt: ${p.prompt}`).join('\n\n');
       
       // Generate group image prompt with retry logic
+      // Save last generated version even if it exceeds length limit
       let groupImagePrompt = '';
+      let lastGeneratedImagePrompt = '';
       let imageAttempts = 0;
       const maxImageAttempts = 3;
+      const maxImagePromptLength = 1800;
       
-      while (imageAttempts < maxImageAttempts && !groupImagePrompt) {
+      while (imageAttempts < maxImageAttempts) {
         imageAttempts++;
         
         if (options.emitLog && options.requestId) {
@@ -112,24 +115,35 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
           
           if (parsed && typeof parsed === 'object' && parsed.group_image_prompt) {
             const candidatePrompt = parsed.group_image_prompt;
+            // Always save the last generated version
+            lastGeneratedImagePrompt = candidatePrompt;
             
             // Validate prompt length (max 1800 characters)
-            if (candidatePrompt.length <= 1800) {
+            if (candidatePrompt.length <= maxImagePromptLength) {
               groupImagePrompt = candidatePrompt;
               if (options.emitLog && options.requestId) {
                 options.emitLog(`✅ Group image prompt generated (${candidatePrompt.length} characters)`, options.requestId);
               }
+              break; // Found valid prompt, exit loop
             } else {
               if (options.emitLog && options.requestId) {
-                options.emitLog(`⚠️ Group image prompt too long: ${candidatePrompt.length} characters (max 1500). Retrying...`, options.requestId);
+                options.emitLog(`⚠️ Group image prompt too long: ${candidatePrompt.length} characters (max ${maxImagePromptLength}). Retrying...`, options.requestId);
               }
             }
           }
         }
         
-        if (!groupImagePrompt && imageAttempts < maxImageAttempts) {
+        if (imageAttempts < maxImageAttempts) {
           // Wait a bit before retry
           await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // If no valid prompt found but we have a last generated version, use it with warning
+      if (!groupImagePrompt && lastGeneratedImagePrompt) {
+        groupImagePrompt = lastGeneratedImagePrompt;
+        if (options.emitLog && options.requestId) {
+          options.emitLog(`⚠️ Using last generated group image prompt (${lastGeneratedImagePrompt.length} characters, exceeds max ${maxImagePromptLength})`, options.requestId);
         }
       }
 
@@ -141,11 +155,14 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
       }
 
       // Generate group video prompt with retry logic
+      // Save last generated version even if it exceeds length limit
       let groupVideoPrompt = '';
+      let lastGeneratedVideoPrompt = '';
       let videoAttempts = 0;
       const maxVideoAttempts = 3;
+      const maxVideoPromptLength = 1800;
       
-      while (videoAttempts < maxVideoAttempts && !groupVideoPrompt) {
+      while (videoAttempts < maxVideoAttempts) {
         videoAttempts++;
         
         if (options.emitLog && options.requestId) {
@@ -173,24 +190,35 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
           
           if (parsed && typeof parsed === 'object' && parsed.group_video_prompt) {
             const candidatePrompt = parsed.group_video_prompt;
+            // Always save the last generated version
+            lastGeneratedVideoPrompt = candidatePrompt;
             
-            // Validate prompt length (max 1500 characters)
-            if (candidatePrompt.length <= 1500) {
+            // Validate prompt length (max 1800 characters)
+            if (candidatePrompt.length <= maxVideoPromptLength) {
               groupVideoPrompt = candidatePrompt;
               if (options.emitLog && options.requestId) {
                 options.emitLog(`✅ Group video prompt generated (${candidatePrompt.length} characters)`, options.requestId);
               }
+              break; // Found valid prompt, exit loop
             } else {
               if (options.emitLog && options.requestId) {
-                options.emitLog(`⚠️ Group video prompt too long: ${candidatePrompt.length} characters (max 1500). Retrying...`, options.requestId);
+                options.emitLog(`⚠️ Group video prompt too long: ${candidatePrompt.length} characters (max ${maxVideoPromptLength}). Retrying...`, options.requestId);
               }
             }
           }
         }
         
-        if (!groupVideoPrompt && videoAttempts < maxVideoAttempts) {
+        if (videoAttempts < maxVideoAttempts) {
           // Wait a bit before retry
           await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // If no valid prompt found but we have a last generated version, use it with warning
+      if (!groupVideoPrompt && lastGeneratedVideoPrompt) {
+        groupVideoPrompt = lastGeneratedVideoPrompt;
+        if (options.emitLog && options.requestId) {
+          options.emitLog(`⚠️ Using last generated group video prompt (${lastGeneratedVideoPrompt.length} characters, exceeds max ${maxVideoPromptLength})`, options.requestId);
         }
       }
 
@@ -201,8 +229,8 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
         continue;
       }
 
-      // Add to additional frames
-      additionalFrames.push({
+      // Add to group frames
+      groupFrames.push({
         index: groupIndex,
         lines: group.map(p => p.line),
         group_image_prompt: groupImagePrompt,
@@ -215,7 +243,7 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
     }
     
     if (options.emitLog && options.requestId) {
-      options.emitLog(`✅ Successfully generated ${additionalFrames.length} group frames`, options.requestId);
+      options.emitLog(`✅ Successfully generated ${groupFrames.length} group frames`, options.requestId);
     }
   } catch (e) {
     if (options.emitLog && options.requestId) {
@@ -223,7 +251,7 @@ export async function generateGroupFrames<TImagePrompt extends ImagePromptWithLi
     }
   }
 
-  return additionalFrames;
+  return groupFrames;
 }
 
 /* END GENAI */

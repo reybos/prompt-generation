@@ -63,14 +63,14 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 // API endpoint for Halloween Patchwork generation
 app.post('/api/generate-halloween-patchwork', async (req, res) => {
     try {
-        const { input, generateAdditionalFrames } = req.body;
+        const { input, generateGroupFrames } = req.body;
         if (!input) {
             return res.status(400).json({ error: 'Missing input' });
         }
         // Generate a unique requestId for this generation
         const requestId = crypto.randomUUID();
         // Start Halloween Patchwork generation in the background (do not await)
-        processHalloweenPatchworkGeneration(input, requestId, generateAdditionalFrames)
+        processHalloweenPatchworkGeneration(input, requestId, generateGroupFrames)
             .catch(err => {
                 console.error('Error in background Halloween Patchwork generation:', err);
                 emitLog('Error during Halloween Patchwork generation: ' + (err?.message || err), requestId);
@@ -86,14 +86,14 @@ app.post('/api/generate-halloween-patchwork', async (req, res) => {
 // API endpoint for Halloween generation
 app.post('/api/generate-halloween', async (req, res) => {
     try {
-        const { input, generateAdditionalFrames } = req.body;
+        const { input, generateGroupFrames } = req.body;
         if (!input) {
             return res.status(400).json({ error: 'Missing input' });
         }
         // Generate a unique requestId for this generation
         const requestId = crypto.randomUUID();
         // Start Halloween generation in the background (do not await)
-        processHalloweenGeneration(input, requestId, generateAdditionalFrames)
+        processHalloweenGeneration(input, requestId, generateGroupFrames)
             .catch(err => {
                 console.error('Error in background Halloween generation:', err);
                 emitLog('Error during Halloween generation: ' + (err?.message || err), requestId);
@@ -109,14 +109,14 @@ app.post('/api/generate-halloween', async (req, res) => {
 // API endpoint for Halloween Transform generation
 app.post('/api/generate-halloween-transform', async (req, res) => {
     try {
-        const { input, generateAdditionalFrames } = req.body;
+        const { input, generateGroupFrames } = req.body;
         if (!input) {
             return res.status(400).json({ error: 'Missing input' });
         }
         // Generate a unique requestId for this generation
         const requestId = crypto.randomUUID();
         // Start Halloween Transform generation in the background (do not await)
-        processHalloweenTransformGeneration(input, requestId, generateAdditionalFrames)
+        processHalloweenTransformGeneration(input, requestId, generateGroupFrames)
             .catch(err => {
                 console.error('Error in background Halloween Transform generation:', err);
                 emitLog('Error during Halloween Transform generation: ' + (err?.message || err), requestId);
@@ -132,14 +132,14 @@ app.post('/api/generate-halloween-transform', async (req, res) => {
 // API endpoint for Halloween Transform Two Frame generation
 app.post('/api/generate-halloween-transform-two-frame', async (req, res) => {
     try {
-        const { input, generateAdditionalFrames } = req.body;
+        const { input, generateGroupFrames } = req.body;
         if (!input) {
             return res.status(400).json({ error: 'Missing input' });
         }
         // Generate a unique requestId for this generation
         const requestId = crypto.randomUUID();
         // Start Halloween Transform Two Frame generation in the background (do not await)
-        processHalloweenTransformTwoFrameGeneration(input, requestId, generateAdditionalFrames)
+        processHalloweenTransformTwoFrameGeneration(input, requestId, generateGroupFrames)
             .catch(err => {
                 console.error('Error in background Halloween Transform Two Frame generation:', err);
                 emitLog('Error during Halloween Transform Two Frame generation: ' + (err?.message || err), requestId);
@@ -242,7 +242,7 @@ function emitLog(log: string, requestId?: string): void {
 async function processHalloweenPatchworkGeneration(
     input: any,
     requestId: string,
-    generateAdditionalFrames?: boolean
+    generateGroupFrames?: boolean
 ): Promise<void> {
     const logs: string[] = [];
 
@@ -256,12 +256,12 @@ async function processHalloweenPatchworkGeneration(
         const result = await import('./pipeline/halloweenPatchworkPipeline.js').then(m => m.runHalloweenPatchworkPipeline(input, { 
             requestId, 
             emitLog: (log: string, reqId?: string) => emitLog(log, reqId), 
-            generateAdditionalFrames: generateAdditionalFrames || false
+            generateGroupFrames: generateGroupFrames || false
         }));
         
         // Emit completion message with results
-        const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
-        emitLog(`Halloween Patchwork generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+        const groupFramesInfo = generateGroupFrames ? ' (with group frames)' : '';
+        emitLog(`Halloween Patchwork generation complete${groupFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during Halloween Patchwork generation: ${err}`;
         logs.push(error);
@@ -273,7 +273,7 @@ async function processHalloweenPatchworkGeneration(
 async function processHalloweenGeneration(
     input: HalloweenInput,
     requestId: string,
-    generateAdditionalFrames?: boolean
+    generateGroupFrames?: boolean
 ): Promise<void> {
     const logs: string[] = [];
 
@@ -287,12 +287,12 @@ async function processHalloweenGeneration(
         const result = await import('./pipeline/halloweenDancePipeline.js').then(m => m.runHalloweenPipeline(input, {
             requestId, 
             emitLog: (log: string, reqId?: string) => emitLog(log, reqId),
-            generateAdditionalFrames: generateAdditionalFrames || false
+            generateGroupFrames: generateGroupFrames || false
         }));
         
         // Emit completion message with results
-        const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
-        emitLog(`Halloween generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+        const groupFramesInfo = generateGroupFrames ? ' (with group frames)' : '';
+        emitLog(`Halloween generation complete${groupFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during Halloween generation: ${err}`;
         logs.push(error);
@@ -304,7 +304,7 @@ async function processHalloweenGeneration(
 async function processHalloweenTransformGeneration(
     input: HalloweenInput,
     requestId: string,
-    generateAdditionalFrames?: boolean
+    generateGroupFrames?: boolean
 ): Promise<void> {
     const logs: string[] = [];
 
@@ -318,12 +318,12 @@ async function processHalloweenTransformGeneration(
         const result = await runHalloweenTransformPipeline(input, { 
             requestId, 
             emitLog: (log: string, reqId?: string) => emitLog(log, reqId),
-            generateAdditionalFrames: generateAdditionalFrames || false
+            generateGroupFrames: generateGroupFrames || false
         });
         
         // Emit completion message with results
-        const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
-        emitLog(`Halloween Transform generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+        const groupFramesInfo = generateGroupFrames ? ' (with group frames)' : '';
+        emitLog(`Halloween Transform generation complete${groupFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during Halloween Transform generation: ${err}`;
         logs.push(error);
@@ -335,7 +335,7 @@ async function processHalloweenTransformGeneration(
 async function processHalloweenTransformTwoFrameGeneration(
     input: HalloweenInput,
     requestId: string,
-    generateAdditionalFrames?: boolean
+    generateGroupFrames?: boolean
 ): Promise<void> {
     const logs: string[] = [];
 
@@ -349,12 +349,12 @@ async function processHalloweenTransformTwoFrameGeneration(
         const result = await runHalloweenTransformTwoFramePipeline(input, { 
             requestId, 
             emitLog: (log: string, reqId?: string) => emitLog(log, reqId),
-            generateAdditionalFrames: generateAdditionalFrames || false
+            generateGroupFrames: generateGroupFrames || false
         });
         
         // Emit completion message with results
-        const additionalFramesInfo = generateAdditionalFrames ? ' (with additional frames)' : '';
-        emitLog(`Halloween Transform Two Frame generation complete${additionalFramesInfo}. Generated ${result.length} song(s).`, requestId);
+        const groupFramesInfo = generateGroupFrames ? ' (with group frames)' : '';
+        emitLog(`Halloween Transform Two Frame generation complete${groupFramesInfo}. Generated ${result.length} song(s).`, requestId);
     } catch (err) {
         const error = `Error during Halloween Transform Two Frame generation: ${err}`;
         logs.push(error);

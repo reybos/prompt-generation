@@ -25,7 +25,7 @@ function createPoemsDirectVideoConfig(): PipelineConfig<any, PoemsDirectVideoVid
       // createImagePrompt is not needed when skipImageStep is true
       videoPrompt: poemsDirectVideoVideoPrompt,
       titlePrompt: poemsDirectVideoTitlePrompt,
-      // groupImagePrompt and groupVideoPrompt are not needed as additional frames are not supported
+      // groupImagePrompt and groupVideoPrompt are not needed as group frames are not supported
       groupImagePrompt: poemsDirectVideoVideoPrompt, // Placeholder, won't be used
       groupVideoPrompt: poemsDirectVideoVideoPrompt // Placeholder, won't be used
     },
@@ -66,7 +66,7 @@ function createPoemsDirectVideoConfig(): PipelineConfig<any, PoemsDirectVideoVid
       }));
     },
     
-    // Note: Additional frames are not supported for direct video pipeline
+    // Note: Group frames are not supported for direct video pipeline
     // as they require image prompts which are not generated
     
     // Skip image step - generate video prompts directly from lyrics

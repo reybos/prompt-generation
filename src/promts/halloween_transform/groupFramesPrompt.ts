@@ -8,14 +8,14 @@ import path from 'path';
 const __dirname = getDirname(import.meta.url);
 
 // Read prompt text with fallback to template
-let additionalFramesPromptTemplate: string;
-const actualPath = path.join(__dirname, 'prompts', 'additionalFramesPrompt.prompt.txt');
-const templatePath = path.join(__dirname, 'prompts', 'additionalFramesPrompt.prompt.template.txt');
+let groupFramesPromptTemplate: string;
+const actualPath = path.join(__dirname, 'prompts', 'groupFramesPrompt.prompt.txt');
+const templatePath = path.join(__dirname, 'prompts', 'groupFramesPrompt.prompt.template.txt');
 
 if (fs.existsSync(actualPath)) {
-    additionalFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
+    groupFramesPromptTemplate = fs.readFileSync(actualPath, 'utf-8');
 } else {
-    additionalFramesPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
+    groupFramesPromptTemplate = fs.readFileSync(templatePath, 'utf-8');
     console.warn('⚠️  Using template prompt for halloweenGroupImagePrompt. Copy .template.txt to .txt for production use.');
 }
 
@@ -25,7 +25,7 @@ if (fs.existsSync(actualPath)) {
  */
 export const halloweenTransformGroupImagePrompt = new PromptTemplate({ 
     inputVariables: ["prompts"],
-    template: additionalFramesPromptTemplate 
+    template: groupFramesPromptTemplate 
 });
 
 /**
@@ -90,3 +90,4 @@ export function logHalloweenTransformGroupVideoPrompt(
   console.log('Group Image Prompt:', groupImagePrompt);
   console.log('==========================================');
 }
+

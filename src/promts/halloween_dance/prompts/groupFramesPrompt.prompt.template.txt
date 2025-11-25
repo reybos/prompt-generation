@@ -19,3 +19,4 @@ Return your response as a JSON object with the following structure:
 {{
   "group_image_prompt": "The unified group prompt for thumbnail generation"
 }}
+

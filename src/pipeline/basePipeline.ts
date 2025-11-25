@@ -8,17 +8,17 @@ import { PipelineOptions, LLMRequest } from '../types/pipeline.js';
 import { executePipelineStepWithTracking, safeJsonParse } from '../utils/index.js';
 import { splitLyricsIntoSegments, groupVideoPromptsIntoSegments, savePipelineResult } from '../utils/pipelineCommon.js';
 import { PipelineConfig } from './pipelineConfig.js';
-import { generateGroupFrames, ImagePromptWithLine, AdditionalFrameResult } from './generateGroupFrames.js';
+import { generateGroupFrames, ImagePromptWithLine, GroupFrameResult } from './generateGroupFrames.js';
 import config from '../config/index.js';
 
 /**
  * Base pipeline result structure
  */
-export interface BasePipelineResult<TImagePrompt, TVideoPrompt, TAdditionalFrame> {
+export interface BasePipelineResult<TImagePrompt, TVideoPrompt, TGroupFrame> {
   prompts?: TImagePrompt[]; // Optional when skipImageStep is true
   video_prompts: TVideoPrompt[];
   titles: string[];
-  additional_frames?: TAdditionalFrame[];
+  group_frames?: TGroupFrame[];
   requests?: LLMRequest[];
 }
 
@@ -40,7 +40,7 @@ export async function runBasePipeline<
   TInputItem extends LyricsInputItem,
   TImagePrompt extends ImagePromptWithLine,
   TVideoPrompt extends { index: number; line: string; [key: string]: any },
-  TOutput extends BasePipelineResult<TImagePrompt, TVideoPrompt, AdditionalFrameResult>
+  TOutput extends BasePipelineResult<TImagePrompt, TVideoPrompt, GroupFrameResult>
 >(
   input: TInputItem[],
   pipelineConfig: PipelineConfig<TImagePrompt, TVideoPrompt>,
@@ -61,6 +61,9 @@ export async function runBasePipeline<
       attempt++;
       const requests: LLMRequest[] = [];
       
+      // If skipImageStep is not defined, default to false (don't skip)
+      const shouldSkipImageStep = pipelineConfig.skipImageStep === true;
+      
       try {
         if (options.emitLog && options.requestId) {
           options.emitLog(`${pipelineConfig.pipelineName} (${pipelineIdentifier})... (Attempt ${attempt})`, options.requestId);
@@ -69,7 +72,7 @@ export async function runBasePipeline<
         // Step 1: Generate image prompts (skip if skipImageStep is true)
         let prompts: TImagePrompt[] = [];
         
-        if (!pipelineConfig.skipImageStep) {
+        if (!shouldSkipImageStep) {
           if (options.emitLog && options.requestId) {
             options.emitLog(`🖼️ Generating image prompts for ${segments.length} segments...`, options.requestId);
           }
@@ -119,11 +122,13 @@ export async function runBasePipeline<
           if (options.emitLog && options.requestId) {
             options.emitLog(`⏭️ Skipping image prompts generation (direct video mode)...`, options.requestId);
           }
+          // Ensure prompts is empty when skipping
+          prompts = [];
         }
 
         // Step 2: Generate video prompts
         if (options.emitLog && options.requestId) {
-          if (pipelineConfig.skipImageStep) {
+          if (shouldSkipImageStep) {
             options.emitLog(`🎬 Generating video prompts directly from poem lyrics...`, options.requestId);
           } else {
             options.emitLog(`🎬 Generating video prompts for ${prompts.length} image prompts...`, options.requestId);
@@ -136,7 +141,7 @@ export async function runBasePipeline<
         try {
           let videoParams: Record<string, any>;
           
-          if (pipelineConfig.skipImageStep) {
+          if (shouldSkipImageStep) {
             // Generate video prompts directly from lyrics
             if (pipelineConfig.formatters.buildVideoParamsFromLyrics) {
               videoParams = pipelineConfig.formatters.buildVideoParamsFromLyrics(lyrics);
@@ -149,7 +154,7 @@ export async function runBasePipeline<
           } else {
             // Format image prompts for video step
             if (!pipelineConfig.formatters.formatImagePromptsForVideo) {
-              throw new Error('formatImagePromptsForVideo is required when skipImageStep is false');
+              throw new Error('formatImagePromptsForVideo is required when skipImageStep is not true');
             }
             
             const imagePromptsFormatted = pipelineConfig.formatters.formatImagePromptsForVideo(prompts);
@@ -312,36 +317,30 @@ export async function runBasePipeline<
           continue; // Retry the whole song
         }
 
-        // Step 4: Generate additional group frames (if requested)
+        // Step 4: Generate group frames (if requested)
         // Note: generateGroupFrames may need prompts, but if skipImageStep is true, we pass empty array
         // The function should handle this case or we need to modify it
-        let additionalFrames = await generateGroupFrames(
+        let groupFrames = await generateGroupFrames(
           prompts.length > 0 ? prompts : [] as any,
           pipelineConfig,
           options,
           requests
         );
 
-        // Apply post-processing to additional frames if configured
-        if (pipelineConfig.postProcessAdditionalFrames && additionalFrames.length > 0) {
-          additionalFrames = pipelineConfig.postProcessAdditionalFrames(additionalFrames);
+        // Apply post-processing to group frames if configured
+        if (pipelineConfig.postProcessGroupFrames && groupFrames.length > 0) {
+          groupFrames = pipelineConfig.postProcessGroupFrames(groupFrames);
         }
 
         // Create result object
         // If skipImageStep is true, don't include prompts field (undefined)
         const songResult: any = {
+          prompts: prompts.length > 0 ? prompts : undefined,
           video_prompts: videoPrompts,
           titles,
-          additional_frames: additionalFrames.length > 0 ? additionalFrames : undefined,
+          group_frames: groupFrames.length > 0 ? groupFrames : undefined,
           requests: requests.length > 0 ? requests : undefined
         };
-        
-        // Only include prompts if we generated them
-        if (!pipelineConfig.skipImageStep && prompts.length > 0) {
-          songResult.prompts = prompts;
-        }
-        
-        const finalResult = songResult as TOutput;
         
         results.push(songResult);
 

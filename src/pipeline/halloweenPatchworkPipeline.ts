@@ -1,4 +1,4 @@
-import { HalloweenPatchworkInput, HalloweenPatchworkOutput, HalloweenPatchworkImagePrompt, HalloweenPatchworkVideoPrompt, HalloweenPatchworkAdditionalFramePrompt } from '../types/pipeline.js';
+import { HalloweenPatchworkInput, HalloweenPatchworkOutput, HalloweenPatchworkImagePrompt, HalloweenPatchworkVideoPrompt, HalloweenPatchworkGroupFramePrompt } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { createImagePrompt } from '../promts/halloween_patchwork/imagePrompt.js';
 import { halloweenPatchworkVideoPrompt, halloweenPatchworkTitlePrompt, halloweenPatchworkLogVideoPrompt, halloweenPatchworkLogTitlePrompt, halloweenPatchworkGroupImagePrompt, halloweenPatchworkGroupVideoPrompt, logHalloweenPatchworkGroupImagePrompt, logHalloweenPatchworkGroupVideoPrompt } from '../promts/index.js';

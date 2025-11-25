@@ -46,7 +46,7 @@ const copyToast = document.getElementById('copyToast');
 const halloweenPatchworkLink = document.getElementById('halloween-patchwork-link');
 const halloweenPatchworkContent = document.getElementById('halloween-patchwork-content');
 const halloweenPatchworkForm = document.getElementById('halloweenPatchworkForm');
-const halloweenPatchworkAdditionalFrames = document.getElementById('halloweenPatchworkAdditionalFrames');
+const halloweenPatchworkGroupFrames = document.getElementById('halloweenPatchworkGroupFrames');
 const halloweenPatchworkResultsSection = document.getElementById('halloweenPatchworkResultsSection');
 const halloweenPatchworkResultsContainer = document.getElementById('halloweenPatchworkResultsContainer');
 const halloweenPatchworkErrorAlert = document.getElementById('halloweenPatchworkErrorAlert');
@@ -57,7 +57,7 @@ const halloweenPatchworkLoadingSpinner = document.getElementById('halloweenPatch
 const halloweenLink = document.getElementById('halloween-link');
 const halloweenContent = document.getElementById('halloween-content');
 const halloweenForm = document.getElementById('halloweenForm');
-const halloweenAdditionalFrames = document.getElementById('halloweenAdditionalFrames');
+const halloweenGroupFrames = document.getElementById('halloweenGroupFrames');
 const halloweenResultsSection = document.getElementById('halloweenResultsSection');
 const halloweenResultsContainer = document.getElementById('halloweenResultsContainer');
 const halloweenErrorAlert = document.getElementById('halloweenErrorAlert');
@@ -68,7 +68,7 @@ const halloweenLoadingSpinner = document.getElementById('halloweenLoadingSpinner
 const halloweenTransformLink = document.getElementById('halloween-transform-link');
 const halloweenTransformContent = document.getElementById('halloween-transform-content');
 const halloweenTransformForm = document.getElementById('halloweenTransformForm');
-const halloweenTransformAdditionalFrames = document.getElementById('halloweenTransformAdditionalFrames');
+const halloweenTransformGroupFrames = document.getElementById('halloweenTransformGroupFrames');
 const halloweenTransformResultsSection = document.getElementById('halloweenTransformResultsSection');
 const halloweenTransformResultsContainer = document.getElementById('halloweenTransformResultsContainer');
 const halloweenTransformErrorAlert = document.getElementById('halloweenTransformErrorAlert');
@@ -79,7 +79,7 @@ const halloweenTransformLoadingSpinner = document.getElementById('halloweenTrans
 const halloweenTransformTwoFrameLink = document.getElementById('halloween-transform-two-frame-link');
 const halloweenTransformTwoFrameContent = document.getElementById('halloween-transform-two-frame-content');
 const halloweenTransformTwoFrameForm = document.getElementById('halloweenTransformTwoFrameForm');
-const halloweenTransformTwoFrameAdditionalFrames = document.getElementById('halloweenTransformTwoFrameAdditionalFrames');
+const halloweenTransformTwoFrameGroupFrames = document.getElementById('halloweenTransformTwoFrameGroupFrames');
 const halloweenTransformTwoFrameResultsSection = document.getElementById('halloweenTransformTwoFrameResultsSection');
 const halloweenTransformTwoFrameResultsContainer = document.getElementById('halloweenTransformTwoFrameResultsContainer');
 const halloweenTransformTwoFrameErrorAlert = document.getElementById('halloweenTransformTwoFrameErrorAlert');
@@ -1519,9 +1519,9 @@ if (halloweenPatchworkForm) {
         if (halloweenPatchworkLoadingSpinner) halloweenPatchworkLoadingSpinner.classList.remove('d-none');
         
         const lyricsElem = document.getElementById('halloweenPatchworkLyrics');
-        const additionalFramesElem = document.getElementById('halloweenPatchworkAdditionalFrames');
+        const groupFramesElem = document.getElementById('halloweenPatchworkGroupFrames');
         const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
-        const generateAdditionalFrames = additionalFramesElem && additionalFramesElem.checked;
+        const generateGroupFrames = groupFramesElem && groupFramesElem.checked;
         
         if (!lyricsText) {
             if (halloweenPatchworkErrorAlert && halloweenPatchworkErrorMessage) {
@@ -1541,7 +1541,7 @@ if (halloweenPatchworkForm) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     input: songs,
-                    generateAdditionalFrames: generateAdditionalFrames
+                    generateGroupFrames: generateGroupFrames
                 })
             });
 
@@ -1600,9 +1600,9 @@ if (halloweenForm) {
         if (halloweenLoadingSpinner) halloweenLoadingSpinner.classList.remove('d-none');
         
         const lyricsElem = document.getElementById('halloweenLyrics');
-        const additionalFramesElem = document.getElementById('halloweenAdditionalFrames');
+        const groupFramesElem = document.getElementById('halloweenGroupFrames');
         const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
-        const generateAdditionalFrames = additionalFramesElem && additionalFramesElem.checked;
+        const generateGroupFrames = groupFramesElem && groupFramesElem.checked;
         
         if (!lyricsText) {
             if (halloweenErrorAlert && halloweenErrorMessage) {
@@ -1622,7 +1622,7 @@ if (halloweenForm) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     input: songs,
-                    generateAdditionalFrames: generateAdditionalFrames
+                    generateGroupFrames: generateGroupFrames
                 })
             });
 
@@ -1656,9 +1656,9 @@ if (halloweenTransformForm) {
         if (halloweenTransformLoadingSpinner) halloweenTransformLoadingSpinner.classList.remove('d-none');
         
         const lyricsElem = document.getElementById('halloweenTransformLyrics');
-        const additionalFramesElem = document.getElementById('halloweenTransformAdditionalFrames');
+        const groupFramesElem = document.getElementById('halloweenTransformGroupFrames');
         const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
-        const generateAdditionalFrames = additionalFramesElem && additionalFramesElem.checked;
+        const generateGroupFrames = groupFramesElem && groupFramesElem.checked;
         
         if (!lyricsText) {
             if (halloweenTransformErrorAlert && halloweenTransformErrorMessage) {
@@ -1678,7 +1678,7 @@ if (halloweenTransformForm) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     input: songs,
-                    generateAdditionalFrames: generateAdditionalFrames
+                    generateGroupFrames: generateGroupFrames
                 })
             });
 
@@ -1712,9 +1712,9 @@ if (halloweenTransformTwoFrameForm) {
         if (halloweenTransformTwoFrameLoadingSpinner) halloweenTransformTwoFrameLoadingSpinner.classList.remove('d-none');
         
         const lyricsElem = document.getElementById('halloweenTransformTwoFrameLyrics');
-        const additionalFramesElem = document.getElementById('halloweenTransformTwoFrameAdditionalFrames');
+        const groupFramesElem = document.getElementById('halloweenTransformTwoFrameGroupFrames');
         const lyricsText = lyricsElem && lyricsElem.value ? lyricsElem.value.trim() : '';
-        const generateAdditionalFrames = additionalFramesElem && additionalFramesElem.checked;
+        const generateGroupFrames = groupFramesElem && groupFramesElem.checked;
         
         if (!lyricsText) {
             if (halloweenTransformTwoFrameErrorAlert && halloweenTransformTwoFrameErrorMessage) {
@@ -1734,7 +1734,7 @@ if (halloweenTransformTwoFrameForm) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     input: songs,
-                    generateAdditionalFrames: generateAdditionalFrames
+                    generateGroupFrames: generateGroupFrames
                 })
             });
 

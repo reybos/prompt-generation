@@ -7,7 +7,7 @@
 import { PromptTemplate } from '@langchain/core/prompts';
 import { LLMOptions } from '../types/config.js';
 import { PipelineOptions } from '../types/pipeline.js';
-import { AdditionalFrameResult } from './generateGroupFrames.js';
+import { GroupFrameResult } from './generateGroupFrames.js';
 
 /**
  * Model and temperature configuration for a pipeline step
@@ -95,7 +95,7 @@ export interface PipelineConfig<TImagePrompt, TVideoPrompt> {
   // Post-processing hooks
   postProcessImagePrompts?: (prompts: TImagePrompt[]) => TImagePrompt[];
   postProcessVideoPrompts?: (prompts: TVideoPrompt[]) => TVideoPrompt[];
-  postProcessAdditionalFrames?: (frames: AdditionalFrameResult[]) => AdditionalFrameResult[];
+  postProcessGroupFrames?: (frames: GroupFrameResult[]) => GroupFrameResult[];
   
   // Step skipping options
   skipImageStep?: boolean; // If true, skip image prompt generation

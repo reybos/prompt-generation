@@ -14,5 +14,5 @@ export {
     halloweenPatchworkGroupVideoPrompt,
     logHalloweenPatchworkGroupImagePrompt,
     logHalloweenPatchworkGroupVideoPrompt
-} from './additionalFramesPrompt.js';
+} from './groupFramesPrompt.js';
 

@@ -9,5 +9,5 @@ export {
     logPoemsTitlePrompt
 } from './titleDescPrompt.js';
 export { poemsVideoPrompt, logPoemsVideoPrompt } from './videoPrompt.js';
-// Note: Additional frames are not supported for poems pipeline
+// Note: Group frames are not supported for poems pipeline
 

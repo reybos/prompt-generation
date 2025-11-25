@@ -1,4 +1,4 @@
-import { HalloweenInput, HalloweenImagePrompt, HalloweenAdditionalFramePrompt, HalloweenTransformVideoPrompt, HalloweenTransformOutput } from '../types/pipeline.js';
+import { HalloweenInput, HalloweenImagePrompt, HalloweenGroupFramePrompt, HalloweenTransformVideoPrompt, HalloweenTransformOutput } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
 import { createImagePromptWithStyle } from '../promts/halloween_transform_two_frame/imagePrompt.js';
 import { halloweenTransformTwoFrameVideoPrompt, halloweenTransformTwoFrameTitlePrompt, halloweenTransformTwoFrameLogVideoPrompt, halloweenTransformTwoFrameLogTitlePrompt, halloweenTransformTwoFrameGroupImagePrompt, halloweenTransformTwoFrameGroupVideoPrompt, logHalloweenTransformTwoFrameGroupImagePrompt, logHalloweenTransformTwoFrameGroupVideoPrompt } from '../promts/index.js';

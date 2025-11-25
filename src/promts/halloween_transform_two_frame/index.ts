@@ -19,5 +19,5 @@ export {
     halloweenTransformTwoFrameGroupVideoPrompt,
     logHalloweenTransformTwoFrameGroupImagePrompt,
     logHalloweenTransformTwoFrameGroupVideoPrompt
-} from './additionalFramesPrompt.js';
+} from './groupFramesPrompt.js';
 
