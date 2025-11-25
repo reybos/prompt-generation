@@ -1878,6 +1878,8 @@ if (poemsForm) {
                     poemsLyrics.value = formatted;
                     // Update original to the formatted version
                     poemsOriginalLyrics = formatted;
+                    // Sync Lines per video to 1 since we formatted as if linesPerVideo = 1
+                    poemsLinesPerVideo.value = "1";
                 }
             }
         });
@@ -1995,6 +1997,8 @@ if (poemsDirectVideoForm) {
                     poemsDirectVideoLyrics.value = formatted;
                     // Update original to the formatted version
                     poemsDirectVideoOriginalLyrics = formatted;
+                    // Sync Lines per video to 1 since we formatted as if linesPerVideo = 1
+                    poemsDirectVideoLinesPerVideo.value = "1";
                 }
             }
         });
