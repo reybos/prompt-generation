@@ -14,4 +14,5 @@ export {
     halloweenGroupVideoPrompt,
     logHalloweenGroupImagePrompt,
     logHalloweenGroupVideoPrompt
-} from './groupFramesPrompt.js'; 
+} from './groupFramesPrompt.js';
+export { getVideoPromptStyleSuffix } from './videoPromptStyle.js'; 

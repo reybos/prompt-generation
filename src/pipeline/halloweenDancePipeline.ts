@@ -1,9 +1,10 @@
 import { HalloweenInput, HalloweenOutput, HalloweenImagePrompt, HalloweenVideoPrompt, HalloweenGroupFramePrompt } from '../types/pipeline.js';
 import { PipelineOptions } from '../types/pipeline.js';
-import { createImagePromptWithStyle } from '../promts/halloween_dance/index.js';
+import { createImagePromptWithStyle, getVideoPromptStyleSuffix } from '../promts/halloween_dance/index.js';
 import { halloweenVideoPrompt, halloweenTitlePrompt, halloweenLogVideoPrompt, halloweenLogTitlePrompt, halloweenGroupImagePrompt, halloweenGroupVideoPrompt, logHalloweenGroupImagePrompt, logHalloweenGroupVideoPrompt } from '../promts/index.js';
 import { PipelineConfig } from './pipelineConfig.js';
 import { runBasePipeline } from './basePipeline.js';
+import { GroupFrameResult } from './generateGroupFrames.js';
 
 /**
  * Create pipeline configuration for Halloween dance
@@ -53,6 +54,24 @@ function createHalloweenDanceConfig(): PipelineConfig<HalloweenImagePrompt, Hall
         }
         return null;
       }
+    },
+    
+    // Post-processing: append style suffix to video prompts
+    postProcessVideoPrompts: (prompts: HalloweenVideoPrompt[]) => {
+      const styleSuffix = getVideoPromptStyleSuffix();
+      return prompts.map(prompt => ({
+        ...prompt,
+        video_prompt: prompt.video_prompt + "; " + styleSuffix
+      }));
+    },
+    
+    // Post-processing: append style suffix to group frames
+    postProcessGroupFrames: (frames: GroupFrameResult[]) => {
+      const styleSuffix = getVideoPromptStyleSuffix();
+      return frames.map(frame => ({
+        ...frame,
+        group_video_prompt: frame.group_video_prompt + "; " + styleSuffix
+      }));
     },
     
     stepNames: {
